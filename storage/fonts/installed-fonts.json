@@ -1,0 +1,15 @@
+{
+    "raleway": {
+        "100": "D:\\LAMVIEC\\fivevai_vv\\storage\\fonts\/raleway_100_19d6175205ce7a6195ce3c34cb0a6612",
+        "600": "raleway_600_680162e22c2503082b6c31a243da744a"
+    },
+    "aozoraminchomedium": {
+        "normal": "aozoraminchomedium_normal_15682712cc2157ccfc8356edc29983fe"
+    },
+    "notosans": {
+        "normal": "notosans_normal_345dd61aa4d6b22bbfd879667245d92e"
+    },
+    "ibmplexsansjp": {
+        "normal": "ibmplexsansjp_normal_76edf6c0ac75756b8735f26569e78fbf"
+    }
+}
