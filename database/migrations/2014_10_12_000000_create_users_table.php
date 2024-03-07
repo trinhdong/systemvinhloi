@@ -18,13 +18,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->integer('role');
+            $table->integer('is_admin')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

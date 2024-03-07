@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->integer('status')->default(0);
             $table->date('order_date');
             $table->string('shipping_address')->nullable();
-            $table->string('postal_code')->nullable();
+            $table->string('shipping_service_address')->nullable();
             $table->text('note')->nullable();
             $table->string('payment_method')->nullable();
             $table->date('payment_date')->nullable();

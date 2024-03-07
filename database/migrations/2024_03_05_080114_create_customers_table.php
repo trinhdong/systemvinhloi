@@ -18,10 +18,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
-            $table->string('zip_code')->nullable();
-            $table->string('credit_card_number')->nullable();
-            $table->string('credit_card_name')->nullable();
-            $table->date('credit_card_expiration')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
