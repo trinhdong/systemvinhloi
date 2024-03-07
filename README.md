@@ -8,35 +8,12 @@
 </p>
 
 ## About Project
-
-YamaPlus is a company that deals in items such as clothing and products for home and life. This system was created to support the company's digital transformation and manage data effectively.
-
-The system includes the following main features:
-
-Sales Document Management
-The system allows you to save sales documents with ease. This ensures that all sales records are kept in a centralized location, making it easy to access and manage.
-
-Employee Management
-The employee management feature allows you to manage all employee information in one place. This includes personal information, job responsibilities, and work schedules.
-
-Customer Management
-The customer management feature helps you to manage customer information, including contact details and purchasing history. This allows you to provide better customer service and build long-lasting relationships.
-
-Revenue Management
-The revenue management feature provides you with an overview of your company's revenue, including sales and expenses. This helps you make informed business decisions and plan for future growth.
-
-Data Entry and Contract Drafting Support
-The system provides support in data entry and contract drafting, making it easier for you to keep track of all necessary information. This helps to minimize errors and ensures that all contracts are properly documented.
-
-Overall, YamaPlus provides a comprehensive solution for managing the day-to-day operations of your business. With its range of features, you can streamline your processes and make data-driven decisions to drive growth and success.
-
 ## Technology in used:
 
 -   [Laravel](https://laravel.com/docs/9.x) => Version 9
 -   PHP => Version 8
 -   Bootstrap 5
 -   Database => Mysql
--   Laravel-filemanager => Version 2.5
 
 ## Setup and Run Source
 
