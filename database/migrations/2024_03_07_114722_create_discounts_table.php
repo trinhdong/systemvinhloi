@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('customer_id');
             $table->decimal('discount_percent', 10, 2);
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->foreign('product_id')->references('id')->on('products');
             $table->foreign('customer_id')->references('id')->on('customers');

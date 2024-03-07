@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('quantity')->default(0);
             $table->text('description')->nullable();
             $table->string('attributes')->nullable();
+            $table->string('unit')->nullable();
             $table->string('image_url')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
