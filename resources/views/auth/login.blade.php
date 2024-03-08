@@ -37,7 +37,7 @@
                                     @csrf
                                     <div class="row g-3">
                                         <div class="col-12">
-                                            <label for="inputEmailAddress" class="form-label">メールアドレス</label>
+                                            <label for="inputEmailAddress" class="form-label">Email</label>
                                             <div class="ms-auto position-relative">
                                                 <div
                                                     class="position-absolute top-50 translate-middle-y search-icon px-3">
@@ -45,7 +45,7 @@
                                                 </div>
                                                 <input id="email" type="email" class="form-control radius-30 ps-5"
                                                     name="email" value="{{ old('email') }}" required
-                                                    autocomplete="email" autofocus placeholder="メールアドレス">
+                                                    autocomplete="email" autofocus placeholder="Email">
                                                 @error('email')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -54,7 +54,7 @@
                                             </div>
                                         </div>
                                         <div class="col-12">
-                                            <label for="inputChoosePassword" class="form-label">パスワード</label>
+                                            <label for="inputChoosePassword" class="form-label">Mật khẩu</label>
                                             <div class="ms-auto position-relative">
                                                 <div
                                                     class="position-absolute top-50 translate-middle-y search-icon px-3">
@@ -62,7 +62,7 @@
                                                 </div>
                                                 <input id="password" type="password"
                                                     class="form-control radius-30 ps-5" name="password" required
-                                                    autocomplete="current-password" placeholder="パスワード">
+                                                    autocomplete="current-password" placeholder="Mật khẩu">
                                                 @error('password')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
