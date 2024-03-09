@@ -53,4 +53,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function hasRole($role)
+    {
+        // Logic kiểm tra vai trò, ví dụ:
+        return $this->role === $role;
+    }
 }

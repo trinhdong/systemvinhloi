@@ -23,14 +23,14 @@
             <ul class="dropdown-menu dropdown-menu-end">
               @if (auth()->check())
                   <li>
-                    <a class="dropdown-item" href="{{ route('detail-user',Auth::user()->id) }}">
+                    <a class="dropdown-item" href="{{ route('user.detail',Auth::user()->id) }}">
                       <div class="d-flex align-items-center">
                         <img src="assets/images/avatars/person.png" alt=""
                             class="rounded-circle" width="54" height="54">
                         <div class="ms-3">
                           <h6 class="mb-0 dropdown-user-name">{{ Auth::user()->name }}</h6>
                           <small class="mb-0 dropdown-user-designation text-secondary">
-                            @foreach (App\Enums\EUserRole::getArray() as $key => $type)
+                            @foreach (ROLE_TYPE_NAME as $key => $type)
                                 @if ($key === Auth::user()->role)
                                   {{ $type }}
                                 @endif

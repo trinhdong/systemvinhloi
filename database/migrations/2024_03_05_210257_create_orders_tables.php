@@ -28,9 +28,6 @@ return new class extends Migration {
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
-
-            // Foreign key
-            $table->foreign('customer_id')->references('id')->on('customers');
         });
     }
 

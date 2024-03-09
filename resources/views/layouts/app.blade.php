@@ -161,10 +161,10 @@
             //modal logout
             $('.btn-logout').click(function(){
               Swal.fire({
-                  title: '{{ __('message.message_do_you_want_to_logout') }}',
+                  title: 'Ban co muon dang xuat khong?',
                   showDenyButton: true,
-                  confirmButtonText: '{{ __('ログアウト') }}',
-                  denyButtonText: '{{__('admin.btn_back') }}',
+                  confirmButtonText: '{{ __('Ok') }}',
+                  denyButtonText: '{{__('Cancel') }}',
                   customClass: {
                       confirmButton: 'swal-btn',
                       denyButton: 'swal-btn'

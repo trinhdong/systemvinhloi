@@ -42,15 +42,19 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        var_dump('s');exit;
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            // Nếu đăng nhập thành công
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/');
         }
 
-        // Nếu đăng nhập thất bại
         return redirect()->route('login')->withErrors(['loginError' => 'Invalid email or password']);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+
+        return redirect('/login');
     }
 }
