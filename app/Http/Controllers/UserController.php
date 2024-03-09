@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\UserCreateRequest;
-use App\Http\Requests\UserEditRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Services\UserService;
-use App\Services\BusinessLocationService;
 use App\Enums\EUserRole;
 
 class UserController extends Controller
@@ -15,9 +12,8 @@ class UserController extends Controller
     protected $userService;
     protected $businessLocationService;
 
-    public function __construct (UserService $userService, BusinessLocationService $businessLocationService) {
+    public function __construct (UserService $userService) {
         $this->userService = $userService;
-        $this->businessLocationService = $businessLocationService;
     }
 
     /**

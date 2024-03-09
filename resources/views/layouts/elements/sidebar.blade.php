@@ -9,73 +9,71 @@
     </div>
     <!--navigation-->
     <ul class="metismenu" id="menu">
-        @if (Auth::user()->is_admin == 1)
             <li>
-                <a href="{{ Route('list-business') }}" class="">
+                <a href="" class="">
                 <div class="parent-icon"><i class="bi bi-house-fill"></i>
                 </div>
-                <div class="menu-title">{{__('admin.business_location_list')}}</div>
+                <div class="menu-title">das</div>
                 </a>
             </li>
-        @endif
       <li>
-        <a href="{{route('list-user')}}" class="">
+        <a href="#" class="">
           <div class="parent-icon"><i class="bi bi-person-circle"></i>
           </div>
           <div class="menu-title">{{__('admin.user_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('list-moproduct')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-ui-checks"></i>
           </div>
           <div class="menu-title">{{__('admin.manufacture_product_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('list-oproduct')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-cash-stack"></i>
           </div>
           <div class="menu-title">{{__('admin.original_product_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('list-customer')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-person-circle"></i>
           </div>
           <div class="menu-title">{{__('admin.customer_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('list-supplier')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-cash-stack"></i>
           </div>
           <div class="menu-title">{{__('admin.supplier_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('supplier-contract.list')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-ui-checks"></i>
           </div>
           <div class="menu-title">{{__('admin.supplier_contract_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('original-contract-list')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-cash-stack"></i>
           </div>
           <div class="menu-title">{{__('admin.original_contract_list')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('billing-manager')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-cash"></i>
           </div>
           <div class="menu-title">{{__('admin.billing_management')}}</div>
         </a>
       </li>
       <li>
-        <a href="{{route('list-pay')}}" class="">
+        <a href="" class="">
           <div class="parent-icon"><i class="bi bi-cash"></i>
           </div>
           <div class="menu-title">支払い管理</div>
@@ -87,9 +85,9 @@
           </div>
           <div class="menu-title cursor-pointer">{{ __('ログアウト') }}</div>
         </a>
-        <form id="logout-form-menu" action="{{ route('logout') }}" method="POST" class="d-none">
+        <form id="logout-form-menu" action="" method="POST" class="d-none">
           @csrf
-        </form> 
+        </form>
       </li>
     </ul>
     <!--end navigation-->

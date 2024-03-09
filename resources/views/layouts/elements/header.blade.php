@@ -23,7 +23,7 @@
             <ul class="dropdown-menu dropdown-menu-end">
               @if (auth()->check())
                   <li>
-                    <a class="dropdown-item" href="{{ route('detail-user',Auth::user()->id) }}">
+                    <a class="dropdown-item" href="#">
                       <div class="d-flex align-items-center">
                         <img src="assets/images/avatars/person.png" alt=""
                             class="rounded-circle" width="54" height="54">

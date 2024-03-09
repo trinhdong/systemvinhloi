@@ -15,19 +15,23 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::middleware('auth')->group(function () {
-    //user
-    Route::controller(UserController::class)->group(function () {
-        Route::get('/', 'getListUser')->name('list-user');
-        Route::prefix('user')->group(function () {
-            Route::get('/list', 'getListUser')->name('list-user');
-            Route::get('/detail/{id}', 'viewUser')->name('detail-user');
-            Route::middleware(['productmanager','accountant','seller','sellerdepartment'])->group(function () {
-                Route::get('/add', 'addUser')->name('add-user');
-                Route::post('/add', 'createUser')->name('create-user');
-                Route::get('/edit/{id}', 'viewUserEdit')->name('edit-user');
-                Route::post('/edit/{id}', 'editUser')->name('edited-user');
-                Route::post('/delete', 'deleteUser')->name('delete-user');
-            });
-        });
+//    dashboard
+    Route::controller(DashboardController::class)->group(function () {
+        Route::get('/', 'index')->name('dashboard');
     });
+    //user
+//    Route::controller(UserController::class)->group(function () {
+//        Route::get('/', 'getListUser')->name('list-user');
+//        Route::prefix('user')->group(function () {
+//            Route::get('/list', 'getListUser')->name('list-user');
+//            Route::get('/detail/{id}', 'viewUser')->name('detail-user');
+//            Route::middleware(['productmanager','accountant','seller','sellerdepartment'])->group(function () {
+//                Route::get('/add', 'addUser')->name('add-user');
+//                Route::post('/add', 'createUser')->name('create-user');
+//                Route::get('/edit/{id}', 'viewUserEdit')->name('edit-user');
+//                Route::post('/edit/{id}', 'editUser')->name('edited-user');
+//                Route::post('/delete', 'deleteUser')->name('delete-user');
+//            });
+//        });
+//    });
 });
