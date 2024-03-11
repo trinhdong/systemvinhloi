@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UserCreateRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Services\UserService;
-use App\Services\BusinessLocationService;
 
 class UserController extends Controller
 {
