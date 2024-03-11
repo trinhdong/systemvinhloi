@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
@@ -55,7 +54,6 @@ class User extends Authenticatable
 
     public function hasRole($role)
     {
-        // Logic kiểm tra vai trò, ví dụ:
         return $this->role === $role;
     }
 }

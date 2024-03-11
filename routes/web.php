@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/', 'UserController@index')->middleware('checkrole:user');
+Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::controller(UserController::class)->group(function () {
-        Route::get('/', 'getListUser')->name('list-user');
-        Route::prefix('user')->group(function () {
-            Route::get('/list', 'getListUser')->name('list-user');
-            Route::get('/detail/{id}', 'viewUser')->name('detail-user');
-        });
+    Route::prefix('user')->group(function () {
+        Route::get('/list', [UserController::class, 'getListUser'])->name('user.list');
+        Route::get('/detail/{id}', [UserController::class, 'viewUser'])->name('user.detail');
     });
 });
