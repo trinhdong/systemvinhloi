@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,5 +16,9 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/list', [UserController::class, 'getListUser'])->name('user.list');
         Route::get('/detail/{id}', [UserController::class, 'viewUser'])->name('user.detail');
+    });
+
+    Route::prefix('area')->group(function () {
+        Route::get('/', [AreaController::class, 'index'])->name('area.list');
     });
 });

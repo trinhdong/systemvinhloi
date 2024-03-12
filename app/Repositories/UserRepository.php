@@ -3,33 +3,33 @@ namespace App\Repositories;
 
 use App\Models\User;
 
-class UserRepository
+class UserRepository extends BaseRepository
 {
-    public function getAllUsers()
+    protected $user;
+    /**
+     * Create a new repository instance.
+     * Created at: 12/03/2024
+     * Created by: Hieu
+     *
+     * @param  \App\Models\User  $accept
+     * @return void
+     */
+    public function __construct(User $user)
     {
-        return User::all();
+        $this->user = $user;
+        $this->setModel();
     }
 
-    public function getUserById($id)
+    /**
+     * Setting model want to interact
+     * Created at: 12/03/2023
+     * Created by: Hieu
+     *
+     * @access public
+     * @return string
+     */
+    public function getModel()
     {
-        return User::find($id);
-    }
-
-    public function createUser(array $data)
-    {
-        return User::create($data);
-    }
-
-    public function updateUser($id, array $data)
-    {
-        $user = User::find($id);
-        $user->update($data);
-        return $user;
-    }
-
-    public function deleteUser($id)
-    {
-        $user = User::find($id);
-        $user->delete();
+        return User::class;
     }
 }
