@@ -131,7 +131,7 @@
     $(document).ready(function() {
             @if (Session::get('flash_level') == 'success')
               Lobibox.notify('success', {
-                title: '成功',
+                title: 'Thành công',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
                 position: 'top right',
@@ -140,7 +140,7 @@
               });
             @elseif (Session::get('flash_level') == 'warning')
               Lobibox.notify('warning', {
-                title: '注意',
+                title: 'Cảnh báo',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
                 position: 'top right',
@@ -149,7 +149,7 @@
               });
             @elseif (Session::get('flash_level') == 'error')
               Lobibox.notify('error', {
-                title: 'エラー',
+                title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
                 position: 'top right',

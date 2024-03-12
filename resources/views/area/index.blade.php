@@ -16,54 +16,42 @@
                 <div class="col-sm-4 mb-2">
                     <form class="position-relative">
                         <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-search"></i></div>
-                        <input class="form-control ps-5 rounded" type="text" placeholder="検索" name="user_name" value="{{ request()->input('user_name') }}">
+                        <input class="form-control ps-5 rounded" type="text" placeholder="Nhập nội dung tìm kiếm" name="user_name" value="">
                     </form>
                 </div>
-                @if (Auth::user()->is_admin == true || Auth::user()->role == 2)
                     <div class="col-sm-5 col-md-4 col-lg-4 mb-2">
-                        <a href="{{route('add-user')}}" type="button" class="btn btn-primary px-5 float-end">{{__('admin.user_add')}}</a>
+                        <a href="{{route('area.create.show')}}" type="button" class="btn btn-primary px-5 float-end">Tạo khu vực</a>
                     </div>
-                @endif
             </div>
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive mt-3">
+                        @if($areaList && $areaList->count() > 0)
                         <table class="table align-middle last-child-right">
                             <thead class="table-secondary">
                             <tr>
-                                <th>{{__('admin.code')}}</th>
-                                <th>{{__('admin.user_name')}}</th>
-                                <th>{{__('admin.user_mail')}}</th>
-                                <th>{{__('admin.user_role')}}</th>
-                                @if (Auth::user()->is_admin == 1)
-                                    <th>{{__('admin.business_location_name')}}</th>
-                                @endif
+                                <th>Số thứ tự</th>
+                                <th>Tên khu vực</th>
+                                <th>Nội dung khi vực</th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($users as $user)
+                            @php
+                                $currentPage = $areaList->currentPage();
+                                $perPage = $areaList->perPage();
+                                $currentItem = ($currentPage - 1) * $perPage;
+                            @endphp
+                            @foreach($areaList as $key => $item)
                                 <tr>
-                                    <td>{{$user->user_code}}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3 cursor-pointer">
-                                            <div class="">
-                                                <p class="mb-0">{{$user->name}}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{{$user->email}}</td>
-                                    <td>{{$user->rolename}}</td>
-                                    @if (Auth::user()->is_admin == 1)
-                                        <td>{{!empty($user->businessLocation->name) ? $user->businessLocation->name : "本社"}}</td>
-                                    @endif
+                                    <td>{{++$currentItem}}</td>
+                                    <td>{{$item->name}}</td>
+                                    <td>{{$item->description}}</td>
                                     <td>
                                         <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                            <a href="{{route('detail-user',$user->id)}}" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="詳細"><i class="bi bi-eye-fill"></i></a>
-                                            @if (Auth::user()->is_admin == 1 || Auth::user()->role == 2)
-                                                <a href="{{route('edit-user',$user->id)}}" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="編集"><i class="bi bi-pencil-fill"></i></a>
-                                                <a class="text-danger delete-user" data-bs-toggle="tooltip" data-bs-placement="bottom" title="削除" data-id="{{ $user->id }}"><i class="bi bi-trash-fill"></i></a>
-                                            @endif
+                                            <a href="#" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="詳細"><i class="bi bi-eye-fill"></i></a>
+                                                <a href="#" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="編集"><i class="bi bi-pencil-fill"></i></a>
+                                                <a class="text-danger delete-user" data-bs-toggle="tooltip" data-bs-placement="bottom" title="削除" data-id=""><i class="bi bi-trash-fill"></i></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -71,8 +59,9 @@
                             </tbody>
                         </table>
                         <div class=" justify-content-center">
-                            {!! $users->links('pagination::bootstrap-5') !!}
+                            {!! $areaList->links('pagination::bootstrap-5') !!}
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

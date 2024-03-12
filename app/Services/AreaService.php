@@ -1,39 +1,40 @@
 <?php
+
 namespace App\Services;
 
-use App\Repositories\UserRepository;
+use App\Repositories\AreaRepository;
+use Hash;
+use Log;
 
-class AreaService
+class AreaService extends BaseService
 {
-    protected $userRepository;
 
-    public function __construct(UserRepository $userRepository)
+    protected $areaRepository;
+
+    /**
+     * Method: __construct
+     * Created at: 12/03/2024
+     * Created by: Hieu
+     *
+     * @param App\Repositories\AreaRepository $areaRepository
+     * @access public
+     * @return void
+     */
+    public function __construct(AreaRepository $areaRepository)
     {
-        $this->userRepository = $userRepository;
+        $this->areaRepository = $areaRepository;
+        $this->setRepository();
     }
 
-    public function getAllUsers()
-    {
-        return $this->userRepository->getAllUsers();
-    }
-
-    public function getUserById($id)
-    {
-        return $this->userRepository->getUserById($id);
-    }
-
-    public function createUser(array $data)
-    {
-        return $this->userRepository->createUser($data);
-    }
-
-    public function updateUser($id, array $data)
-    {
-        return $this->userRepository->updateUser($id, $data);
-    }
-
-    public function deleteUser($id)
-    {
-        return $this->userRepository->deleteUser($id);
+    /**
+     * Setting repository want to interact
+     * Created at: 12/03/2024
+     * Created by: Hieu
+     *
+     * @access public
+     * @return Repository
+     */
+    public function getRepository(){
+        return AreaRepository::class;
     }
 }

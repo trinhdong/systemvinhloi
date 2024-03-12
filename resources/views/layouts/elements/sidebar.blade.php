@@ -16,6 +16,13 @@
           <div class="menu-title">Quan ly nhan vien</div>
         </a>
       </li>
+        <li>
+            <a href="{{route('area.list')}}" class="">
+                <div class="parent-icon"><i class="bi bi-person-circle"></i>
+                </div>
+                <div class="menu-title">Quản lý khu vực</div>
+            </a>
+        </li>
       <li>
         <a class="btn-logout" >
           <div class="parent-icon"><i class="bi bi-person-circle"></i>
@@ -24,7 +31,7 @@
         </a>
         <form id="logout-form-menu" action="{{ route('logout') }}" method="POST" class="d-none">
           @csrf
-        </form> 
+        </form>
       </li>
     </ul>
     <!--end navigation-->

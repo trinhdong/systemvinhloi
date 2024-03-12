@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
-use App\Services\BaseService;
-use Illuminate\Http\Request;
 use Hash;
 use Log;
 
