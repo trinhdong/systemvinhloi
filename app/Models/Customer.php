@@ -19,4 +19,9 @@ class Customer extends Model
         'updated_by',
         'deleted_at',
     ];
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
 }

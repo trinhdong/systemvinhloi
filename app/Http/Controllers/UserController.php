@@ -23,7 +23,7 @@ class UserController extends Controller
 
     public function detail($id)
     {
-        $user = $this->userService->getUserById($id);
+        $user = $this->userService->find($id);
         return view('user.detail', compact('user'));
     }
 
@@ -36,17 +36,17 @@ class UserController extends Controller
         $data = $request->only(['name', 'email', 'password', 'role']);
         $user = $this->userService->createUser($data);
         if ($user) {
-            return redirect()->route('user.index')->with('success', 'Thêm người dùng thành công');
+            return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Thêm nhân viên thành công']);
         }
 
-        return redirect()->route('user.index')->with('error', 'Lỗi không thể thêm người dùng');
+        return redirect()->route('user.add')->with(['flash_level' => 'error', 'flash_message' => 'Lỗi không thể thêm nhân viên']);
     }
 
     public function edit(CreateUpdateUserRequest $request, $id)
     {
-        $user = $this->userService->getUserById($id);
+        $user = $this->userService->find($id);
         if (!$user) {
-            return redirect()->route('user.index')->with('error', 'Người dùng không tồn tại');
+            return redirect()->route('user.index')->with(['flash_level' => 'error', 'flash_message' => 'Nhân viên không tồn tại']);
         }
 
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
@@ -56,18 +56,18 @@ class UserController extends Controller
         $data = $request->only(['name', 'email', 'password', 'role']);
         $updated = $this->userService->updateUser($user->id, $data);
         if ($updated) {
-            return redirect()->route('user.index')->with('success', 'Cập nhật người dùng thành công');
+            return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Cập nhật nhân viên thành công']);
         }
 
-        return redirect()->route('user.index')->with('error', 'Lỗi không thể cập nhật người dùng');
+        return redirect()->route('user.edit')->with(['flash_level' => 'error', 'flash_message' => 'Lỗi không thể cập nhật nhân viên']);
     }
 
     public function delete($id)
     {
-        $user = $this->userService->deleteUser($id);
+        $user = $this->userService->delete($id);
         if ($user) {
-            return redirect()->route('user.index')->with('success', 'Xóa thành công');
+            return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Xóa thành công']);
         }
-        return redirect()->route('user.index')->with('error', 'Lỗi không thể xóa nhân viên');
+        return redirect()->route('user.index')->with(['flash_level' => 'error', 'flash_message' => 'Lỗi không thể xóa nhân viên']);
     }
 }
