@@ -108,5 +108,5 @@
     </div>
 @endsection
 @section('script')
-    <script src="js/users/index.js"></script>
+    <script src="js/user/index.js"></script>
 @endsection
