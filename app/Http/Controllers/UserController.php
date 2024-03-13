@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUpdateUserRequest;
@@ -9,8 +10,7 @@ class UserController extends Controller
 {
     protected $userService;
 
-    public function __construct(UserService $userService)
-    {
+    public function __construct (UserService $userService) {
         $this->userService = $userService;
     }
 

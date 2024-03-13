@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +22,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::get('/add', [UserController::class, 'add'])->name('user.add');
         Route::post('/add', [UserController::class, 'add'])->name('user.create');
     });
+});
+Route::prefix('area')->group(function () {
+    Route::get('/', [AreaController::class, 'index'])->name('area.list');
 });
