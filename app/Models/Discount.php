@@ -15,5 +15,6 @@ class Discount extends Model
         'discount_percent',
         'created_by',
         'updated_by',
+        'deleted_at',
     ];
 }

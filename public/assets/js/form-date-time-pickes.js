@@ -3,7 +3,7 @@ $(function() {
 
     $('.datepicker').pickadate({
         selectMonths: true,
-        selectYears: true
+        selectYears: true,
     }),
     $('.timepicker').pickatime()
 

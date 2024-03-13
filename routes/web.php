@@ -6,14 +6,19 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/', 'UserController@index')->middleware('checkrole:user');
+Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::controller(UserController::class)->group(function () {
-        Route::get('/', 'getListUser')->name('list-user');
-        Route::prefix('user')->group(function () {
-            Route::get('/list', 'getListUser')->name('list-user');
-            Route::get('/detail/{id}', 'viewUser')->name('detail-user');
-        });
+    Route::prefix('user')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('user.index');
+        Route::get('/detail/{id}', [UserController::class, 'detail'])->name('user.detail');
+        Route::delete('/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
+        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
+        Route::put('/edit/{id}', [UserController::class, 'edit'])->name('user.update');
+        Route::get('/add', [UserController::class, 'add'])->name('user.add');
+        Route::post('/add', [UserController::class, 'add'])->name('user.create');
     });
 });

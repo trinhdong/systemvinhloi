@@ -18,5 +18,6 @@ class Customer extends Model
         'shipping_service_address',
         'created_by',
         'updated_by',
+        'deleted_at',
     ];
 }

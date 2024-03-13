@@ -17,5 +17,6 @@ class OrderDetail extends Model
         'note',
         'created_by',
         'updated_by',
+        'deleted_at',
     ];
 }

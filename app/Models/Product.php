@@ -21,5 +21,6 @@ class Product extends Model
         'image_url',
         'created_by',
         'updated_by',
+        'deleted_at',
     ];
 }

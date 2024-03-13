@@ -23,5 +23,6 @@ class Order extends Model
         'payment_status',
         'created_by',
         'updated_by',
+        'deleted_at',
     ];
 }
