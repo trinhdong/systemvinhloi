@@ -65,7 +65,7 @@
                 title: 'Thành công',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top right',
+                position: 'top center',
                 icon: 'bx bx-check-circle',
                 msg: "{{ Session::get('flash_message') }}"
               });
@@ -74,7 +74,7 @@
                 title: 'Cảnh báo',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top right',
+                position: 'top center',
                 icon: 'bx bx-error',
                 msg: "{{ Session::get('flash_message') }}"
               });
@@ -83,30 +83,30 @@
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top right',
+                position: 'top center',
                 icon: 'bx bx-x-circle',
                 msg: "{{ Session::get('flash_message') }}"
               });
+            @elseif ($errors->any())
+              Lobibox.notify('error', {
+                title: 'Lỗi',
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top center',
+                icon: 'bx bx-x-circle',
+                msg: "<div class=\"ms-3\">\n" +
+                        "                <ul>\n" +
+                        "                    @foreach ($errors->all() as $error)\n" +
+                        "                        <li>\n" +
+                        "                            <div class=\"text-light\">{{ $error }}</div>\n" +
+                        "                        </li>\n" +
+                        "                    @endforeach\n" +
+                        "                </ul>\n" +
+                        "\n" +
+                        "            </div>"
+              });
             @endif
 
-            //modal logout
-            $('.btn-logout').click(function(){
-              Swal.fire({
-                  title: 'Ban co muon dang xuat khong?',
-                  showDenyButton: true,
-                  confirmButtonText: '{{ __('Ok') }}',
-                  denyButtonText: '{{__('Cancel') }}',
-                  customClass: {
-                      confirmButton: 'swal-btn',
-                      denyButton: 'swal-btn'
-                  },
-              }).then((result) => {
-                  if (result.isConfirmed) {
-                      $('#logout-form-menu').submit();
-                  }else if (result.isDenied) {
-                  }
-              })
-            })
         });
 
   </script>

@@ -34,7 +34,7 @@ class CreateUpdateUserRequest extends FormRequest
 
         if ($this->isMethod('POST')) {
             $rules['email'] .= '|unique:users,email';
-            $rules['password'] = 'required|string|min:8|confirmed';
+            $rules['password'] = 'required|string|min:8';
         }
 
         return $rules;

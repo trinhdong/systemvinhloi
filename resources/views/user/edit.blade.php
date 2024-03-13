@@ -35,15 +35,13 @@
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
-                        @if($user->role !== SUPER_ADMIN)
+                        @if(Auth::user()->id !== $user->id)
                         <div class="col-md-3 mt-2">
                             <label for="validationRole" class="form-label">Chức vụ</label>
                             <select name="role" class="form-select" id="validationRole" required="">
                                 <option selected="" disabled="" value="">Chọn...</option>
                                 @foreach(ROLE_TYPE_LIST as $role => $roleName)
-                                    @if(Auth::user()->role !== $role)
-                                        <option value="{{ $role }}" @if($user->role == $role) selected @endif>{{ $roleName }}</option>
-                                    @endif
+                                    <option value="{{ $role }}" @if($user->role == $role) selected @endif>{{ $roleName }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback"></div>

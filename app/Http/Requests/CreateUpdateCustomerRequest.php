@@ -28,12 +28,13 @@ class CreateUpdateCustomerRequest extends FormRequest
         }
 
         $rules = [
-            'name' => 'required|string|max:255',
+            'customer_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'phone' => ['string', 'max:20', 'regex:/^0\d{9,10}$/'], // Validate Vietnamese phone number format
         ];
 
         if ($this->isMethod('POST')) {
-            $rules['email'] .= '|unique:users,email';
+            $rules['email'] .= '|unique:customers,email';
         }
 
         return $rules;
@@ -42,10 +43,13 @@ class CreateUpdateCustomerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Vui lòng nhập tên.',
+            'customer_name.required' => 'Vui lòng nhập tên.',
             'email.required' => 'Vui lòng nhập địa chỉ email.',
-            'email.email' => 'Vui lòng nhập đúng định dạng địa chỉ email',
+            'email.email' => 'Vui lòng nhập đúng định dạng địa chỉ email.',
             'email.unique' => 'Địa chỉ email này đã tồn tại.',
+            'phone.string' => 'Số điện thoại phải là chuỗi.',
+            'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.', // Adjust message as needed
+            'phone.regex' => 'Số điện thoại không hợp lệ.',
         ];
     }
 }

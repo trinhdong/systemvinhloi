@@ -30,28 +30,29 @@
                     <div class="col-md-8 mt-2">
                         <label for="validationPhone" class="form-label">Số điện thoại</label>
                         <div class="input-group has-validation">
-                            <input name="phone" type="phone" class="form-control" id="validationPhone" required="">
+                            <input name="phone" type="text" class="form-control" id="validationPhone">
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
                     <div class="col-md-8 mt-2">
                         <label for="validationAddress" class="form-label">Địa chỉ</label>
                         <div class="input-group has-validation">
-                            <input name="address" type="text" class="form-control" id="validationAddress" required="">
+                            <input name="address" type="text" class="form-control" id="validationAddress">
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <label for="validationRole" class="form-label">Khu vực</label>
-                        <select name="role" class="form-select" id="validationRole" required="">
+                        <select name="area_id" class="form-select" id="validationRole" required="">
                             <option selected="" disabled="" value="">Chọn...</option>
-                            @foreach($areas as $area)
-                                <option value="{{ $area }}">{{ $area }}</option>
+                            @foreach($areas as $areaCode => $areaName)
+                                <option value="{{ $areaCode }}">{{ $areaName }}</option>
                             @endforeach
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
+                @include('customer.addDiscount', compact('products'))
                 <div class="col-2">
                     <div class="d-grid">
                     <button class="btn btn-primary" type="submit">Thêm mới</button>

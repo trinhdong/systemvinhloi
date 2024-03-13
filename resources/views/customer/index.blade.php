@@ -17,10 +17,10 @@
                 <form class="ms-auto position-relative">
                     <div class="row col-12">
                         <div class="col-5">
-                            <select name="area" class="form-select">
+                            <select name="area_id" class="form-select">
                                 <option selected="" value="">Chọn khu vực...</option>
-                                @foreach($areas as $area)
-                                    <option value="{{ $area }}" @if(intval(request('area')) === $area) selected @endif>{{ $area }}</option>
+                                @foreach($areas as $areaId => $areaName)
+                                    <option value="{{ $areaId }}" @if(intval(request('area_id')) === $areaId) selected @endif>{{ $areaName }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -46,6 +46,7 @@
                         <th>Tên</th>
                         <th>Số điện thoại</th>
                         <th>Địa chỉ</th>
+                        <th>Khu vực</th>
                         <th>Hành động</th>
                     </tr>
                     </thead>
@@ -57,6 +58,7 @@
                             <td>{{ $customer->customer_name }}</td>
                             <td>{{ $customer->phone }}</td>
                             <td>{{ $customer->address }}</td>
+                            <td>{{ $areas[$customer->id] ?? '' }}</td>
                             <td>
                                 <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                     <a href="{{route('customer.detail', $customer->id)}}" class="text-primary"
@@ -67,19 +69,17 @@
                                        data-bs-placement="bottom"
                                        title="Chỉnh sửa">
                                         <i class="bi bi-pencil-fill"></i></a>
-                                    @if(Auth::User()->id !== $customer->id)
-                                        <form class="d-none" id="formDeleteUser{{$customer->id}}" action="{{ route('customer.delete', $customer->id) }}" method="POST">
+                                        <form class="d-none" id="formDeleteCustomer{{$customer->id}}" action="{{ route('customer.delete', $customer->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                         </form>
-                                        <a href="javascript:;" id="deleteUserModalBtn" class="text-danger pointer-event"
+                                        <a href="javascript:;" id="deleteCustomerModalBtn" class="text-danger pointer-event"
                                                 data-bs-tooltip="tooltip"
                                                 data-bs-toggle="modal"
                                                 data-bs-placement="bottom" title="Xóa"
-                                                data-bs-target="#deleteUserModal" data-customer-id="{{$customer->id}}">
+                                                data-bs-target="#deleteCustomerModal" data-customer-id="{{$customer->id}}">
                                             <i class="bi bi-trash-fill"></i>
                                         </a>
-                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -95,22 +95,22 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteUserModalLabel">Xóa khách hàng</h5>
+                    <h5 class="modal-title" id="deleteCustomerModalLabel">Xóa khách hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">Bạn có chắc muốn xóa khách hàng này?</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button id="deleteUser" type="button" class="btn btn-danger">Xóa</button>
+                    <button id="deleteCustomer" type="button" class="btn btn-danger">Xóa</button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 @section('script')
-    <script src="js/customers/index.js"></script>
+    <script src="js/customer/index.js"></script>
 @endsection

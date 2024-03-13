@@ -13,7 +13,7 @@
     <ul class="metismenu" id="menu">
         <li class="<?= (request()->is('dashboard*')) ? 'mm-active' : '' ?>">
             <a href="{{route('dashboard')}}">
-                <div class="parent-icon"><i class="bi bi-house-fill"></i>
+                <div class="parent-icon"><i class="lni lni-dashboard"></i>
                 </div>
                 <div class="menu-title">Dashboard</div>
             </a>
@@ -29,7 +29,7 @@
         @endif
         <li class="<?= (request()->is('customer*')) ? 'mm-active' : '' ?>">
             <a href="{{route('customer.index')}}">
-                <div class="parent-icon"><i class="lni lni-user"></i>
+                <div class="parent-icon"><i class="lni lni-customer"></i>
                 </div>
                 <div class="menu-title">Quản lý khách hàng</div>
             </a>

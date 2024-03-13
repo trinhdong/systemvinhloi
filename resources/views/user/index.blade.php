@@ -20,7 +20,9 @@
                             <select name="role" class="form-select">
                                 <option selected="" value="">Chọn chức vụ...</option>
                                 @foreach(ROLE_TYPE_LIST as $role => $roleName)
+                                    @if(Auth::user()->role != $role)
                                     <option value="{{ $role }}" @if(intval(request('role')) === $role) selected @endif>{{ $roleName }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
@@ -44,7 +46,7 @@
                         <th>#</th>
                         <th>Email</th>
                         <th>Tên</th>
-                        <th>Hành động</th>
+                        <th class="col-1">Hành động</th>
                     </tr>
                     </thead>
                     <tbody>

@@ -14,8 +14,9 @@
     <div class="card">
         <div class="card-body">
             <div class="p-4 border rounded">
-                <form class="row g-3 needs-validation" action="{{ route('customer.update') }}" method="POST">
+                <form class="row g-3 needs-validation" action="{{ route('customer.update', $customer->id) }}" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="col-12">
                         <div class="col-md-8 mt-2">
                             <label for="validationName" class="form-label">Tên</label>
@@ -30,23 +31,23 @@
                         <div class="col-md-8 mt-2">
                             <label for="validationPhone" class="form-label">Số điện thoại</label>
                             <div class="input-group has-validation">
-                                <input name="phone" type="phone" class="form-control" id="validationPhone" value="{{ $customer->email }}" required="">
+                                <input name="phone" type="text" class="form-control" id="validationPhone" value="{{ $customer->phone }}">
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationAddress" class="form-label">Địa chỉ</label>
                             <div class="input-group has-validation">
-                                <input name="address" type="text" class="form-control" id="validationAddress" value="{{ $customer->address }}" required="">
+                                <input name="address" type="text" class="form-control" id="validationAddress" value="{{ $customer->address }}">
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-md-3 mt-2">
                             <label for="validationRole" class="form-label">Khu vực</label>
-                            <select name="role" class="form-select" id="validationRole" required="">
+                            <select name="area_id" class="form-select" id="validationRole" required="">
                                 <option selected="" disabled="" value="">Chọn...</option>
-                                @foreach($areas as $area)
-{{--                                    <option value="{{ $area }}" @if($customer->area->name == $role) selected @endif>{{ $area }}</option>--}}
+                                @foreach($areas as $areaId => $areaName)
+                                    <option value="{{ $areaId }}" @if($customer->area_id == $areaId) selected @endif>{{ $areaName }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback"></div>

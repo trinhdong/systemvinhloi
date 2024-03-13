@@ -3,15 +3,19 @@
 namespace App\Services;
 
 use App\Repositories\CustomerRepository;
-use Illuminate\Support\Facades\Auth;
 
-class CustomerService
+class CustomerService extends BaseService
 {
     protected $customerRepository;
 
     public function __construct(CustomerRepository $customerRepository)
     {
         $this->customerRepository = $customerRepository;
+        $this->setRepository();
+    }
+
+    public function getRepository(){
+        return CustomerRepository::class;
     }
 
     public function searchQuery($query, $request = [])
@@ -30,13 +34,10 @@ class CustomerService
                 'value' => '%' . $query . '%'
             ],
         ];
-
-        return $this->customerRepository->paginate($filters, 'id');
-    }
-
-    public function getCustomerById($id)
-    {
-        return $this->customerRepository->getCustomerById($id);
+        if (!empty($request['area_id'])) {
+            $filters['area_id'] = $request['area_id'];
+        }
+        return $this->paginate($filters, 'id');
     }
 
     public function createCustomer(array $data)
@@ -52,14 +53,9 @@ class CustomerService
     private function processCustomer(array $data, $id = null)
     {
         if ($id === null) {
-            return $this->customerRepository->createCustomer($data);
+            return $this->customerRepository->create($data);
         } else {
-            return $this->customerRepository->updateCustomer($id, $data);
+            return $this->customerRepository->update($id, $data);
         }
-    }
-
-    public function deleteCustomer($id)
-    {
-        return $this->customerRepository->deleteCustomer($id);
     }
 }
