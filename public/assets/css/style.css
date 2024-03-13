@@ -418,7 +418,7 @@ a {
 }
 
 .sidebar-wrapper .sidebar-header .logo-icon {
-    width: 50px;
+    width: 35px;
 }
 
 .sidebar-wrapper .sidebar-header  .logo-text {
@@ -955,7 +955,6 @@ a {
 }
 
 .breadcrumb-title {
-	color: #334155;
     font-size: 20px;
     border-right: 1.5px solid #aaa4a4;
 }

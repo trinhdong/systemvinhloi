@@ -3,38 +3,84 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
-use Hash;
-use Log;
+use Illuminate\Support\Facades\Auth;
 
-class UserService extends BaseService
+class UserService
 {
-
     protected $userRepository;
 
-    /**
-     * Method: __construct
-     * Created at: 12/03/2024
-     * Created by: Hieu
-     *
-     * @param App\Repositories\UserRepository $userRepository
-     * @access public
-     * @return void
-     */
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
-        $this->setRepository();
     }
 
-    /**
-     * Setting repository want to interact
-     * Created at: 12/03/2024
-     * Created by: Hieu
-     *
-     * @access public
-     * @return Repository
-     */
-    public function getRepository(){
-        return UserRepository::class;
+    public function searchQuery($query, $request)
+    {
+        $filters = [
+            'name' => [
+                'operator' => 'LIKE',
+                'value' => '%' . $query . '%'
+            ],
+            'email' => [
+                'operator' => 'LIKE',
+                'value' => '%' . $query . '%'
+            ],
+        ];
+
+        if (Auth::user()->role === ADMIN) {
+            $filters['role'] = [
+                'column' => 'name',
+                'operator' => 'NOT IN',
+                'value' => [SUPER_ADMIN, ADMIN]
+            ];
+        }
+
+        if (isset($request['role'])) {
+            $filters['role'] = [
+                'operator' => '=',
+                'value' => intval($request['role'])
+            ];
+        }
+
+        return $this->userRepository->paginate($filters, 'id');
+    }
+
+    public function getUserById($id)
+    {
+        return $this->userRepository->getUserById($id);
+    }
+
+    public function createUser(array $data)
+    {
+        return $this->processUser($data);
+    }
+
+    public function updateUser($id, array $data)
+    {
+        return $this->processUser($data, $id);
+    }
+
+    private function processUser(array $data, $id = null)
+    {
+        if (isset($data['role']) && intval($data['role']) === ADMIN) {
+            $data['is_admin'] = true;
+            $data['role'] = intval($data['role']);
+        }
+        if (!empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        if ($id === null) {
+            return $this->userRepository->createUser($data);
+        } else {
+            return $this->userRepository->updateUser($id, $data);
+        }
+    }
+
+    public function deleteUser($id)
+    {
+        return $this->userRepository->deleteUser($id);
     }
 }

@@ -48,8 +48,7 @@ html.semi-dark .sidebar-wrapper .metismenu ul {
 }
 
 html.semi-dark .sidebar-wrapper .sidebar-header img {
-    /* filter: invert(1) grayscale(100%) brightness(200%); */
-    color: #fff;
+    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 html.semi-dark .sidebar-wrapper .simplebar-scrollbar:before {

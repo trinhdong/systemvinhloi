@@ -8,14 +8,19 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/', function () {
         return view('dashboard');
     })->name('dashboard');
 
     Route::prefix('user')->group(function () {
-        Route::get('/list', [UserController::class, 'getListUser'])->name('user.list');
-        Route::get('/detail/{id}', [UserController::class, 'viewUser'])->name('user.detail');
+        Route::get('/', [UserController::class, 'index'])->name('user.index');
+        Route::get('/detail/{id}', [UserController::class, 'detail'])->name('user.detail');
+        Route::delete('/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
+        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
+        Route::put('/edit/{id}', [UserController::class, 'edit'])->name('user.update');
+        Route::get('/add', [UserController::class, 'add'])->name('user.add');
+        Route::post('/add', [UserController::class, 'add'])->name('user.create');
     });
 
     Route::controller(AreaController::class)->prefix('area')->group(function () {

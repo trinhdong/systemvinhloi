@@ -48,7 +48,7 @@ class LoginController extends Controller
             return redirect()->intended('/');
         }
 
-        return redirect()->route('login')->withErrors(['loginError' => 'Invalid email or password']);
+        return redirect()->route('login')->withErrors(['loginError' => 'Tên đăng nhập hoặc mật khẩu không đúng!']);
     }
 
     public function logout()

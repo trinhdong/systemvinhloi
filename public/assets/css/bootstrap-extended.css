@@ -194,7 +194,7 @@
 /* Text Colors */
 
 .text-primary {
-    color: #64748B!important;
+    color: #3461ff!important;
 }
 
 .text-danger {
@@ -330,8 +330,8 @@
 
 .btn-primary {
 	color: #fff;
-	background-color: #0EA5E9;
-	border-color: #0EA5E9;
+	background-color: #3461ff;
+	border-color: #3461ff
 }
 .btn-primary:hover {
 	color: #fff;
@@ -828,10 +828,6 @@
 
 /* Tables */
 
-.table {
-	--bs-table-color: #334155;
-}
-
 .color-table .table {
 	color: #ffffff;
 	border-color: rgb(255 255 255 / 22%);
@@ -840,9 +836,4 @@
 .info-table .table, .warning-table .table {
 	color: #16191d;
 	border-color: rgb(0 0 0 / 12%);
-}
-
-.table-secondary {
-	--bs-table-color: #64748B;
-	--bs-table-bg: #F8FAFC;
 }
