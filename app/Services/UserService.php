@@ -14,7 +14,7 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function searchQuery($query, $request)
+    public function searchQuery($query, $request = [])
     {
         $filters = [
             'name' => [
