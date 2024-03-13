@@ -18,7 +18,9 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::get('/detail/{id}', [UserController::class, 'viewUser'])->name('user.detail');
     });
 
-    Route::prefix('area')->group(function () {
-        Route::get('/', [AreaController::class, 'index'])->name('area.list');
+    Route::controller(AreaController::class)->prefix('area')->group(function () {
+        Route::get('/', 'index')->name('area.list');
+        Route::get('/create', 'show')->name('area.create.show');
+        Route::post('/create', 'create')->name('area.create.post');
     });
 });
