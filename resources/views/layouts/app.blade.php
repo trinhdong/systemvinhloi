@@ -19,7 +19,9 @@
   <link href="assets/css/icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-
+  <link rel="stylesheet" href="assets/plugins/notifications/css/lobibox.min.css" />
+  <link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+  <link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
 
   <!-- loader-->
   <link href="assets/css/pace.min.css" rel="stylesheet" />
@@ -51,17 +53,11 @@
   <script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
   <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
   <script src="assets/js/pace.min.js"></script>
-  <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
-  <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-  <script src="assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
-  <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
-  <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
   <script src="assets/plugins/notifications/js/lobibox.min.js"></script>
   <script src="assets/plugins/notifications/js/notifications.min.js"></script>
   <script src="assets/plugins/notifications/js/notification-custom-script.js"></script>
   <!--app-->
   <script src="assets/js/app.js"></script>
-  <script src="assets/js/index.js"></script>
   <script>
     $(document).ready(function() {
             @if (Session::get('flash_level') == 'success')
