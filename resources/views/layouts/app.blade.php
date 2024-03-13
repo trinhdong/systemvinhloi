@@ -56,6 +56,9 @@
   <script src="assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
   <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
   <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
+  <script src="assets/plugins/notifications/js/lobibox.min.js"></script>
+  <script src="assets/plugins/notifications/js/notifications.min.js"></script>
+  <script src="assets/plugins/notifications/js/notification-custom-script.js"></script>
   <!--app-->
   <script src="assets/js/app.js"></script>
   <script src="assets/js/index.js"></script>
