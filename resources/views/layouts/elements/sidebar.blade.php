@@ -6,7 +6,7 @@
         <div>
             <h4 class="logo-text">Quản lý bán hàng</h4>
         </div>
-        <div class="toggle-icon ms-auto"> <i class="bi bi-list"></i>
+        <div class="toggle-icon ms-auto"><i class="bi bi-list"></i>
         </div>
     </div>
     <!--navigation-->
@@ -18,11 +18,20 @@
                 <div class="menu-title">Dashboard</div>
             </a>
         </li>
-            <li class="<?= (request()->is('user*')) ? 'mm-active' : '' ?>">
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
+        <li class="<?= (request()->is('user*')) ? 'mm-active' : '' ?>">
             <a href="{{route('user.index')}}">
                 <div class="parent-icon"><i class="bi bi-grid-fill"></i>
                 </div>
-            <div class="menu-title">Quản lý nhân viên</div>
+                <div class="menu-title">Quản lý nhân viên</div>
+            </a>
+        </li>
+        @endif
+        <li class="<?= (request()->is('area*')) ? 'mm-active' : '' ?>">
+            <a href="{{route('area.index')}}">
+                <div class="parent-icon"><i class="bi bi-house-fill"></i>
+                </div>
+                <div class="menu-title">Khu vực</div>
             </a>
         </li>
     </ul>

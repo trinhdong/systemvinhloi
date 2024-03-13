@@ -24,5 +24,5 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
     });
 });
 Route::prefix('area')->group(function () {
-    Route::get('/', [AreaController::class, 'index'])->name('area.list');
+    Route::get('/', [AreaController::class, 'index'])->name('area.index');
 });
