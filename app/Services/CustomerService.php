@@ -51,16 +51,6 @@ class CustomerService
 
     private function processCustomer(array $data, $id = null)
     {
-        if (isset($data['role']) && intval($data['role']) === ADMIN) {
-            $data['is_admin'] = true;
-            $data['role'] = intval($data['role']);
-        }
-        if (!empty($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
-        }
-
         if ($id === null) {
             return $this->customerRepository->createCustomer($data);
         } else {

@@ -38,7 +38,7 @@ class CustomerController extends Controller
             return view('customer.add', compact('areas'));
         }
 
-        $data = $request->only(['name', 'email', 'password', 'role']);
+        $data = $request->only(['name', 'email', 'phone', 'address', 'area_id']);
         $customer = $this->customerService->createCustomer($data);
         if ($customer) {
             return redirect()->route('customer.index')->with('success', 'Thêm người dùng thành công');
@@ -59,7 +59,7 @@ class CustomerController extends Controller
             return view('customer.edit', compact('customer'), compact('areas'));
         }
 
-        $data = $request->only(['name', 'email', 'password', 'role']);
+        $data = $request->only(['name', 'email', 'phone', 'address', 'area_id']);
         $updated = $this->customerService->updateCustomer($customer->id, $data);
         if ($updated) {
             return redirect()->route('customer.index')->with('success', 'Cập nhật khách hàng thành công');
