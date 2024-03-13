@@ -2,7 +2,6 @@
 namespace App\Repositories;
 
 use App\Models\Area;
-use App\Models\User;
 
 class AreaRepository extends BaseRepository
 {

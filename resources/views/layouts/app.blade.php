@@ -60,8 +60,56 @@
   <script src="assets/js/app.js"></script>
   <script src="assets/js/index.js"></script>
   <script>
-    new PerfectScrollbar(".review-list")
-    new PerfectScrollbar(".chat-talk")
+    $(document).ready(function() {
+            @if (Session::get('flash_level') == 'success')
+              Lobibox.notify('success', {
+                title: 'Thành công',
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                icon: 'bx bx-check-circle',
+                msg: "{{ Session::get('flash_message') }}"
+              });
+            @elseif (Session::get('flash_level') == 'warning')
+              Lobibox.notify('warning', {
+                title: 'Cảnh báo',
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                icon: 'bx bx-error',
+                msg: "{{ Session::get('flash_message') }}"
+              });
+            @elseif (Session::get('flash_level') == 'error')
+              Lobibox.notify('error', {
+                title: 'Lỗi',
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                icon: 'bx bx-x-circle',
+                msg: "{{ Session::get('flash_message') }}"
+              });
+            @endif
+
+            //modal logout
+            $('.btn-logout').click(function(){
+              Swal.fire({
+                  title: 'Ban co muon dang xuat khong?',
+                  showDenyButton: true,
+                  confirmButtonText: '{{ __('Ok') }}',
+                  denyButtonText: '{{__('Cancel') }}',
+                  customClass: {
+                      confirmButton: 'swal-btn',
+                      denyButton: 'swal-btn'
+                  },
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      $('#logout-form-menu').submit();
+                  }else if (result.isDenied) {
+                  }
+              })
+            })
+        });
+
   </script>
   @yield('script')
 </div>

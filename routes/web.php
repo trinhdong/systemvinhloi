@@ -22,7 +22,10 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::get('/add', [UserController::class, 'add'])->name('user.add');
         Route::post('/add', [UserController::class, 'add'])->name('user.create');
     });
-});
-Route::prefix('area')->group(function () {
-    Route::get('/', [AreaController::class, 'index'])->name('area.index');
+
+    Route::controller(AreaController::class)->prefix('area')->group(function () {
+        Route::get('/', 'index')->name('area.list');
+        Route::get('/create', 'show')->name('area.create.show');
+        Route::post('/create', 'create')->name('area.create.post');
+    });
 });
