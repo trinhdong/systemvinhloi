@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUpdateCustomerRequest;
 use App\Repositories\AreaRepository;
-use App\Repositories\productRepository;
+use App\Repositories\ProductRepository;
+use App\Repositories\CategoryRepository;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
 
@@ -13,23 +14,27 @@ class CustomerController extends Controller
     protected $customerService;
     protected $areaRepository;
     protected $productRepository;
+    protected $categoryRepository;
 
     public function __construct (
         CustomerService $customerService,
         AreaRepository $areaRepository,
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        CategoryRepository $categoryRepository
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;
         $this->productRepository = $productRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function index(Request $request)
     {
         $areas = $this->areaRepository->getList();
+        $categories = $this->categoryRepository->getList('category_name');
         $query = $request->input('query');
         $customers = $this->customerService->searchQuery($query, $request->input());
-        return view('customer.index', compact('customers', 'areas'));
+        return view('customer.index', compact('customers', 'areas', 'categories'));
     }
 
     public function detail($id)
@@ -45,10 +50,12 @@ class CustomerController extends Controller
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
             $areas = $this->areaRepository->getList();
             $products = $this->productRepository->getList('product_name');
-            return view('customer.add', compact('areas', 'products'));
+            $categories = $this->categoryRepository->getList('category_name');
+            return view('customer.add', compact('areas', 'products', 'categories'));
         }
 
-        $data = $request->only(['customer_name', 'email', 'phone', 'address', 'area_id']);
+        $data = $request->only(['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent']);
+        dd($data);
         $customer = $this->customerService->createCustomer($data);
         if ($customer) {
             return redirect()->route('customer.index')->with(['flash_level' => 'success', 'flash_message' => 'Thêm khách hàng thành công']);
@@ -67,7 +74,8 @@ class CustomerController extends Controller
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
             $products = $this->productRepository->getList('product_name');
             $areas = $this->areaRepository->getList();
-            return view('customer.edit', compact('customer', 'areas', 'products'));
+            $categories = $this->categoryRepository->getList('category_name');
+            return view('customer.edit', compact('customer', 'areas', 'products', 'categories'));
         }
 
         $data = $request->only(['customer_name', 'email', 'phone', 'address', 'area_id']);

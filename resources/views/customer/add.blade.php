@@ -52,7 +52,7 @@
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
-                @include('customer.addDiscount', compact('products'))
+                @include('customer.addDiscount', compact('products', 'categories'))
                 <div class="col-2">
                     <div class="d-grid">
                     <button class="btn btn-primary" type="submit">Thêm mới</button>
