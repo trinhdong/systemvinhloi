@@ -15,7 +15,7 @@
             <a href="{{route('dashboard')}}">
                 <div class="parent-icon"><i class="lni lni-dashboard"></i>
                 </div>
-                <div class="menu-title">Dashboard</div>
+                <div class="menu-title">Quản lý thống kê</div>
             </a>
         </li>
         @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
@@ -38,7 +38,7 @@
             <a href="{{route('area.list')}}">
                 <div class="parent-icon"><i class="bi bi-house-fill"></i>
                 </div>
-                <div class="menu-title">Khu vực</div>
+                <div class="menu-title">Quản lý khu vực</div>
             </a>
         </li>
     </ul>
