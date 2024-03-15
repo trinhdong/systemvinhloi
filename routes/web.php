@@ -33,6 +33,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::put('/edit/{id}', [CustomerController::class, 'edit'])->name('customer.update');
         Route::get('/add', [CustomerController::class, 'add'])->name('customer.add');
         Route::post('/add', [CustomerController::class, 'add'])->name('customer.create');
+        Route::delete('/delete-discount/{discountId}', [CustomerController::class, 'deleteDiscount'])->name('customer.deleteDiscount');
     });
 
     Route::prefix('product')->group(function () {

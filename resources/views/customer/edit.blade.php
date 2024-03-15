@@ -53,13 +53,18 @@
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
+                    @include('customer.editDiscount', compact('products', 'categories', 'customer', 'categoryIds', 'productPrice'), ['discounts' => $customer->discount])
                     <div class="col-2">
                         <div class="d-grid">
-                            <button class="btn btn-primary" type="submit">Thêm mới</button>
+                            <button class="btn btn-primary" type="submit">Cập nhật</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script src="js/customer/add.js"></script>
+    <script src="js/customer/edit.js"></script>
 @endsection

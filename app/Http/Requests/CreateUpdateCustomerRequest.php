@@ -48,7 +48,7 @@ class CreateUpdateCustomerRequest extends FormRequest
             'email.email' => 'Vui lòng nhập đúng định dạng địa chỉ email.',
             'email.unique' => 'Địa chỉ email này đã tồn tại.',
             'phone.string' => 'Số điện thoại phải là chuỗi.',
-            'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.', // Adjust message as needed
+            'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
         ];
     }

@@ -16,7 +16,7 @@ class ProductController extends Controller
     public function getByCategoryId(Request $request)
     {
         $categoryId = intval($request->query('categoryId') ?? 0);
-        $productIdNotIn = $request->query('productIdNotIn') ?? [];
+        $productIdNotIn = array_map('intval', $request->query('productIdNotIn') ?? []);
         $products = $this->productService->getByCategoryId($categoryId, $productIdNotIn);
         return response()->json($products);
     }
