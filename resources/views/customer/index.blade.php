@@ -1,14 +1,14 @@
 @extends('layouts.app')
 @section('title')
-    Nhân viên
+    Khách hàng
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{route('user.add')}}" class="btn btn-sm btn-primary">Thêm nhân viên</a>
+        <a href="{{route('customer.add')}}" class="btn btn-sm btn-primary">Thêm khách hàng</a>
     </div>
 @endsection
 @section('breadcrumb')
-    Danh sách nhân viên
+    Danh sách khách hàng
 @endsection
 @section('content')
     <div class="card">
@@ -17,12 +17,10 @@
                 <form class="ms-auto position-relative">
                     <div class="row col-12">
                         <div class="col-5">
-                            <select name="role" class="form-select">
-                                <option selected="" value="">Chọn chức vụ...</option>
-                                @foreach(ROLE_TYPE_LIST as $role => $roleName)
-                                    @if(Auth::user()->role != $role)
-                                    <option value="{{ $role }}" @if(intval(request('role')) === $role) selected @endif>{{ $roleName }}</option>
-                                    @endif
+                            <select name="area_id" class="form-select">
+                                <option selected="" value="">Chọn khu vực...</option>
+                                @foreach($areas as $areaId => $areaName)
+                                    <option value="{{ $areaId }}" @if(intval(request('area_id')) === $areaId) selected @endif>{{ $areaName }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -37,7 +35,7 @@
             </div>
             <div class="table-responsive mt-3">
 
-                @if($users->isEmpty())
+                @if($customers->isEmpty())
                     <p>Không tìm thấy dữ liệu</p>
                 @else
                 <table class="table align-middle">
@@ -46,38 +44,42 @@
                         <th>#</th>
                         <th>Email</th>
                         <th>Tên</th>
-                        <th class="col-1">Hành động</th>
+                        <th>Số điện thoại</th>
+                        <th>Địa chỉ</th>
+                        <th>Khu vực</th>
+                        <th>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($users as $key => $user)
+                    @foreach($customers as $key => $customer)
                         <tr>
                             <td>{{ $key + 1 }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->name }}</td>
+                            <td>{{ $customer->email }}</td>
+                            <td>{{ $customer->customer_name }}</td>
+                            <td>{{ $customer->phone }}</td>
+                            <td>{{ $customer->address }}</td>
+                            <td>{{ $areas[$customer->area_id] ?? '' }}</td>
                             <td>
                                 <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                    <a href="{{route('user.detail', $user->id)}}" class="text-primary"
+                                    <a href="{{route('customer.detail', $customer->id)}}" class="text-primary"
                                        data-bs-toggle="tooltip"
                                        data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
-                                    <a href="{{route('user.edit', $user->id)}}" class="text-warning"
+                                    <a href="{{route('customer.edit', $customer->id)}}" class="text-warning"
                                        data-bs-toggle="tooltip"
                                        data-bs-placement="bottom"
                                        title="Chỉnh sửa">
                                         <i class="bi bi-pencil-fill"></i></a>
-                                    @if(Auth::User()->id !== $user->id)
-                                        <form class="d-none" id="formDeleteUser{{$user->id}}" action="{{ route('user.delete', $user->id) }}" method="POST">
+                                        <form class="d-none" id="formDeleteCustomer{{$customer->id}}" action="{{ route('customer.delete', $customer->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                         </form>
-                                        <a href="javascript:;" id="deleteUserModalBtn" class="text-danger pointer-event"
+                                        <a href="javascript:;" id="deleteCustomerModalBtn" class="text-danger pointer-event"
                                                 data-bs-tooltip="tooltip"
                                                 data-bs-toggle="modal"
                                                 data-bs-placement="bottom" title="Xóa"
-                                                data-bs-target="#deleteUserModal" data-user-id="{{$user->id}}">
+                                                data-bs-target="#deleteCustomerModal" data-customer-id="{{$customer->id}}">
                                             <i class="bi bi-trash-fill"></i>
                                         </a>
-                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -88,27 +90,27 @@
             </div>
             <div class="row">
                 <div class="col-sm-12 col-md-7">
-                    {{ $users->links('pagination::bootstrap-5') }}
+                    {{ $customers->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteUserModalLabel">Xóa nhân viên</h5>
+                    <h5 class="modal-title" id="deleteCustomerModalLabel">Xóa khách hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">Bạn có chắc muốn xóa nhân viên này?</div>
+                <div class="modal-body">Bạn có chắc muốn xóa khách hàng này?</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button id="deleteUser" type="button" class="btn btn-danger">Xóa</button>
+                    <button id="deleteCustomer" type="button" class="btn btn-danger">Xóa</button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 @section('script')
-    <script src="js/user/index.js"></script>
+    <script src="js/customer/index.js"></script>
 @endsection

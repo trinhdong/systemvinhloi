@@ -16,4 +16,9 @@ class Discount extends Model
         'updated_by',
         'deleted_at',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
 }

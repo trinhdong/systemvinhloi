@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="assets/plugins/notifications/css/lobibox.min.css" />
   <link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
   <link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+  <link href="assets/plugins/select2/css/select2.min.css" rel="stylesheet" />
+  <link href="assets/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet" />
 
   <!-- loader-->
   <link href="assets/css/pace.min.css" rel="stylesheet" />
@@ -56,6 +58,8 @@
   <script src="assets/plugins/notifications/js/lobibox.min.js"></script>
   <script src="assets/plugins/notifications/js/notifications.min.js"></script>
   <script src="assets/plugins/notifications/js/notification-custom-script.js"></script>
+  <script src="assets/plugins/select2/js/select2.min.js"></script>
+  <script src="assets/js/form-select2.js"></script>
   <!--app-->
   <script src="assets/js/app.js"></script>
   <script>
@@ -65,7 +69,7 @@
                 title: 'Thành công',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top right',
+                position: 'top center',
                 icon: 'bx bx-check-circle',
                 msg: "{{ Session::get('flash_message') }}",
                 sound: false
@@ -75,7 +79,7 @@
                 title: 'Cảnh báo',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top right',
+                position: 'top center',
                 icon: 'bx bx-error',
                 msg: "{{ Session::get('flash_message') }}",
                 sound: false
@@ -85,31 +89,31 @@
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top right',
+                position: 'top center',
                 icon: 'bx bx-x-circle',
                 msg: "{{ Session::get('flash_message') }}",
                 sound: false
               });
+            @elseif ($errors->any())
+              Lobibox.notify('error', {
+                title: 'Lỗi',
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top center',
+                icon: 'bx bx-x-circle',
+                msg: "<div class=\"ms-3\">\n" +
+                        "                <ul>\n" +
+                        "                    @foreach ($errors->all() as $error)\n" +
+                        "                        <li>\n" +
+                        "                            <div class=\"text-light\">{{ $error }}</div>\n" +
+                        "                        </li>\n" +
+                        "                    @endforeach\n" +
+                        "                </ul>\n" +
+                        "\n" +
+                        "            </div>"
+              });
             @endif
 
-            //modal logout
-            $('.btn-logout').click(function(){
-              Swal.fire({
-                  title: 'Ban co muon dang xuat khong?',
-                  showDenyButton: true,
-                  confirmButtonText: '{{ __('Ok') }}',
-                  denyButtonText: '{{__('Cancel') }}',
-                  customClass: {
-                      confirmButton: 'swal-btn',
-                      denyButton: 'swal-btn'
-                  },
-              }).then((result) => {
-                  if (result.isConfirmed) {
-                      $('#logout-form-menu').submit();
-                  }else if (result.isDenied) {
-                  }
-              })
-            })
         });
 
   </script>

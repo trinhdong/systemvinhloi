@@ -436,4 +436,15 @@ abstract class BaseRepository
     {
        return $this->model->where($p_arr)->delete();
     }
+
+    public function getList($value = 'name')
+    {
+        return $this->model->pluck($value, 'id');
+    }
+
+
+    public function get()
+    {
+        return $this->model->get();
+    }
 }
