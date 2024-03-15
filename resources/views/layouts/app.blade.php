@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="assets/plugins/notifications/css/lobibox.min.css" />
   <link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
   <link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+  <link href="assets/plugins/select2/css/select2.min.css" rel="stylesheet" />
+  <link href="assets/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet" />
 
   <!-- loader-->
   <link href="assets/css/pace.min.css" rel="stylesheet" />
@@ -56,6 +58,8 @@
   <script src="assets/plugins/notifications/js/lobibox.min.js"></script>
   <script src="assets/plugins/notifications/js/notifications.min.js"></script>
   <script src="assets/plugins/notifications/js/notification-custom-script.js"></script>
+  <script src="assets/plugins/select2/js/select2.min.js"></script>
+  <script src="assets/js/form-select2.js"></script>
   <!--app-->
   <script src="assets/js/app.js"></script>
   <script>

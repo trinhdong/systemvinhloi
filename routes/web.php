@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -32,8 +33,12 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::put('/edit/{id}', [CustomerController::class, 'edit'])->name('customer.update');
         Route::get('/add', [CustomerController::class, 'add'])->name('customer.add');
         Route::post('/add', [CustomerController::class, 'add'])->name('customer.create');
+        Route::delete('/delete-discount/{discountId}', [CustomerController::class, 'deleteDiscount'])->name('customer.deleteDiscount');
     });
 
+    Route::prefix('product')->group(function () {
+        Route::get('/getByCategoryId', [ProductController::class, 'getByCategoryId'])->name('product.getByCategoryId');
+    });
 
     Route::controller(AreaController::class)->prefix('area')->group(function () {
         Route::get('/', 'index')->name('area.list');

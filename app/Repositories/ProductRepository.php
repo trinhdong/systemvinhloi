@@ -5,6 +5,7 @@ use App\Models\Product;
 
 class ProductRepository extends BaseRepository
 {
+    protected $product;
     public function __construct(Product $product)
     {
         $this->product = $product;
@@ -14,5 +15,13 @@ class ProductRepository extends BaseRepository
     public function getModel()
     {
         return Product::class;
+    }
+
+    public function getByCategoryId(int $categoryId, array $productIdNotIn = [])
+    {
+        return $this->product
+            ->where('category_id', '=', $categoryId)
+            ->whereNotIn('id', $productIdNotIn)
+            ->get();
     }
 }

@@ -441,4 +441,10 @@ abstract class BaseRepository
     {
         return $this->model->pluck($value, 'id');
     }
+
+
+    public function get()
+    {
+        return $this->model->get();
+    }
 }

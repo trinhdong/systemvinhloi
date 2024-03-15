@@ -1,16 +1,20 @@
 @extends('layouts.app')
+
 @section('title')
     Khách hàng
 @endsection
+
 @section('action')
     <div class="col-12">
         <a href="{{route('customer.edit', $customer->id)}}" class="btn btn-sm btn-warning me-2">Chỉnh sửa</a>
         <a href="{{route('customer.index')}}" class="btn btn-sm btn-primary">Quay lại</a>
     </div>
 @endsection
+
 @section('breadcrumb')
     {{$customer->customer_name}}
 @endsection
+
 @section('content')
     <div class="card">
         <div class="card-body">
@@ -56,6 +60,36 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="col-12 mt-4">
+                        <h5 class="mb-0">Sản phẩm khuyến mãi</h5>
+                    </div>
+
+                    <div class="table-responsive mt-3">
+                        <table class="table align-middle table-bordered">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="col-3">Danh mục</th>
+                                <th class="col-3">Sản phẩm</th>
+                                <th>Phần trăm giảm giá</th>
+                                <th>Giá</th>
+                                <th>Giá khuyến mãi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($discounts as $discount)
+                                <tr>
+                                    <td>{{$categories[$categoryIds[$discount->product_id]] ?? ''}}</td>
+                                    <td>{{$products[$discount->product_id]}}</td>
+                                    <td>{{$discount->discount_percent}}%</td>
+                                    <td>{{number_format($productPrice[$discount->product_id] ?? 0)}}</td>
+                                    <td>{{number_format(max($productPrice[$discount->product_id] - ($productPrice[$discount->product_id] * $discount->discount_percent) / 100, 0))}}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         </div>

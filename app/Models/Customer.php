@@ -24,4 +24,9 @@ class Customer extends Model
     {
         return $this->belongsTo(Area::class);
     }
+
+    public function discount()
+    {
+        return $this->hasMany(Discount::class);
+    }
 }

@@ -58,7 +58,7 @@
                             <td>{{ $customer->customer_name }}</td>
                             <td>{{ $customer->phone }}</td>
                             <td>{{ $customer->address }}</td>
-                            <td>{{ $areas[$customer->id] ?? '' }}</td>
+                            <td>{{ $areas[$customer->area_id] ?? '' }}</td>
                             <td>
                                 <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                     <a href="{{route('customer.detail', $customer->id)}}" class="text-primary"
