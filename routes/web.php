@@ -25,7 +25,11 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
 
     Route::controller(AreaController::class)->prefix('area')->group(function () {
         Route::get('/', 'index')->name('area.list');
-        Route::get('/create', 'show')->name('area.create.show');
-        Route::post('/create', 'create')->name('area.create.post');
+        Route::get('/add', 'show')->name('area.create.show');
+        Route::post('/add', 'create')->name('area.create.post');
+        Route::get('/detail/{id}', 'detail')->name('area.detail');
+        Route::get('/edit/{id}', 'edit')->name('area.edit');
+        Route::post('/edit/{id}', 'update')->name('area.update');
+        Route::delete('/delete/{id}', 'delete')->name('area.delete');
     });
 });

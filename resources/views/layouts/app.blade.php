@@ -67,7 +67,8 @@
                 continueDelayOnInactiveTab: false,
                 position: 'top right',
                 icon: 'bx bx-check-circle',
-                msg: "{{ Session::get('flash_message') }}"
+                msg: "{{ Session::get('flash_message') }}",
+                sound: false
               });
             @elseif (Session::get('flash_level') == 'warning')
               Lobibox.notify('warning', {
@@ -76,7 +77,8 @@
                 continueDelayOnInactiveTab: false,
                 position: 'top right',
                 icon: 'bx bx-error',
-                msg: "{{ Session::get('flash_message') }}"
+                msg: "{{ Session::get('flash_message') }}",
+                sound: false
               });
             @elseif (Session::get('flash_level') == 'error')
               Lobibox.notify('error', {
@@ -85,7 +87,8 @@
                 continueDelayOnInactiveTab: false,
                 position: 'top right',
                 icon: 'bx bx-x-circle',
-                msg: "{{ Session::get('flash_message') }}"
+                msg: "{{ Session::get('flash_message') }}",
+                sound: false
               });
             @endif
 

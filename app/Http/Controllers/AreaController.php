@@ -21,7 +21,7 @@ class AreaController extends Controller
         return view('area.index', compact('areaList'));
     }
     public function show(){
-        return view('area.create');
+        return view('area.add');
     }
     public function create(Request $request)
     {
@@ -29,17 +29,40 @@ class AreaController extends Controller
         $user = Auth::user();
         $data['created_by'] = $user['id'];
         $insertArea = $this->areaService->create($data);
-
-        if ($insertArea) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Thêm khu vực thành công',
-            ]);
+        if($insertArea) {
+            return redirect()->route('area.list')->with(['flash_level' => 'success', 'flash_message' => 'Thêm khu vực thành công']);
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Thêm khu vực thất bại hoặc đã xảy ra lỗi nào đó',
-            ]);
+            return redirect()->route('area.create.show')->with(['flash_level' => 'error', 'flash_message' => 'Thêm khu vực không thành công']);
         }
+    }
+    public function detail($id){
+        $area = $this->areaService->find($id);
+        return view('area.detail', compact('area'));
+    }
+    public function edit($id){
+        $area = $this->areaService->find($id);
+        if (!$area){
+            return redirect()->route('area.list')->with(['flash_level' => 'error', 'flash_message' => 'Khu vực không tồn tại']);
+        }
+        return view('area.edit', compact('area'));
+    }
+    public function update(Request $request){
+        $data = $request->all();
+        $user = Auth::user();
+        $data['updated_by'] = $user['id'];
+        $updateArea = $this->areaService->update($data['id'], $data);
+        if ($updateArea){
+            return redirect()->route('area.list')->with(['flash_level' => 'success', 'flash_message' => 'Chỉnh sửa khu vực thành công']);
+        } else {
+            return redirect()->route('area.edit', ['id' => $data['id']])->with(['flash_level' => 'error', 'flash_message' => 'Chỉnh sửa khu vực không thành công']);
+        }
+    }
+    public function delete($id)
+    {
+        $area = $this->areaService->delete($id);
+        if ($area) {
+            return redirect()->route('area.list')->with(['flash_level' => 'success', 'flash_message' => 'Xóa khu vực thành công']);
+        }
+        return redirect()->route('area.list')->with('error', 'Lỗi không thể xóa khu vực');
     }
 }
