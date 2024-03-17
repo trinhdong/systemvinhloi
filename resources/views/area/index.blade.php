@@ -22,14 +22,14 @@
                     </form>
                 </div>
                 <div class="col-sm-5 col-md-4 col-lg-4 mb-2">
-                    <a href="{{route('area.create.show')}}" type="button" class="btn btn-primary px-5 float-end">Thêm khu
+                    <a href="{{route('area.create.show')}}" type="button" class="btn btn-primary px-5 float-end">Thêm
+                        khu
                         vực</a>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive mt-3">
-                        @if($areaList && $areaList->count() > 0)
                             <table class="table align-middle last-child-right">
                                 <thead class="table-secondary">
                                 <tr>
@@ -40,6 +40,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                @if($areaList && $areaList->count() > 0)
                                 @php
                                     $currentPage = $areaList->currentPage();
                                     $perPage = $areaList->perPage();
@@ -52,24 +53,59 @@
                                         <td>{{$item->description}}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                                <a href="{{route('area.detail', $item->id)}}" class="text-primary" data-bs-toggle="tooltip"
+                                                <a href="{{route('area.detail', $item->id)}}" class="text-primary"
+                                                   data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i
                                                         class="bi bi-eye-fill"></i></a>
-                                                <a href="{{route('area.edit', $item->id)}}" class="text-warning" data-bs-toggle="tooltip"
-                                                   data-bs-placement="bottom" title="Chỉnh sửa"><i class="bi bi-pencil-fill"></i></a>
-                                                <a href="{{route('area.delete', $item->id)}}" class="text-danger" data-bs-toggle="tooltip"
-                                                   data-bs-placement="bottom" title="Xóa" data-id=""><i
-                                                        class="bi bi-trash-fill"></i></a>
+                                                <a href="{{route('area.edit', $item->id)}}" class="text-warning"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-placement="bottom" title="Chỉnh sửa"><i
+                                                        class="bi bi-pencil-fill"></i></a>
+                                                <form class="d-none" id="formDeleteArea{{$item->id}}"
+                                                      action="{{ route('area.delete', $item->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                                <a href="javascript:;" id="deleteAreaModalBtn"
+                                                   class="text-danger pointer-event"
+                                                   data-bs-tooltip="tooltip"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-placement="bottom" title="Xóa"
+                                                   data-bs-target="#deleteAreaModal" data-area-id="{{$item->id}}">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
                                 @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="4" class="text-center">Không tìm thấy dữ liệu</td>
+                                    </tr>
+                                @endif
                                 </tbody>
                             </table>
-                            <div class=" justify-content-center">
-                                {!! $areaList->links('pagination::bootstrap-5') !!}
-                            </div>
-                        @endif
+                            @if($areaList && $areaList->count() > 0)
+                                <div class=" justify-content-center">
+                                    {!! $areaList->links('pagination::bootstrap-5') !!}
+                                </div>
+                            @endif
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-labelledby="deleteAreaModalLabel"
+                 aria-hidden="true" style="display: none;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteAreaModalLabel">Xóa khu vực</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">Bạn có chắc muốn xóa khu vực này?</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button id="deleteArea" type="button" class="btn btn-danger">Xóa</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,9 +113,7 @@
     </div>
 @endsection
 @section('script')
-    <script>
-
-    </script>
+    <script src="js/area/index.js"></script>
 @endsection
 
 

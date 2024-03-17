@@ -28,7 +28,6 @@
                 <div class="d-flex justify-content-center mb-5">
                     <div>
                         <a href="{{route('area.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
-                        <a href="#" type="button" class="btn btn-warning px-5 me-2">Chỉnh sửa</a>
                     </div>
                 </div>
             </div>

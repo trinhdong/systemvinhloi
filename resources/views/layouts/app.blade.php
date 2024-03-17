@@ -69,7 +69,7 @@
                 title: 'Thành công',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-check-circle',
                 msg: "{{ Session::get('flash_message') }}",
                 sound: false
@@ -79,7 +79,7 @@
                 title: 'Cảnh báo',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-error',
                 msg: "{{ Session::get('flash_message') }}",
                 sound: false
@@ -89,7 +89,7 @@
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-x-circle',
                 msg: "{{ Session::get('flash_message') }}",
                 sound: false
@@ -99,7 +99,7 @@
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-x-circle',
                 msg: "<div class=\"ms-3\">\n" +
                         "                <ul>\n" +
@@ -115,7 +115,6 @@
             @endif
 
         });
-
   </script>
   @yield('script')
 </div>

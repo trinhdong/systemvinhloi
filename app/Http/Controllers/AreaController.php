@@ -20,9 +20,11 @@ class AreaController extends Controller
         $areaList = $this->areaService->paginate('', '','ASC',2,false);
         return view('area.index', compact('areaList'));
     }
+
     public function show(){
         return view('area.add');
     }
+
     public function create(Request $request)
     {
         $data = $request->all();
@@ -35,10 +37,12 @@ class AreaController extends Controller
             return redirect()->route('area.create.show')->with(['flash_level' => 'error', 'flash_message' => 'Thêm khu vực không thành công']);
         }
     }
+
     public function detail($id){
         $area = $this->areaService->find($id);
         return view('area.detail', compact('area'));
     }
+
     public function edit($id){
         $area = $this->areaService->find($id);
         if (!$area){
@@ -46,6 +50,7 @@ class AreaController extends Controller
         }
         return view('area.edit', compact('area'));
     }
+
     public function update(Request $request){
         $data = $request->all();
         $user = Auth::user();
@@ -57,12 +62,29 @@ class AreaController extends Controller
             return redirect()->route('area.edit', ['id' => $data['id']])->with(['flash_level' => 'error', 'flash_message' => 'Chỉnh sửa khu vực không thành công']);
         }
     }
+
     public function delete($id)
     {
-        $area = $this->areaService->delete($id);
-        if ($area) {
-            return redirect()->route('area.list')->with(['flash_level' => 'success', 'flash_message' => 'Xóa khu vực thành công']);
+        try {
+            $area = $this->areaService->find($id);
+            if (!$area) {
+                return redirect()->route('area.list')->with([
+                    'flash_level' => 'error',
+                    'flash_message' => 'Khu vực không tồn tại.'
+                ]);
+            }
+            $area->deleted_by = auth()->user()->id;
+            $area->delete();
+
+            return redirect()->route('area.list')->with([
+                'flash_level' => 'success',
+                'flash_message' => 'Xóa khu vực thành công.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('area.list')->with([
+                'flash_level' => 'error',
+                'flash_message' => 'Đã có lỗi xảy ra khi xóa khu vực.'
+            ]);
         }
-        return redirect()->route('area.list')->with('error', 'Lỗi không thể xóa khu vực');
     }
 }

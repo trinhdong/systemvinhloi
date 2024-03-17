@@ -35,7 +35,7 @@
             </div>
             <div class="d-flex justify-content-end">
                 <div>
-                    <a href="#" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
+                    <a href="{{route('area.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
                 </div>
                 <div>
                     <button type="submit" class="btn btn-primary px-5 mx-2">Lưu</button>

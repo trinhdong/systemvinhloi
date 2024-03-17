@@ -36,7 +36,7 @@
         </li>
         <li class="<?= (request()->is('area*')) ? 'mm-active' : '' ?>">
             <a href="{{route('area.list')}}">
-                <div class="parent-icon"><i class="bi bi-house-fill"></i>
+                <div class="parent-icon"><i class="bi bi-pin-map-fill"></i>
                 </div>
                 <div class="menu-title">Quản lý khu vực</div>
             </a>
