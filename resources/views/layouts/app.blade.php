@@ -70,34 +70,37 @@
                 title: 'Thành công',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-check-circle',
-                msg: "{{ Session::get('flash_message') }}"
+                msg: "{{ Session::get('flash_message') }}",
+                sound: false
               });
             @elseif (Session::get('flash_level') == 'warning')
               Lobibox.notify('warning', {
                 title: 'Cảnh báo',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-error',
-                msg: "{{ Session::get('flash_message') }}"
+                msg: "{{ Session::get('flash_message') }}",
+                sound: false
               });
             @elseif (Session::get('flash_level') == 'error')
               Lobibox.notify('error', {
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-x-circle',
-                msg: "{{ Session::get('flash_message') }}"
+                msg: "{{ Session::get('flash_message') }}",
+                sound: false
               });
             @elseif ($errors->any())
               Lobibox.notify('error', {
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-x-circle',
                 msg: "<div class=\"ms-3\">\n" +
                         "                <ul>\n" +
@@ -113,7 +116,6 @@
             @endif
 
         });
-
   </script>
   @yield('script')
 </div>

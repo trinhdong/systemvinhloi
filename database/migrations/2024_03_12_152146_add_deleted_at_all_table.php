@@ -13,30 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('categories', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('products', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('areas', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('customers', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('orders', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('order_details', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
-        Schema::table('discounts', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
-        });
+        $tables = ['users', 'categories', 'products', 'areas', 'customers', 'orders', 'order_details', 'discounts'];
+
+        foreach ($tables as $table) {
+            Schema::table($table, function (Blueprint $table) {
+                $table->timestamp('deleted_at')->nullable();
+            });
+        }
     }
 
     /**
@@ -46,5 +29,12 @@ return new class extends Migration
      */
     public function down()
     {
+        $tables = ['users', 'categories', 'products', 'areas', 'customers', 'orders', 'order_details', 'discounts'];
+
+        foreach ($tables as $table) {
+            Schema::table($table, function (Blueprint $table) {
+                $table->dropColumn('deleted_at');
+            });
+        }
     }
 };

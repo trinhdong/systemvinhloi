@@ -15,7 +15,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <form id="areaForm">
+                    <form action="{{ route('area.create.post') }}" method="post">
                         @csrf
                         <div class="p-4 rounded">
                             <div class="row mb-2">
@@ -46,45 +46,6 @@
     </div>
 @endsection
 @section('script')
-    <script>
-        $(document).ready(function() {
-            $('#areaForm').on('submit', function(e) {
-                e.preventDefault();
-                var formData = $(this).serialize(); // Lấy dữ liệu từ form
-                $.ajax({
-                    url: "{{route('area.create.post')}}", // URL tới phương thức create trong AreaController
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                       if(response.success == true){
-                           Lobibox.notify('success', {
-                               title: 'Thành công',
-                               pauseDelayOnHover: true,
-                               continueDelayOnInactiveTab: false,
-                               position: 'top right',
-                               icon: 'bx bx-check-circle',
-                               msg: response['message'],
-                               sound: false
-                           });
-                       }else {
-                           Lobibox.notify('error', {
-                               title: 'Lỗi',
-                               pauseDelayOnHover: true,
-                               continueDelayOnInactiveTab: false,
-                               position: 'top right',
-                               icon: 'bx bx-check-circle',
-                               msg: response['message'],
-                               sound: false
-                           });
-                       }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log('Đã xảy ra lỗi: ' + error);
-                    }
-                });
-            });
-        });
-    </script>
 @endsection
 
 
