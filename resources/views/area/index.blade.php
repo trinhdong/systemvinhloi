@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title')
-    Danh sách khu vực
+    Khu vực
 @endsection
 @section('css')
     {{-- write css this page--}}

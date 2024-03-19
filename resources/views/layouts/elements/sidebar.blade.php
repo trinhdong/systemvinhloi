@@ -34,6 +34,13 @@
                 <div class="menu-title">Quản lý khách hàng</div>
             </a>
         </li>
+        <li class="<?= (request()->is('category*')) ? 'mm-active' : '' ?>">
+            <a href="{{route('category.list')}}">
+                <div class="parent-icon"><i class="lni lni-list"></i>
+                </div>
+                <div class="menu-title">Quản lý danh mục</div>
+            </a>
+        </li>
         <li class="<?= (request()->is('area*')) ? 'mm-active' : '' ?>">
             <a href="{{route('area.list')}}">
                 <div class="parent-icon"><i class="bi bi-pin-map-fill"></i>
