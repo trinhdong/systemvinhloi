@@ -39,6 +39,8 @@
                 <div class="parent-icon"><i class="lni lni-list"></i>
                 </div>
                 <div class="menu-title">Quản lý danh mục</div>
+            </a>
+        </li>
         <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
             <a href="{{route('order.index')}}">
                 <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
