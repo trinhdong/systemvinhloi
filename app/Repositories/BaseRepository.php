@@ -5,6 +5,7 @@ namespace App\Repositories;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 abstract class BaseRepository
 {
@@ -156,6 +157,7 @@ abstract class BaseRepository
                             break;
 
                         default:
+                            $logicalOperator = $value['logical_operator'] ?? 'AND';
                             if (is_array($value)) {
                                 $operator = $value['operator'];
                                 $value = $value['value'];
@@ -163,8 +165,36 @@ abstract class BaseRepository
                                 $operator = '=';
                             }
 
-                            $model = $model->where($key, $operator, $value);
-                            break;
+                            if ($operator == 'NOT IN') {
+                                $whereNotInConditions[] = [$key, $value];
+                                break;
+                            }
+
+                            if ($logicalOperator === 'OR') {
+                                $orConditions[] = [$key, $operator, $value];
+                            } else {
+                                $andConditions[] = [$key, $operator, $value];
+                            }
+
+                    }
+                }
+
+                if (!empty($orConditions)) {
+                    $model = $model->where(function ($query) use ($orConditions) {
+                        foreach ($orConditions as $condition) {
+                            $query->orWhere(...$condition);
+                        }
+                    });
+                }
+
+                if (!empty($andConditions)) {
+                    foreach ($andConditions as $condition) {
+                        $model = $model->where(...$condition);
+                    }
+                }
+                if (!empty($whereNotInConditions)) {
+                    foreach ($whereNotInConditions as $condition) {
+                        $model = $model->whereNotIn(...$condition);
                     }
                 }
             }
@@ -314,6 +344,7 @@ abstract class BaseRepository
     {
         DB::beginTransaction();
         try {
+            $attributes['created_by'] = Auth::user()->id;
             $result = $this->model->create($attributes);
             DB::commit();
             return $result;
@@ -361,6 +392,7 @@ abstract class BaseRepository
         try {
             $result = $this->model->find($id);
             if ($result) {
+                $attributes['updated_by'] = Auth::user()->id;
                 $result->update($attributes);
                 DB::commit();
                 return $result;
@@ -384,6 +416,7 @@ abstract class BaseRepository
      */
     public function updateByWhere($p_where, array $p_inputs)
     {
+       $p_inputs['updated_by'] = Auth::user()->id;
        return $this->model->where($p_where)->update($p_inputs);
     }
 

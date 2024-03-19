@@ -33,6 +33,7 @@
   <link href="assets/css/light-theme.css" rel="stylesheet" />
   <link href="assets/css/semi-dark.css" rel="stylesheet" />
   <link href="assets/css/header-colors.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
     @yield('css')
   <title>Quản lý bán hàng Vinh Lợi</title>
 </head>

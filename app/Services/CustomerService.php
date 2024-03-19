@@ -26,20 +26,23 @@ class CustomerService extends BaseService
     {
         $filters = [
             'customer_name' => [
+                'logical_operator' => 'OR',
                 'operator' => 'LIKE',
                 'value' => '%' . $query . '%'
             ],
             'email' => [
+                'logical_operator' => 'OR',
                 'operator' => 'LIKE',
                 'value' => '%' . $query . '%'
             ],
             'phone' => [
+                'logical_operator' => 'OR',
                 'operator' => 'LIKE',
                 'value' => '%' . $query . '%'
             ],
         ];
         if (!empty($request['area_id'])) {
-            $filters['area_id'] = $request['area_id'];
+            $filters['area_id'] = intval($request['area_id']);
         }
         return $this->paginate($filters, 'id');
     }
@@ -59,7 +62,7 @@ class CustomerService extends BaseService
         $data['area_id'] = intval($data['area_id']);
         if ($id === null) {
             $customer = $this->customerRepository->create($data);
-            if (!$customer || $this->processDiscount($data, $customer->id)) {
+            if (!$customer || !$this->processDiscount($data, $customer->id)) {
                 return false;
             }
 
@@ -73,6 +76,9 @@ class CustomerService extends BaseService
 
     public function processDiscount(array $data, $customerId)
     {
+        if (empty($data['product_id'])) {
+            return true;
+        }
         $discounts = [];
         $discountsIdMap = $this->discountRepository
             ->getWhere(['customer_id' => $customerId])

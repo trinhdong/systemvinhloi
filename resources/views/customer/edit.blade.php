@@ -20,19 +20,18 @@
                     <div class="col-12">
                         <div class="col-md-8 mt-2">
                             <label for="validationName" class="form-label">Tên</label>
-                            <input name="customer_name" type="text" class="form-control" id="validationName" value="{{ $customer->customer_name }}" required="">
-                            <div class="valid-feedback"></div>
+                            <input name="customer_name" type="text" class="form-control" id="validationName" value="{{ $customer->customer_name }}">
+                            <div class="invalid-feedback">Vui lòng nhập tên</div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationEmail" class="form-label">Email</label>
-                            <input name="email" type="email" class="form-control" id="validationEmail" value="{{ $customer->email }}" required="">
+                            <input name="email" type="email" class="form-control" id="validationEmail" value="{{ $customer->email }}">
                             <div class="valid-feedback"></div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationPhone" class="form-label">Số điện thoại</label>
                             <div class="input-group has-validation">
                                 <input name="phone" type="text" class="form-control" id="validationPhone" value="{{ $customer->phone }}">
-                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-md-8 mt-2">
@@ -44,13 +43,13 @@
                         </div>
                         <div class="col-md-3 mt-2">
                             <label for="validationRole" class="form-label">Khu vực</label>
-                            <select name="area_id" class="form-select" id="validationRole" required="">
+                            <select name="area_id" class="form-select" id="validationRole">
                                 <option selected="" disabled="" value="">Chọn...</option>
                                 @foreach($areas as $areaId => $areaName)
                                     <option value="{{ $areaId }}" @if($customer->area_id == $areaId) selected @endif>{{ $areaName }}</option>
                                 @endforeach
                             </select>
-                            <div class="invalid-feedback"></div>
+                            <div class="invalid-feedback">Vui lòng chọn khu vực</div>
                         </div>
                     </div>
                     @include('customer.editDiscount', compact('products', 'categories', 'customer', 'categoryIds', 'productPrice'), ['discounts' => $customer->discount])

@@ -34,6 +34,13 @@
                 <div class="menu-title">Quản lý khách hàng</div>
             </a>
         </li>
+        <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
+            <a href="{{route('order.index')}}">
+                <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
+                </div>
+                <div class="menu-title">Quản lý đơn hàng</div>
+            </a>
+        </li>
         <li class="<?= (request()->is('area*')) ? 'mm-active' : '' ?>">
             <a href="{{route('area.list')}}">
                 <div class="parent-icon"><i class="bi bi-house-fill"></i>

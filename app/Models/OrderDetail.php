@@ -19,4 +19,9 @@ class OrderDetail extends Model
         'updated_by',
         'deleted_at',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

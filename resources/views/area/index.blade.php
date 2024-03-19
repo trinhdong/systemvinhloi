@@ -58,8 +58,8 @@
                             @endforeach
                             </tbody>
                         </table>
-                        <div class=" justify-content-center">
-                            {!! $areaList->links('pagination::bootstrap-5') !!}
+                        <div class="col-12">
+                            {!! $areaList->links('pagination::bootstrap-4') !!}
                         </div>
                         @endif
                     </div>

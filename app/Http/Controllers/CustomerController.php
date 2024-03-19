@@ -110,7 +110,7 @@ class CustomerController extends Controller
             );
         }
 
-        return redirect()->route('customer.edit')->with(
+        return redirect()->route('customer.edit', $id)->with(
             ['flash_level' => 'error', 'flash_message' => 'Lỗi không thể cập nhật khách hàng']
         );
     }

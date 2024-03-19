@@ -24,4 +24,29 @@ class ProductService extends BaseService
     {
         return $this->productRepository->getByCategoryId($categoryId, $productIdNotIn);
     }
+
+    public function searchQuery($query, $request = [])
+    {
+        $filters = [
+            'product_name' => [
+                'logical_operator' => 'AND',
+                'operator' => 'LIKE',
+                'value' => $query . '%'
+            ],
+        ];
+        $categoryId = intval($request['category_id'] ?? 0);
+        $productIdsNotIn = $request['productIdsNotIn'] ?? [];
+        if (!empty($categoryId)) {
+            $filters['category_id'] = $categoryId;
+        }
+        if (!empty($productIdsNotIn)) {
+            $filters['id'] = [
+                'logical_operator' => 'AND',
+                'operator' => 'NOT IN',
+                'value' => array_map('intval', $productIdsNotIn)
+            ];
+        }
+
+        return $this->paginate($filters, 'id');
+    }
 }

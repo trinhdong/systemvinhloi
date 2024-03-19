@@ -23,27 +23,27 @@ class UserService extends BaseService
     {
         $filters = [
             'name' => [
+                'logical_operator' => 'OR',
                 'operator' => 'LIKE',
                 'value' => '%' . $query . '%'
             ],
             'email' => [
+                'logical_operator' => 'OR',
                 'operator' => 'LIKE',
                 'value' => '%' . $query . '%'
             ],
         ];
 
-        if (!empty($request['role'])) {
-            $filters['role'] = [
-                'operator' => '=',
-                'value' => intval($request['role'])
-            ];
-        }
-
         if (Auth::user()->role === ADMIN) {
             $filters['role'] = [
+                'logical_operator' => 'AND',
                 'operator' => '>',
                 'value' => ADMIN
             ];
+        }
+
+        if (!empty($request['role']) && $request['role'] > ADMIN) {
+            $filters['role'] = intval($request['role']);
         }
 
 

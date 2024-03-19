@@ -34,10 +34,6 @@
                 </form>
             </div>
             <div class="table-responsive mt-3">
-
-                @if($customers->isEmpty())
-                    <p>Không tìm thấy dữ liệu</p>
-                @else
                 <table class="table align-middle">
                     <thead class="table-secondary">
                     <tr>
@@ -51,6 +47,9 @@
                     </tr>
                     </thead>
                     <tbody>
+                    @if($customers->isEmpty())
+                        <tr><td colspan="7" class="text-center">Không tìm thấy dữ liệu</td></tr>
+                    @else
                     @foreach($customers as $key => $customer)
                         <tr>
                             <td>{{ $key + 1 }}</td>
@@ -84,13 +83,13 @@
                             </td>
                         </tr>
                     @endforeach
+                    @endif
                     </tbody>
                 </table>
-                @endif
             </div>
             <div class="row">
-                <div class="col-sm-12 col-md-7">
-                    {{ $customers->links('pagination::bootstrap-5') }}
+                <div class="col-12">
+                    {{ $customers->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         </div>
