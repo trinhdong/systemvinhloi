@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
@@ -37,8 +38,19 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::delete('/delete-discount/{discountId}', [CustomerController::class, 'deleteDiscount'])->name('customer.deleteDiscount');
     });
 
+    Route::prefix('order')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('order.index');
+        Route::get('/detail/{id}', [OrderController::class, 'detail'])->name('order.detail');
+        Route::delete('/delete/{id}', [OrderController::class, 'delete'])->name('order.delete');
+        Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('order.edit');
+        Route::put('/edit/{id}', [OrderController::class, 'edit'])->name('order.update');
+        Route::get('/add', [OrderController::class, 'add'])->name('order.add');
+        Route::post('/add', [OrderController::class, 'add'])->name('order.create');
+    });
+
     Route::prefix('product')->group(function () {
         Route::get('/getByCategoryId', [ProductController::class, 'getByCategoryId'])->name('product.getByCategoryId');
+        Route::get('/search-product', [ProductController::class, 'searchProduct'])->name('product.searchProduct');
     });
 
     Route::controller(AreaController::class)->prefix('area')->group(function () {

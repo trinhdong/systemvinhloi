@@ -20,31 +20,31 @@
                     <div class="col-12">
                         <div class="col-md-8 mt-2">
                             <label for="validationName" class="form-label">Tên</label>
-                            <input name="name" type="text" class="form-control" id="validationName" value="{{ $user->name }}">
-                            <div class="invalid-feedback">Vui lòng nhập tên</div>
+                            <input name="name" type="text" class="form-control" id="validationName" value="{{ $user->name }}" required="">
+                            <div class="valid-feedback"></div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationEmail" class="form-label">Email</label>
-                            <input name="email" type="email" class="form-control" id="validationEmail" value="{{ $user->email }}">
-                            <div class="invalid-feedback">Vui lòng nhập email</div>
+                            <input name="email" type="email" class="form-control" id="validationEmail" value="{{ $user->email }}" required="">
+                            <div class="valid-feedback"></div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationPassword" class="form-label">Mật khẩu</label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                                 <input name="password" type="password" class="form-control" id="validationPassword">
-                                <div class="valid-feedback"></div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         @if(Auth::user()->id !== $user->id)
                         <div class="col-md-3 mt-2">
                             <label for="validationRole" class="form-label">Chức vụ</label>
-                            <select name="role" class="form-select" id="validationRole">
+                            <select name="role" class="form-select" id="validationRole" required="">
                                 <option selected="" disabled="" value="">Chọn...</option>
                                 @foreach(ROLE_TYPE_LIST as $role => $roleName)
                                     <option value="{{ $role }}" @if($user->role == $role) selected @endif>{{ $roleName }}</option>
                                 @endforeach
                             </select>
-                            <div class="invalid-feedback">Vui lòng nhập chức vụ</div>
+                            <div class="invalid-feedback"></div>
                         </div>
                         @endif
                     </div>
@@ -57,7 +57,4 @@
             </div>
         </div>
     </div>
-@endsection
-@section('script')
-    <script src="js/user/add.js"></script>
 @endsection

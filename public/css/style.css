@@ -35,3 +35,9 @@ table.last-child-right tr td:last-child {
 .swal2-popup .swal2-styled:focus {
     box-shadow: none !important;
 }
+.pagination {
+    justify-content: center;
+}
+tr.hover-able:hover {
+    background-color: #f0fbff;
+}

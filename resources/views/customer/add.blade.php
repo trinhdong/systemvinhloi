@@ -19,37 +19,35 @@
                 <div class="col-12">
                     <div class="col-md-8 mt-2">
                         <label for="validationName" class="form-label">Tên</label>
-                        <input name="customer_name" type="text" class="form-control" id="validationName" value="" required="">
-                        <div class="valid-feedback"></div>
+                        <input name="customer_name" type="text" class="form-control" id="validationName" value="">
+                        <div class="invalid-feedback">Vui lòng nhập tên</div>
                     </div>
                     <div class="col-md-8 mt-2">
                         <label for="validationEmail" class="form-label">Email</label>
-                        <input name="email" type="email" class="form-control" id="validationEmail" value="" required="">
-                        <div class="valid-feedback"></div>
+                        <input name="email" type="email" class="form-control" id="validationEmail" value="">
+                        <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-md-8 mt-2">
                         <label for="validationPhone" class="form-label">Số điện thoại</label>
                         <div class="input-group has-validation">
                             <input name="phone" type="text" class="form-control" id="validationPhone">
-                            <div class="invalid-feedback"></div>
                         </div>
                     </div>
                     <div class="col-md-8 mt-2">
                         <label for="validationAddress" class="form-label">Địa chỉ</label>
                         <div class="input-group has-validation">
                             <input name="address" type="text" class="form-control" id="validationAddress">
-                            <div class="invalid-feedback"></div>
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <label for="validationRole" class="form-label">Khu vực</label>
-                        <select name="area_id" class="form-select" id="validationRole" required="">
+                        <select name="area_id" class="form-select" id="validationRole">
                             <option selected="" disabled="" value="">Chọn...</option>
                             @foreach($areas as $areaCode => $areaName)
                                 <option value="{{ $areaCode }}">{{ $areaName }}</option>
                             @endforeach
                         </select>
-                        <div class="invalid-feedback"></div>
+                        <div class="invalid-feedback">Vui lòng chọn khu vực</div>
                     </div>
                 </div>
                 @include('customer.addDiscount', compact('categories'))

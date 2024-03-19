@@ -6,7 +6,7 @@
         <thead class="table-light">
         <tr>
             <th style="width: 50px">
-                <button type="button" class="btn btn-sm btn-outline-primary border-0 btn-clone-row-edit"
+                <button type="button" class="btn btn-sm btn-outline-primary border-0 btn-clone-row"
                         title="Thêm">
                     <div class="font-13" style="margin-right: 5px;">
                         <i class="lni lni-plus"></i>
@@ -23,7 +23,7 @@
         <tbody>
         <tr class="discount-row">
             <td>
-                <button type="button" class="btn btn-sm btn-outline-danger border-0 btn-remove-row-edit" title="Xóa">
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 btn-remove-row" title="Xóa">
                     <div class="font-13" style="margin-right: 5px;">
                         <i class="lni lni-close"></i>
                     </div>
