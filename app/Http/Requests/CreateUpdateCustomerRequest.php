@@ -29,12 +29,16 @@ class CreateUpdateCustomerRequest extends FormRequest
 
         $rules = [
             'customer_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => ['string', 'max:20', 'regex:/^0\d{9,10}$/'], // Validate Vietnamese phone number format
         ];
 
-        if ($this->isMethod('POST')) {
-            $rules['email'] .= '|unique:customers,email';
+        if (!empty($this->input('email'))) {
+            $rules['email'] = 'email|max:255';
+            if ($this->isMethod('POST')) {
+                $rules['email'] .= '|unique:customers,email';
+            }
+        }
+        if (!empty($this->input('phone'))) {
+            $rules['phone'] = ['string', 'max:20', 'regex:/^0\d{9,10}$/'];
         }
 
         return $rules;
@@ -44,7 +48,6 @@ class CreateUpdateCustomerRequest extends FormRequest
     {
         return [
             'customer_name.required' => 'Vui lòng nhập tên.',
-            'email.required' => 'Vui lòng nhập địa chỉ email.',
             'email.email' => 'Vui lòng nhập đúng định dạng địa chỉ email.',
             'email.unique' => 'Địa chỉ email này đã tồn tại.',
             'phone.string' => 'Số điện thoại phải là chuỗi.',

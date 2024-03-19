@@ -17,8 +17,8 @@
             <div class="row py-4">
                 <div class="col-xl-4 offset-xl-4">
                     <input type="text" hidden name="user_id" value="103">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <img width="100px" src="assets/images/avatars/person.png" class="user-img" alt="">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0">Thông tin nhân viên</h5>
                     </div>
                     <div class="table-responsive mt-3">
                         <table class="table table-bordered">

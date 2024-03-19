@@ -59,14 +59,16 @@ class UserController extends Controller
             return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Cập nhật nhân viên thành công']);
         }
 
-        return redirect()->route('user.edit')->with(['flash_level' => 'error', 'flash_message' => 'Lỗi không thể cập nhật nhân viên']);
+        return redirect()->route('user.edit', $id)->with(['flash_level' => 'error', 'flash_message' => 'Lỗi không thể cập nhật nhân viên']);
     }
 
     public function delete($id)
     {
-        $user = $this->userService->delete($id);
-        if ($user) {
-            return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Xóa thành công']);
+        if ($id > 1) {
+            $user = $this->userService->delete($id);
+            if ($user) {
+                return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Xóa thành công']);
+            }
         }
         return redirect()->route('user.index')->with(['flash_level' => 'error', 'flash_message' => 'Lỗi không thể xóa nhân viên']);
     }

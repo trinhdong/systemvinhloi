@@ -30,7 +30,7 @@
                 </button>
             </td>
             <td>
-                <select class="form-select category" required="">
+                <select class="form-select category">
                     <option selected="" disabled="" value="">Chọn...</option>
                     @foreach($categories as $categoryId => $categoryName)
                         <option value="{{ $categoryId }}">{{ $categoryName }}</option>
@@ -38,13 +38,13 @@
                 </select>
             </td>
             <td>
-                <select name="product_id[]" class="form-select product" required="">
+                <select name="product_id[]" class="form-select product">
                     <option selected="" disabled="" value="">Chọn...</option>
                 </select>
             </td>
             <td>
                 <div class="input-group has-validation">
-                    <input name="discount_percent[]" type="text" class="form-control discountPercent" required=""
+                    <input name="discount_percent[]" type="text" class="form-control discountPercent"
                            placeholder="000.00" autocomplete="off">
                     <div class="invalid-feedback"></div>
                 </div>

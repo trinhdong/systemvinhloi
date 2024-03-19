@@ -20,4 +20,11 @@ class ProductController extends Controller
         $products = $this->productService->getByCategoryId($categoryId, $productIdNotIn);
         return response()->json($products);
     }
+
+    public function searchProduct(Request $request)
+    {
+        $query = $request->query('query') ?? "";
+        $products = $this->productService->searchQuery($query, $request->query());
+        return response()->json($products);
+    }
 }

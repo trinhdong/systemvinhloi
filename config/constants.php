@@ -12,3 +12,9 @@ const ROLE_TYPE_NAME = [
     ADMIN => 'ADMIN',
     SALE => 'SALE',
 ];
+const AWAITING = 1;
+const CONFIRMED = 2;
+const STATUS_ORDER_TYPE = [
+    AWAITING => 'Chờ xác nhận',
+    CONFIRMED => 'Đã xác nhận,'
+];

@@ -68,6 +68,9 @@ $(document).ready(function () {
         if (discountPercent <= 0) {
             $(this).val('');
         }
+        if (discountPercent > 100) {
+            $(this).val('');
+        }
         if (decPart !== undefined && decPart.length > 2) {
             $(this).val(discountPercent.toFixed(2));
         }
@@ -93,6 +96,7 @@ $(document).ready(function () {
         newRow.find('.product').empty().append('<option selected="" disabled="" value="">Chọn...</option>');
         newRow.find('.price').text('0');
         newRow.find('.priceDiscount').text('0');
+        newRow.find('.category, .product, input[name="discount_percent[]"]').removeClass('is-invalid');
         newRow.insertAfter($('.discount-row').first());
     });
 
@@ -106,6 +110,44 @@ $(document).ready(function () {
         $(this).closest('tr').remove();
     });
 
+    $(document).on('submit','form', function () {
+        let isValid = true;
+        if ($('input[name="customer_name"]').val() == '') {
+            $('input[name="customer_name"]').addClass('is-invalid')
+            isValid = false;
+        }
+        if ($('select[name="area_id"]').val() == null) {
+            $('select[name="area_id"]').addClass('is-invalid')
+            isValid = false;
+        }
+        $('.discount-row').each(function () {
+            if ($(this).find('.category').val() == null
+                && $(this).find('.product').val() == null
+                && $(this).find('input[name="discount_percent[]"]').val() == ''
+            ) {
+                return;
+            }
+            if ($(this).find('.category').length > 0 && $(this).find('.category').val() == null) {
+                $(this).find('.category').addClass('is-invalid')
+                isValid = false;
+            }
+            if ($(this).find('.product').length > 0 && $(this).find('.product').val() == null) {
+                $(this).find('.product').addClass('is-invalid')
+                isValid = false;
+            }
+            if ($(this).find('input[name="discount_percent[]"]').val() == '') {
+                $(this).find('input[name="discount_percent[]"]').addClass('is-invalid')
+                isValid = false;
+            }
+        })
+        if (!isValid) {
+            return false;
+        }
+        $(this).submit();
+    });
+    $(document).on('focus', 'input[name="customer_name"], select[name="area_id"], .discount-row .category, .product, input[name="discount_percent[]"]', function () {
+        $(this).removeClass('is-invalid');
+    })
 });
 
 function getAllSelectedProduct() {

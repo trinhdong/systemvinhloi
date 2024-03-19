@@ -24,4 +24,9 @@ class Order extends Model
         'updated_by',
         'deleted_at',
     ];
+
+    public function orderDetail()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
 }
