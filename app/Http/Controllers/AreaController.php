@@ -17,7 +17,7 @@ class AreaController extends Controller
     }
 
     public function index(){
-        $areaList = $this->areaService->paginate('', '','ASC',2,false);
+        $areaList = $this->areaService->paginate('', '','ASC',20,false);
         return view('area.index', compact('areaList'));
     }
 
