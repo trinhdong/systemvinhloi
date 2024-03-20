@@ -15,7 +15,8 @@
         <div class="card-body">
             <div class="d-flex align-items-center">
                 <form class="ms-auto position-relative">
-                    <div class="row col-12">
+                    @csrf
+                    <div class="row">
                         <div class="col-5">
                             <select name="area_id" class="form-select">
                                 <option selected="" value="">Chọn khu vực...</option>

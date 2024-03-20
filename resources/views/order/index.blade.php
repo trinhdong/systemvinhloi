@@ -13,10 +13,11 @@
 @section('content')
     <div class="card">
         <div class="card-body">
-            <div class="d-flex align-items-center">
-                <form class="ms-auto position-relative">
-                    <div class="row col-12">
-                        <div class="col-4">
+            <div class="d-flex align-items-center f">
+                <form id="searchForm" class="ms-auto position-relative">
+                    @csrf
+                    <div class="row">
+                        <div class="col-3">
                             <select name="customer_id" class="form-select single-select">
                                 <option selected="" value="">Chọn khách hàng</option>
                                 @foreach($customers as $customerId => $customerName)
@@ -24,7 +25,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <select name="status" class="form-select">
                                 <option selected="" value="">Chọn trạng thái</option>
                                 @foreach(STATUS_ORDER_TYPE as $status => $statusName)
@@ -32,10 +33,13 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
+                            <input name="order_date" type="text" id="datepicker" class="form-control" placeholder="Ngày đặt hàng" />
+                        </div>
+                        <div class="col-3">
                             <div class="ms-auto position-relative">
                                 <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-search"></i></div>
-                                <input name="query" value="{{ request('query') }}" class="form-control ps-5" type="text" placeholder="Tìm kiếm...">
+                                <input id="submit" name="query" value="{{ request('query') }}" class="form-control ps-5" type="text" placeholder="Tìm kiếm...">
                             </div>
                         </div>
                     </div>
@@ -56,7 +60,7 @@
                     </thead>
                     <tbody>
                     @if($orders->isEmpty())
-                        <tr><td colspan="4" class="text-center">Không tìm thấy dữ liệu</td></tr>
+                        <tr><td colspan="7" class="text-center">Không tìm thấy dữ liệu</td></tr>
                     @else
                     @foreach($orders as $key => $order)
                         <tr>
