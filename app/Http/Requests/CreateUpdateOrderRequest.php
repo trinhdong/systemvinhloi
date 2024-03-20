@@ -28,22 +28,28 @@ class CreateUpdateOrderRequest extends FormRequest
         }
 
         $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'order_number' => 'required',
+            'customer_id' => 'required',
+            'product_id' => 'required|array',
+            'quantity' => 'required|array',
+            'unit_price' => 'required|array',
         ];
 
-        if ($this->isMethod('POST')) {
-            $rules['email'] .= '|unique:users,email';
-            $rules['password'] = 'required|string|min:8';
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            $rules['order_number'] .= '|unique:order,order_number';
         }
 
-        return [];
+        return $rules;
     }
 
     public function messages(): array
     {
         return [
-
+            'order_number.required' => 'Vui lòng nhập mã đơn hàng',
+            'order_number.unique' => 'Mã đơn hàng đã tồn tại trong hệ thống.',
+            'customer_id.required' => 'Vui lòng chọn khách hàng',
+            'product_id.required' => 'Vui lòng chọn sản phẩm',
+            'quantity.required' => 'Vui lòng nhập số lượng',
         ];
     }
 }

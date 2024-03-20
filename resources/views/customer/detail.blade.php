@@ -60,7 +60,7 @@
                             </tbody>
                         </table>
                     </div>
-
+                    @if(!$discounts->isEmpty())
                     <div class="col-12 mt-4">
                         <h5 class="mb-0">Sản phẩm khuyến mãi</h5>
                     </div>
@@ -89,6 +89,7 @@
                             </tbody>
                         </table>
                     </div>
+                    @endif
 
                 </div>
             </div>
