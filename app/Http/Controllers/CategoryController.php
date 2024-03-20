@@ -16,8 +16,14 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
-    public function index(){
-        $categoryList = $this->categoryService->paginate('', '','ASC',20,false);
+    public function index(Request $request)
+    {
+        $searchTerm = $request->query('search-category', '');
+        $filters = [];
+        if (!empty($searchTerm)) {
+            $filters['whereRaw'] = "category_name LIKE '%" . $searchTerm . "%'";
+        }
+        $categoryList = $this->categoryService->paginate($filters, '', 'ASC', 20, false);
         return view('category.index', compact('categoryList'));
     }
 
