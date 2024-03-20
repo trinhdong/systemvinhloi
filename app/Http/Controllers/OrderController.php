@@ -47,9 +47,8 @@ class OrderController extends Controller
             $discounts = $this->orderService->mapDiscounts();
             return view('order.add', compact('customers', 'categories', 'discounts'));
         }
- dd($request->input());
-        $data = $request->only(['name', 'email', 'password', 'role']);
-        $order = $this->orderService->createUser($data);
+        $data = $request->only(['order_number', 'customer_id', 'product_id', 'order_total', 'order_discount', 'quantity', 'unit_price']);
+        $order = $this->orderService->createOrder($data);
         if ($order) {
             return redirect()->route('order.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Thêm đơn hàng thành công']

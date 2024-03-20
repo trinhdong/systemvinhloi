@@ -16,10 +16,23 @@
             <div class="d-flex align-items-center">
                 <form class="ms-auto position-relative">
                     <div class="row col-12">
-                        <div class="col-5">
-
+                        <div class="col-4">
+                            <select name="customer_id" class="form-select single-select">
+                                <option selected="" value="">Chọn khách hàng</option>
+                                @foreach($customers as $customerId => $customerName)
+                                    <option value="{{ $customerId }}" @if(intval(request('customer_id')) === $customerId) selected @endif>{{ $customerName }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="col-7">
+                        <div class="col-4">
+                            <select name="status" class="form-select">
+                                <option selected="" value="">Chọn trạng thái</option>
+                                @foreach(STATUS_ORDER_TYPE as $status => $statusName)
+                                    <option value="{{ $status }}" @if(intval(request('status')) === $status) selected @endif>{{ $statusName }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-4">
                             <div class="ms-auto position-relative">
                                 <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-search"></i></div>
                                 <input name="query" value="{{ request('query') }}" class="form-control ps-5" type="text" placeholder="Tìm kiếm...">
@@ -33,7 +46,11 @@
                     <thead class="table-secondary">
                     <tr>
                         <th>#</th>
-                        <th>Tên</th>
+                        <th>Mã đơn hàng</th>
+                        <th>Tên khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
                         <th class="col-1">Hành động</th>
                     </tr>
                     </thead>
@@ -44,13 +61,17 @@
                     @foreach($orders as $key => $order)
                         <tr>
                             <td>{{ $key + 1 }}</td>
-                            <td>{{ $order->name }}</td>
+                            <td>{{ $order->order_number }}</td>
+                            <td>{{ $customers[$order->customer_id] }}</td>
+                            <td>{{ number_format($order->order_total) }}</td>
+                            <td>{{ STATUS_ORDER_TYPE[$order->status] }}</td>
+                            <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
                             <td>
                                 <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                    <a href="{{route('order.detail', $order->id)}}" class="text-primary"
+                                    <a href="#" class="text-primary"
                                        data-bs-toggle="tooltip"
                                        data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
-                                    <a href="{{route('order.edit', $order->id)}}" class="text-warning"
+                                    <a href="#" class="text-warning"
                                        data-bs-toggle="tooltip"
                                        data-bs-placement="bottom"
                                        title="Chỉnh sửa">

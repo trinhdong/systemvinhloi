@@ -17,7 +17,7 @@
     <div class="card-header py-3">
         <div class="row g-5">
             <div class="col-3">
-                <input name="product_code" type="text" class="form-control" placeholder="Mã đơn hàng">
+                <input name="order_number" type="text" class="form-control" placeholder="Mã đơn hàng">
                 <div class="invalid-feedback">Vui lòng nhập mã đơn hàng</div>
             </div>
             <div class="col-3">
@@ -94,7 +94,8 @@
                                             <div class="invalid-feedback"></div>
                                         </div>
                                     </td>
-                                    <td class="unit-price">
+                                    <td>
+                                        <p class="unit-price"></p>
                                         <input disabled type="hidden" name="unit_price[]" />
                                     </td>
                                     <td class="quantity">
@@ -133,7 +134,7 @@
                                 <p class="mb-0">Khuyến mãi:</p>
                             </div>
                             <div class="ms-auto">
-                                <input type="hidden" name="total_discount" />
+                                <input type="hidden" name="order_discount" />
                                 <h5 id="total-discount"  class="mb-0 text-danger">0₫</h5>
                             </div>
                         </div>
@@ -142,7 +143,7 @@
                                 <p class="mb-0">Tổng tiền sau chiết khấu:</p>
                             </div>
                             <div class="ms-auto">
-                                <input type="hidden" name="total_order" />
+                                <input type="hidden" name="order_total" />
                                 <h5 id="total-order"  class="mb-0 text-danger">0₫</h5>
                             </div>
                         </div>
@@ -164,9 +165,9 @@
     <script src="js/order/add.js"></script>
     <script>
         $(document).on('click', '#productList tr.product', function () {
-            if ($(this).hasClass('disabledOnClick')) {
-                return false;
-            }
+            // if ($(this).hasClass('disabledOnClick')) {
+            //     return false;
+            // }
             const discounts = {!! json_encode($discounts) !!};
             const customerId = parseInt($('#customer').val());
             const productId = parseInt($(this).data('id'));
@@ -187,7 +188,7 @@
             $productOrder.find('.product-title').text(productName);
             $productOrder.find('.discount-percent input').val(0);
             $productOrder.find('.unit-price').text(productPriceFormat);
-            $productOrder.find('.unit-price input:hidden').val(productPrice);
+            $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
             $productOrder.find('.total').text(productPriceFormat);
             $productOrder.find('.quantity input').val(1);
             if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId])) {
@@ -198,12 +199,21 @@
                 }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
                 $productOrder.find('.discount-percent input').attr('readonly', 'readonly').val(discounts[customerId + '_' + productId]);
                 $productOrder.find('.unit-price').text(pricePercent);
-                $productOrder.find('.unit-price input:hidden').val(pricePercent);
+                $productOrder.find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
                 $productOrder.find('.total').text(pricePercent);
             }
             $('#orderlist').prepend($productOrder);
             $('#empty-row').addClass('d-none');
             $(this).remove();
+            if ($('#productList .product').length == 0) {
+                $('#productList').append(`
+                <tr>
+                    <td class="text-center" colspan='2'>
+                        Không có dữ liệu
+                    </td>
+                </tr>
+                `);
+            }
             // onSearch($(this));
             totalOrder()
         });
@@ -219,18 +229,18 @@
                 let productPrice = $(this).find('.product-price').text();
                 $(this).find('.discount-percent input').val(0);
                 $(this).find('.unit-price').text(productPrice);
-                $(this).find('.unit-price input:hidden').val(productPrice);
+                $(this).find('.unit-price').closest('td').find('input:hidden').val(productPrice);
                 $(this).find('.discount-percent input').val(0).removeAttr('readonly');
                 if (!isNaN(discounts[customerId + '_' + productId])) {
-                    productPrice = productPrice.replace(/,/g, '');
+                    productPrice = parseFloat(productPrice.replace(/,/g, ''));
                     const discountPercent = discounts[customerId + '_' + productId];
                     const pricePercent = new Intl.NumberFormat("en", {
                         maximumFractionDigits: 0,
                         minimumFractionDigits: 0,
-                    }).format(Math.max(parseFloat(productPrice.replace(/,/g, '')) - (productPrice * discountPercent) / 100, 0));
+                    }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
                     $(this).find('.discount-percent input').attr('readonly', 'readonly').val(discountPercent);
                     $(this).find('.unit-price').text(pricePercent);
-                    $(this).find('.unit-price input:hidden').val(pricePercent);
+                    $(this).find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
                 }
                 $(this).find('.quantity input').trigger('blur');
             })

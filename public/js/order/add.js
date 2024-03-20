@@ -75,13 +75,13 @@ function onSearch(e, page) {
                             `
                 }
                 $('#productList').html(template);
-                $('#productList tr.product').each(function () {
-                    const $this = $(this);
-                    $this.addClass('disabledOnClick');
-                    setTimeout(function () {
-                        $this.removeClass('disabledOnClick');
-                    }, 1000);
-                })
+                // $('#productList tr.product').each(function () {
+                //     const $this = $(this);
+                //     $this.addClass('disabledOnClick');
+                //     setTimeout(function () {
+                //         $this.removeClass('disabledOnClick');
+                //     }, 1000);
+                // })
 
                 if (response.last_page == 1) {
                     $('#paginateCustom').html('');
@@ -102,8 +102,8 @@ function onSearch(e, page) {
 $(document).ready(function () {
     $(document).on('submit', 'form', function () {
         let isValid = true;
-        if ($('input[name="product_code"]').val() == '') {
-            $('input[name="product_code"]').addClass('is-invalid')
+        if ($('input[name="order_number"]').val() == '') {
+            $('input[name="order_number"]').addClass('is-invalid')
             isValid = false;
         }
         if ($('select[name="customer_id"]').val() == null) {
@@ -140,7 +140,7 @@ $(document).ready(function () {
         $(this).submit();
     })
 
-    $(document).on('focus', 'input[name="product_code"], select[name="customer_id"], input[name="discount_percent[]"], input[name="discount_percent[]"]', function () {
+    $(document).on('focus', 'input[name="order_number"], select[name="customer_id"], input[name="discount_percent[]"], input[name="discount_percent[]"]', function () {
         $(this).removeClass('is-invalid');
     })
     $(document).on('change', 'select[name="customer_id"]', function () {
@@ -204,12 +204,14 @@ $(document).ready(function () {
         const price = parseFloat($price.text().replace(/,/g, ''));
         const discountPercent = !isNaN(parseFloat($(this).val())) ? parseFloat($(this).val()) : 0;
         $(this).val(discountPercent);
-        $priceDiscount.text(new Intl.NumberFormat("en", {
+        const unitPrice = new Intl.NumberFormat("en", {
             maximumFractionDigits: 0,
             minimumFractionDigits: 0,
-        }).format(Math.max(price - (discountPercent * price) / 100, 0)))
+        }).format(Math.max(price - (discountPercent * price) / 100, 0));
+        $priceDiscount.text(unitPrice);
+        $priceDiscount.closest('td').find('input:hidden').val(Math.max(price - (discountPercent * price) / 100, 0));
         $(this).closest('tr').find('.quantity input').trigger('blur');
-        totalOrder()
+        totalOrder();
     });
     $(document).on('keyup', '.quantity input', function (event) {
         let quantity = $(this).val();
@@ -249,8 +251,8 @@ function totalOrder() {
         totalProductOrder += totalProductPrice*quantity;
         totalDiscount += discountPercent < 100 ? ((totalProductPrice * discountPercent) / 100)*quantity : totalProductPrice*quantity;
     });
-    $('input[name="total_order"]').val(totalOrder);
-    $('input[name="total_discount"]').val(totalOrder);
+    $('input[name="order_total"]').val(totalOrder);
+    $('input[name="order_discount"]').val(totalDiscount);
     $('#total-product-order').text(new Intl.NumberFormat("en", {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
