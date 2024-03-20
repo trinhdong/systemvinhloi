@@ -41,6 +41,13 @@
                 <div class="menu-title">Quản lý danh mục</div>
             </a>
         </li>
+        <li class="<?= (request()->is('product*')) ? 'mm-active' : '' ?>">
+            <a href="{{route('product.list')}}">
+                <div class="parent-icon"><i class="lni lni-producthunt"></i>
+                </div>
+                <div class="menu-title">Quản lý sản phẩm</div>
+            </a>
+        </li>
         <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
             <a href="{{route('order.index')}}">
                 <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
