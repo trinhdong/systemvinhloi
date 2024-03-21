@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,8 +49,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
     });
 
     Route::prefix('product')->group(function () {
-        Route::get('/getByCategoryId', [ProductController::class, 'getByCategoryId'])->name('product.getByCategoryId');
-        Route::get('/search-product', [ProductController::class, 'searchProduct'])->name('product.searchProduct');
+
     });
 
     Route::controller(AreaController::class)->prefix('area')->group(function () {
@@ -60,5 +60,25 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::get('/edit/{id}', 'edit')->name('area.edit');
         Route::post('/edit/{id}', 'update')->name('area.update');
         Route::delete('/delete/{id}', 'delete')->name('area.delete');
+    });
+    Route::controller(CategoryController::class)->prefix('category')->group(function () {
+        Route::get('/', 'index')->name('category.list');
+        Route::get('/add', 'show')->name('category.create.show');
+        Route::post('/add', 'create')->name('category.create.post');
+        Route::get('/detail/{id}', 'detail')->name('category.detail');
+        Route::get('/edit/{id}', 'edit')->name('category.edit');
+        Route::post('/edit/{id}', 'update')->name('category.update');
+        Route::delete('/delete/{id}', 'delete')->name('category.delete');
+    });
+    Route::controller(ProductController::class)->prefix('product')->group(function () {
+        Route::get('/', 'index')->name('product.list');
+        Route::get('/add', 'show')->name('product.create.show');
+        Route::post('/add', 'create')->name('product.create.post');
+        Route::get('/detail/{id}', 'detail')->name('product.detail');
+        Route::get('/edit/{id}', 'edit')->name('product.edit');
+        Route::post('/edit/{id}', 'update')->name('product.update');
+        Route::delete('/delete/{id}', 'delete')->name('product.delete');
+        Route::get('/getByCategoryId',  'getByCategoryId')->name('product.getByCategoryId');
+        Route::get('/search-product',  'searchProduct')->name('product.searchProduct');
     });
 });

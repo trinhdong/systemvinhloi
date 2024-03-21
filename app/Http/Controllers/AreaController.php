@@ -16,8 +16,13 @@ class AreaController extends Controller
         $this->areaService = $areaService;
     }
 
-    public function index(){
-        $areaList = $this->areaService->paginate('', '','ASC',2,false);
+    public function index(Request $request){
+        $searchTerm = $request->query('search-area', '');
+        $filters = [];
+        if (!empty($searchTerm)) {
+            $filters['whereRaw'] = "name LIKE '%" . $searchTerm . "%'";
+        }
+        $areaList = $this->areaService->paginate($filters, '','ASC',20,false);
         return view('area.index', compact('areaList'));
     }
 
