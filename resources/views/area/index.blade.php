@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title')
-    Khu vực
+    Danh sách khu vực
 @endsection
 @section('css')
     {{-- write css this page--}}
@@ -13,18 +13,20 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="d-flex justify-content-between m-2 row">
-                <div class="col-sm-4 mb-2">
-                    <form class="position-relative">
-                        <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i
-                                class="bi bi-search"></i></div>
-                        <input class="form-control ps-5 rounded" type="text" placeholder="Nhập nội dung tìm kiếm"
-                               name="search-area" value="">
-                    </form>
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col-4">
+                            <form class="position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i
+                                        class="bi bi-search"></i></div>
+                                <input class="form-control ps-5 rounded" type="text" placeholder="Nhập nội dung tìm kiếm"
+                                       name="search-area" value="">
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-5 col-md-4 col-lg-4 mb-2">
-                    <a href="{{route('area.create.show')}}" type="button" class="btn btn-primary px-5 float-end">Thêm
-                        khu
-                        vực</a>
+                <div class="col-2">
+                    <a href="{{route('area.create.show')}}" type="button" class="btn btn-primary float-end">Thêm khu vực</a>
                 </div>
             </div>
             <div class="card">

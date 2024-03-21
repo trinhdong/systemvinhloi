@@ -4,7 +4,7 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{ route('user.index') }}" class="btn btn-sm btn-primary">Quay lại</a>
+        <a href="{{ route('user.index') }}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 @section('breadcrumb')
@@ -48,13 +48,9 @@
                         </div>
                         @endif
                     </div>
-                    <div class="col-2">
-                        <div class="d-grid">
-                            <button class="btn btn-primary" type="submit">Cập nhật</button>
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>
+        <button style="width: 80px; margin-top: -10px" class="btn btn-success" type="submit">Lưu</button>
     </div>
 @endsection

@@ -128,7 +128,7 @@ $(document).ready(function () {
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
-                position: 'top center',
+                position: 'top right',
                 icon: 'bx bx-x-circle',
                 msg: "Vui lòng thêm sản phẩm vào đơn hàng"
             });

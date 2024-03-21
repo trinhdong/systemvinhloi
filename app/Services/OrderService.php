@@ -6,6 +6,8 @@ use App\Repositories\OrderRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OrderDetailRepository;
 use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
+use function Nette\Utils\data;
 
 class OrderService extends BaseService
 {
@@ -39,6 +41,14 @@ class OrderService extends BaseService
         }
         if (!empty($request['customer_id'])) {
             $filters['customer_id'] = intval($request['customer_id']);
+        }
+
+        if (!empty($request['order_date'])) {
+            $filters['order_date'] =[
+                'logical_operator' => 'AND',
+                'operator' => 'LIKE',
+                'value' => $request['order_date'] . '%'
+            ];
         }
 
         return $this->paginate($filters, 'id');

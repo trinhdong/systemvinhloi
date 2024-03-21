@@ -29,6 +29,8 @@ class CreateUpdateCustomerRequest extends FormRequest
 
         $rules = [
             'customer_name' => 'required|string|max:255',
+            'phone' => ['required', 'max:20', 'regex:/^0\d{9,10}$/'],
+            'address' => 'required|string|max:255',
         ];
 
         if (!empty($this->input('email'))) {
@@ -36,9 +38,6 @@ class CreateUpdateCustomerRequest extends FormRequest
             if ($this->isMethod('POST')) {
                 $rules['email'] .= '|unique:customers,email';
             }
-        }
-        if (!empty($this->input('phone'))) {
-            $rules['phone'] = ['string', 'max:20', 'regex:/^0\d{9,10}$/'];
         }
 
         return $rules;
@@ -48,9 +47,10 @@ class CreateUpdateCustomerRequest extends FormRequest
     {
         return [
             'customer_name.required' => 'Vui lòng nhập tên.',
+            'address.required' => 'Vui lòng nhập địa chỉ.',
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
             'email.email' => 'Vui lòng nhập đúng định dạng địa chỉ email.',
             'email.unique' => 'Địa chỉ email này đã tồn tại.',
-            'phone.string' => 'Số điện thoại phải là chuỗi.',
             'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
         ];

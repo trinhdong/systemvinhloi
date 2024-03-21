@@ -10,7 +10,14 @@
     {{-- write breadcrumb this page--}}
     Chỉnh sửa khu vực
 @endsection
+@section('action')
+    <div class="col-12">
+        <a href="{{route('area.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+    </div>
+@endsection
 @section('content')
+    <div class="card">
+        <div class="card-body">
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
@@ -33,16 +40,11 @@
                             </div>
                         </div>
                 </div>
-                <div class="d-flex justify-content-center mb-5">
-                    <div>
-                        <a href="{{route('area.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
-                    </div>
-                    <div>
-                        <button type="submit" class="btn btn-success px-5 mx-2 w-100">Lưu</button>
-                    </div>
-                </div>
+            </div>
+            <button style="width: 80px;" class="btn btn-success" type="submit">Lưu</button>
             </div>
             </form>
+        </div>
         </div>
     </div>
 @endsection

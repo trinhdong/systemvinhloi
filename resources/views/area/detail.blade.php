@@ -5,6 +5,12 @@
 @section('breadcrumb')
     {{$area->name}}
 @endsection
+@section('action')
+    <div class="col-12">
+        <a href="{{route('area.edit', $area->id)}}" class="btn btn-sm btn-primary me-2">Chỉnh sửa</a>
+        <a href="{{route('area.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+    </div>
+@endsection
 @section('content')
     <div class="row">
         <div class="col-sm-12">

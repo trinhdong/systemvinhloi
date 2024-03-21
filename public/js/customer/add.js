@@ -120,6 +120,14 @@ $(document).ready(function () {
             $('select[name="area_id"]').addClass('is-invalid')
             isValid = false;
         }
+        if ($('input[name="phone"]').val() == '') {
+            $('input[name="phone"]').addClass('is-invalid')
+            isValid = false;
+        }
+        if ($('input[name="address"]').val() == '') {
+            $('input[name="address"]').addClass('is-invalid')
+            isValid = false;
+        }
         $('.discount-row').each(function () {
             if ($(this).find('.category').val() == null
                 && $(this).find('.product').val() == null
@@ -145,7 +153,7 @@ $(document).ready(function () {
         }
         $(this).submit();
     });
-    $(document).on('focus', 'input[name="customer_name"], select[name="area_id"], .discount-row .category, .product, input[name="discount_percent[]"]', function () {
+    $(document).on('focus', 'input[name="customer_name"], input[name="phone"], input[name="address"], select[name="area_id"], .discount-row .category, .product, input[name="discount_percent[]"]', function () {
         $(this).removeClass('is-invalid');
     })
 });

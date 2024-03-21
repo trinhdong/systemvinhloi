@@ -6,8 +6,8 @@
 
 @section('action')
     <div class="col-12">
-        <a href="{{route('customer.edit', $customer->id)}}" class="btn btn-sm btn-warning me-2">Chỉnh sửa</a>
-        <a href="{{route('customer.index')}}" class="btn btn-sm btn-primary">Quay lại</a>
+        <a href="{{route('customer.edit', $customer->id)}}" class="btn btn-sm btn-primary me-2">Chỉnh sửa</a>
+        <a href="{{route('customer.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 

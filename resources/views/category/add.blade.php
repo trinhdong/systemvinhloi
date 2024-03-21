@@ -10,32 +10,34 @@
     {{-- write breadcrumb this page--}}
    Thêm danh mục sản phẩm
 @endsection
+@section('action')
+    <div class="col-12">
+        <a href="{{route('category.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+    </div>
+@endsection
 @section('content')
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <form action="{{ route('category.create.post') }}" method="post">
-                        @csrf
-                        <div class="p-4 rounded">
-                            <div class="row mb-2">
-                                <label for="category_name" class="col-sm-2 col-form-label">Tên danh mục</label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="category_name" class="form-control" id="category_name" placeholder="Nhập tên danh mục sản phẩm" value="">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form action="{{ route('category.create.post') }}" method="post">
+                                @csrf
+                                <div class="p-4 rounded">
+                                    <div class="row mb-2">
+                                        <label for="category_name" class="col-sm-2 col-form-label">Tên danh mục</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" name="category_name" class="form-control" id="category_name" placeholder="Nhập tên danh mục sản phẩm" value="">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
                         </div>
+                    </div>
+                    <button style="width: 80px;" class="btn btn-success" type="submit">Lưu</button>
+                    </form>
                 </div>
             </div>
-            <div class="d-flex justify-content-end">
-                <div>
-                    <a href="{{route('category.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-primary px-5 mx-2">Lưu</button>
-                </div>
-            </div>
-            </form>
         </div>
     </div>
 @endsection
