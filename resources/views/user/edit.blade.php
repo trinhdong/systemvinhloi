@@ -4,7 +4,7 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{ route('user.index') }}" class="btn btn-sm btn-primary">Quay lại</a>
+        <a href="{{ route('user.index') }}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 @section('breadcrumb')
@@ -27,6 +27,14 @@
                             <label for="validationEmail" class="form-label">Email</label>
                             <input name="email" type="email" class="form-control" id="validationEmail" value="{{ $user->email }}">
                             <div class="invalid-feedback">Vui lòng nhập email</div>
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label class="form-label">Số điện thoại</label>
+                            <input name="phone" type="text" class="form-control" value="{{ $user->phone }}" >
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label class="form-label">Ngày vào làm</label>
+                            <input name="day_of_work" type="text" id="datepicker" class="form-control" value="{{ !empty($user->day_of_work) ? date('d/m/Y', strtotime($user->day_of_work)) : '' }}" >
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationPassword" class="form-label">Mật khẩu</label>

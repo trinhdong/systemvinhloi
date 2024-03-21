@@ -42,10 +42,11 @@ class UserService extends BaseService
             ];
         }
 
-        if (!empty($request['role']) && $request['role'] > ADMIN) {
+        if (!empty($request['role']) && $request['role'] > ADMIN
+            || Auth::user()->role === SUPER_ADMIN && !empty($request['role'])
+        ) {
             $filters['role'] = intval($request['role']);
         }
-
 
         return $this->paginate($filters, 'id');
     }
@@ -62,6 +63,9 @@ class UserService extends BaseService
 
     private function processUser(array $data, $id = null)
     {
+        if (isset($data['day_of_work'])) {
+            $data['day_of_work'] = date(FORMAT_DATE_TIME, strtotime($data['day_of_work']));
+        }
         if (isset($data['role']) && intval($data['role']) === ADMIN) {
             $data['is_admin'] = true;
             $data['role'] = intval($data['role']);

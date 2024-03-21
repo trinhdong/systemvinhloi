@@ -4,7 +4,7 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{ route('user.index') }}" class="btn btn-sm btn-primary">Quay lại</a>
+        <a href="{{ route('user.index') }}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 @section('breadcrumb')

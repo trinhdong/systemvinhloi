@@ -33,7 +33,7 @@ class UserController extends Controller
             return view('user.add');
         }
 
-        $data = $request->only(['name', 'email', 'password', 'role']);
+        $data = $request->only(['name', 'email', 'password', 'role', 'day_of_work', 'phone']);
         $user = $this->userService->createUser($data);
         if ($user) {
             return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Thêm nhân viên thành công']);
@@ -53,7 +53,7 @@ class UserController extends Controller
             return view('user.edit', compact('user'));
         }
 
-        $data = $request->only(['name', 'email', 'password', 'role']);
+        $data = $request->only(['name', 'email', 'password', 'role', 'day_of_work', 'phone']);
         $updated = $this->userService->updateUser($user->id, $data);
         if ($updated) {
             return redirect()->route('user.index')->with(['flash_level' => 'success', 'flash_message' => 'Cập nhật nhân viên thành công']);

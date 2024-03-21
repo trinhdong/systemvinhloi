@@ -36,6 +36,9 @@ class CreateUpdateUserRequest extends FormRequest
             $rules['email'] .= '|unique:users,email';
             $rules['password'] = 'required|string|min:8';
         }
+        if (!empty($this->input('phone'))) {
+            $rules['phone'] = ['string', 'max:20', 'regex:/^0\d{9,10}$/'];
+        }
 
         return $rules;
     }
@@ -49,6 +52,8 @@ class CreateUpdateUserRequest extends FormRequest
             'email.unique' => 'Địa chỉ email này đã tồn tại.',
             'password.required' => 'Vui nhập mật khẩu.',
             'password.min' => 'Vui lòng nhập mật khẩu lớn hơn hoặc 8 ký tự.',
+            'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.',
+            'phone.regex' => 'Số điện thoại không hợp lệ.',
         ];
     }
 }
