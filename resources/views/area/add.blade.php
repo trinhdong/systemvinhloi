@@ -10,40 +10,42 @@
     {{-- write breadcrumb this page--}}
    Thêm khu vực
 @endsection
+@section('action')
+    <div class="col-12">
+        <a href="{{route('area.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+    </div>
+@endsection
 @section('content')
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <form action="{{ route('area.create.post') }}" method="post">
-                        @csrf
-                        <div class="p-4 rounded">
-                            <div class="row mb-2">
-                                <label for="name" class="col-sm-2 col-form-label">Tên khu vực</label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="name" class="form-control" id="area_name" placeholder="Nhập tên khu vực" value="">
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{{ route('area.create.post') }}" method="post">
+                            @csrf
+                            <div class="p-4 rounded">
+                                <div class="row mb-2">
+                                    <label for="name" class="col-sm-2 col-form-label">Tên khu vực</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="name" class="form-control" id="area_name" placeholder="Nhập tên khu vực" value="">
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <label for="description" class="col-sm-2 col-form-label">Nội dung khu vực</label>
+                                    <div class="col-sm-10">
+                                        <textarea name="description" class="form-control" id="description" placeholder="Nhập nội dung khu vực"></textarea>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row mb-2">
-                                <label for="description" class="col-sm-2 col-form-label">Nội dung khu vực</label>
-                                <div class="col-sm-10">
-                                    <textarea name="description" class="form-control" id="description" placeholder="Nhập nội dung khu vực"></textarea>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
                 </div>
+                <button style="width: 80px;" class="btn btn-success mt-3" type="submit">Lưu</button>
+                </form>
             </div>
-            <div class="d-flex justify-content-end">
-                <div>
-                    <a href="{{route('area.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-primary px-5 mx-2">Lưu</button>
-                </div>
-            </div>
-            </form>
         </div>
     </div>
+</div>
 @endsection
 @section('script')
 @endsection

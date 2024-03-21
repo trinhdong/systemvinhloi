@@ -2,11 +2,6 @@
 @section('title')
     Khách hàng
 @endsection
-@section('action')
-    <div class="col-12">
-        <a href="{{route('customer.add')}}" class="btn btn-sm btn-primary">Thêm khách hàng</a>
-    </div>
-@endsection
 @section('breadcrumb')
     Danh sách khách hàng
 @endsection
@@ -14,17 +9,17 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="d-flex justify-content-between m-2 row">
-                <div class="col-sm-8 mb-2">
+                <div class="col-sm-10 mb-2">
                     <form id="form-search" class="position-relative">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i
                                             class="bi bi-search"></i></div>
                                 <input onchange="$('#form-search').submit()" class="form-control ps-5 rounded" type="text"
                                        placeholder="Nhập nội dung tìm kiếm"
                                        name="query" value="{{ request('query') }}">
                             </div>
-                            <div class="col-4">
+                            <div class="col-2">
                                 <select onchange="$('#form-search').submit()" name="area_id" class="form-select single-select">
                                     <option selected="" value="">Chọn khu vực</option>
                                     @foreach($areas as $areaId => $areaName)
@@ -35,6 +30,9 @@
                             </div>
                         </div>
                     </form>
+                </div>
+                <div class="col-2">
+                    <a href="{{route('customer.add')}}" class="btn btn-primary float-end">Thêm khách hàng</a>
                 </div>
             </div>
             <div class="card">

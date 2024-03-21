@@ -96,7 +96,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <p class="unit-price"></p>
+                                            <div class="unit-price"></div>
                                             <input disabled type="hidden" name="unit_price[]" />
                                         </td>
                                         <td class="quantity">
@@ -152,13 +152,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-2">
-                <div class="d-grid">
-                    <button class="btn btn-primary" type="submit">Thêm mới</button>
-                </div>
-            </div>
         </div>
     </div>
+     <button style="width: 80px; margin-top: -10px" class="btn btn-success" type="submit">Lưu</button>
 </form>
 
 @include('order.addProduct', compact('categories', 'discounts'))

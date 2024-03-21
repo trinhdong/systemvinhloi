@@ -6,8 +6,8 @@
 
 @section('action')
     <div class="col-12">
-        <a href="{{route('category.edit', $category->id)}}" class="btn btn-success me-2">Chỉnh sửa</a>
-        <a href="{{route('category.list')}}" class="btn btn-primary">Quay lại</a>
+        <a href="{{route('category.edit', $category->id)}}" class="btn btn-sm btn-primary me-2">Chỉnh sửa</a>
+        <a href="{{route('category.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 

@@ -11,59 +11,56 @@
     Thêm nhân viên
 @endsection
 @section('content')
-<div class="card">
-    <div class="card-body">
-        <div class="p-4 border rounded">
-            <form class="row g-3 needs-validation" action="{{ route('user.create') }}" method="POST">
-                @csrf
-                <div class="col-12">
-                    <div class="col-md-8 mt-2">
-                        <label for="validationName" class="form-label">Tên</label>
-                        <input name="name" type="text" class="form-control" id="validationName" value="" >
-                        <div class="invalid-feedback">Vui lòng nhập tên</div>
-                    </div>
-                    <div class="col-md-8 mt-2">
-                        <label for="validationEmail" class="form-label">Email</label>
-                        <input name="email" type="email" class="form-control" id="validationEmail" value="" >
-                        <div class="invalid-feedback">Vui lòng nhập email</div>
-                    </div>
-                    <div class="col-md-8 mt-2">
-                        <label class="form-label">Số điện thoại</label>
-                        <input name="phone" type="text" class="form-control" value="" >
-                    </div>
-                    <div class="col-md-8 mt-2">
-                        <label class="form-label">Ngày vào làm</label>
-                        <input name="day_of_work" type="text" id="datepicker" class="form-control" value="" >
-                    </div>
-                    <div class="col-md-8 mt-2">
-                        <label for="validationPassword" class="form-label">Mật khẩu</label>
-                        <div class="input-group has-validation">
-                            <input name="password" type="password" class="form-control" id="validationPassword" >
-                            <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+<form class="row g-3 needs-validation" action="{{ route('user.create') }}" method="POST">
+    <div class="card">
+        <div class="card-body">
+            <div class="p-4 border rounded">
+                    @csrf
+                    <div class="col-12">
+                        <div class="col-md-8 mt-2">
+                            <label for="validationName" class="form-label">Tên</label>
+                            <input name="name" type="text" class="form-control" id="validationName" value="" >
+                            <div class="invalid-feedback">Vui lòng nhập tên</div>
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label for="validationEmail" class="form-label">Email</label>
+                            <input name="email" type="email" class="form-control" id="validationEmail" value="" >
+                            <div class="invalid-feedback">Vui lòng nhập email</div>
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label class="form-label">Số điện thoại</label>
+                            <input name="phone" type="text" class="form-control" value="" >
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label class="form-label">Ngày vào làm</label>
+                            <input name="day_of_work" type="text" id="datepicker" class="form-control" value="" >
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label for="validationPassword" class="form-label">Mật khẩu</label>
+                            <div class="input-group has-validation">
+                                <input name="password" type="password" class="form-control" id="validationPassword" >
+                                <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                            <label for="validationRole" class="form-label">Chức vụ</label>
+                            <select name="role" class="form-select" id="validationRole" >
+                                <option selected="" disabled="" value="">Chọn...</option>
+                                @foreach(ROLE_TYPE_LIST as $role => $roleName)
+                                    @if(Auth::user()->role !== $role)
+                                        <option value="{{ $role }}">{{ $roleName }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Vui lòng chọn chức vụ</div>
                         </div>
                     </div>
-                    <div class="col-md-3 mt-2">
-                        <label for="validationRole" class="form-label">Chức vụ</label>
-                        <select name="role" class="form-select" id="validationRole" >
-                            <option selected="" disabled="" value="">Chọn...</option>
-                            @foreach(ROLE_TYPE_LIST as $role => $roleName)
-                                @if(Auth::user()->role !== $role)
-                                    <option value="{{ $role }}">{{ $roleName }}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                        <div class="invalid-feedback">Vui lòng chọn chức vụ</div>
-                    </div>
-                </div>
-                <div class="col-2">
-                    <div class="d-grid">
-                    <button class="btn btn-primary" type="submit">Thêm mới</button>
-                    </div>
-                </div>
-            </form>
+            </div>
+            <button style="width: 80px;" class="btn btn-success mt-3" type="submit">Lưu</button>
         </div>
     </div>
-</div>
+</form>
+
 @endsection
 @section('script')
     <script src="js/user/add.js"></script>

@@ -48,13 +48,9 @@
                         </div>
                         @endif
                     </div>
-                    <div class="col-2">
-                        <div class="d-grid">
-                            <button class="btn btn-primary" type="submit">Cập nhật</button>
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>
+        <button style="width: 80px; margin-top: -10px" class="btn btn-success" type="submit">Lưu</button>
     </div>
 @endsection

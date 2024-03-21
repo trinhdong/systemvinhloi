@@ -11,11 +11,12 @@
     Thêm khách hàng
 @endsection
 @section('content')
-<div class="card">
+
+<form class="row g-3 needs-validation" action="{{ route('customer.create') }}" method="POST">
+    @csrf
+    <div class="card">
     <div class="card-body">
         <div class="p-4 border rounded">
-            <form class="row g-3 needs-validation" action="{{ route('customer.create') }}" method="POST">
-                @csrf
                 <div class="col-12">
                     <div class="col-md-8 mt-2">
                         <label for="validationName" class="form-label">Tên</label>
@@ -49,15 +50,12 @@
                     </div>
                 </div>
                 @include('customer.addDiscount', compact('categories'))
-                <div class="col-2">
-                    <div class="d-grid">
-                    <button class="btn btn-primary" type="submit">Thêm mới</button>
-                    </div>
-                </div>
-            </form>
         </div>
+        <button style="width: 80px;" class="btn btn-success mt-3" type="submit">Lưu</button>
     </div>
 </div>
+</form>
+
 @endsection
 @section('script')
     <script src="js/customer/add.js"></script>

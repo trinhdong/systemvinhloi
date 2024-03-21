@@ -10,6 +10,11 @@
     {{-- write breadcrumb this page--}}
     Thêm sản phẩm
 @endsection
+@section('action')
+    <div class="col-12">
+        <a href="{{route('product.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+    </div>
+@endsection
 @section('content')
     <div class="row">
         <div class="col-sm-12">
@@ -71,14 +76,7 @@
                                 </div>
                             </div>
                         </div>
-            <div class="d-flex justify-content-center">
-                <div>
-                    <a href="{{route('product.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-primary px-5 mx-2">Lưu</button>
-                </div>
-            </div>
+                        <button style="width: 80px;" class="btn btn-success" type="submit">Lưu</button>
             </form>
         </div>
     </div>
