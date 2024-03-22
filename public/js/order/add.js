@@ -51,14 +51,14 @@ function onSearch(e, page) {
                                                 <tr class="hover-able cursor-pointer product" data-id=${product.id} data-product-image=${product.image_url}  data-product-name=${product.product_name}  data-product-price=${product.price}>
                                                     <td>
                                                         <div>
-                                                            <a class="d-flex align-items-center gap-2" href="javascript:;">
+                                                            <div class="d-flex align-items-center gap-2"">
                                                                 <div class="product-box">
                                                                     <img src="${product.image_url}" alt="">
                                                                 </div>
                                                                 <div>
                                                                     <p class="mb-0 product-title">${product.product_name}</p>
                                                                 </div>
-                                                            </a>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td>${productPrice}</td>

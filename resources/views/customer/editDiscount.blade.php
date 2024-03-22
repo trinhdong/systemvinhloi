@@ -15,9 +15,9 @@
             </th>
             <th class="col-3">Danh mục</th>
             <th class="col-3">Sản phẩm</th>
-            <th>Phần trăm giảm giá</th>
+            <th>Chiết khấu</th>
             <th>Giá</th>
-            <th>Giá khuyến mãi</th>
+            <th>Giá sau chiết khấu</th>
         </tr>
         </thead>
         <tbody>

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\CustomerRepository;
 use App\Repositories\DiscountRepository;
+use Illuminate\Support\Facades\DB;
 
 class CustomerService extends BaseService
 {
@@ -59,22 +60,30 @@ class CustomerService extends BaseService
 
     private function processCustomer(array $data, $id = null)
     {
+        DB::beginTransaction();
         $data['area_id'] = intval($data['area_id']);
         if ($id === null) {
-            $customer = $this->customerRepository->create($data);
+            $customer = $this->customerRepository->create($data, true);
             if (!$customer || !$this->processDiscount($data, $customer->id)) {
+                DB::rollBack();
                 return false;
             }
-
+            DB::commit();
             return $customer;
         }
         if (!$this->processDiscount($data, $id)) {
+            DB::rollBack();
             return false;
         }
-        return $this->customerRepository->update($id, $data);
+        $customer = $this->customerRepository->update($id, $data, true);
+        if (!$customer) {
+            DB::rollBack();
+        }
+        DB::commit();
+        return $customer;
     }
 
-    public function processDiscount(array $data, $customerId)
+    public function processDiscount(array $data, $customerId, $isAddOrder = false)
     {
         if (empty($data['product_id'])) {
             return true;
@@ -95,12 +104,12 @@ class CustomerService extends BaseService
         foreach ($discounts as $key => $discount) {
             if (in_array($discount['product_id'], $discountsProductIdMap)) {
                 $discountId = $discountsIdMap[$discount['product_id']];
-                if (!$this->discountRepository->update($discountId, $discount)) {
+                if (!$isAddOrder && !$this->discountRepository->update($discountId, $discount, true)) {
                     return false;
                 }
                 continue;
             }
-            if (!$this->discountRepository->create($discount)) {
+            if (!$this->discountRepository->create($discount, true)) {
                 return false;
             }
         }

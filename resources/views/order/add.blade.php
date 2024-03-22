@@ -56,7 +56,7 @@
                                         </th>
                                         <th>Sản phẩm</th>
                                         <th>Giá gốc</th>
-                                        <th>Phần trăm khuyến mãi</th>
+                                        <th>Chiết khấu</th>
                                         <th>Giá sau chiết khấu</th>
                                         <th>Số lượng</th>
                                         <th>Tổng tiền</th>
@@ -77,14 +77,14 @@
                                         <td>
                                             <div>
                                                 <input disabled type="hidden" name="product_id[]" />
-                                                <a class="d-flex align-items-center gap-2" href="javascript:;">
+                                                <div class="d-flex align-items-center gap-2">
                                                     <div class="product-box product-image">
                                                         <img src="" alt="">
                                                     </div>
                                                     <div>
                                                         <P class="mb-0 product-title"></P>
                                                     </div>
-                                                </a>
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="product-price"></td>
@@ -150,11 +150,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card border radius-10">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-4">
+                                <div>
+                                    <h5 class="mb-0">Thông tin thanh toán</h5>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div>
+                                    <p class="mb-0">Tổng tiền sau chiết khấu:</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <button style="width: 80px; margin-top: -10px" class="btn btn-success" type="submit">Lưu</button>
         </div>
     </div>
-     <button style="width: 80px; margin-top: -10px" class="btn btn-success" type="submit">Lưu</button>
 </form>
 
 @include('order.addProduct', compact('categories', 'discounts'))
@@ -195,7 +209,7 @@
                     maximumFractionDigits: 0,
                     minimumFractionDigits: 0,
                 }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-                $productOrder.find('.discount-percent input').attr('readonly', 'readonly').val(discounts[customerId + '_' + productId]);
+                $productOrder.find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discounts[customerId + '_' + productId]);
                 $productOrder.find('.unit-price').text(pricePercent);
                 $productOrder.find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
                 $productOrder.find('.total').text(pricePercent);
@@ -228,7 +242,7 @@
                 $(this).find('.discount-percent input').val(0);
                 $(this).find('.unit-price').text(productPrice);
                 $(this).find('.unit-price').closest('td').find('input:hidden').val(productPrice);
-                $(this).find('.discount-percent input').val(0).removeAttr('readonly');
+                $(this).find('.discount-percent input').val(0).removeAttr('readonly').removeClass('disabled');
                 if (!isNaN(discounts[customerId + '_' + productId])) {
                     productPrice = parseFloat(productPrice.replace(/,/g, ''));
                     const discountPercent = discounts[customerId + '_' + productId];
@@ -236,7 +250,7 @@
                         maximumFractionDigits: 0,
                         minimumFractionDigits: 0,
                     }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-                    $(this).find('.discount-percent input').attr('readonly', 'readonly').val(discountPercent);
+                    $(this).find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discountPercent);
                     $(this).find('.unit-price').text(pricePercent);
                     $(this).find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
                 }

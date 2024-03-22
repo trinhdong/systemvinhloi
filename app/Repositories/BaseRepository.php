@@ -340,17 +340,23 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function create($attributes = [])
+    public function create($attributes = [], $hasTransaction = false)
     {
-        DB::beginTransaction();
+        if (!$hasTransaction) {
+            DB::beginTransaction();
+        }
         try {
             $attributes['created_by'] = Auth::user()->id;
             $result = $this->model->create($attributes);
-            DB::commit();
+            if (!$hasTransaction) {
+                DB::commit();
+            }
             return $result;
         } catch (\Throwable $th) {
             Log::error($th);
-            DB::rollBack();
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
             return false;
         }
     }
@@ -386,23 +392,31 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function update($id, $attributes = [])
+    public function update($id, $attributes = [], $hasTransaction = false)
     {
-        DB::beginTransaction();
+        if (!$hasTransaction) {
+            DB::beginTransaction();
+        }
         try {
             $result = $this->model->find($id);
             if ($result) {
                 $attributes['updated_by'] = Auth::user()->id;
                 $result->update($attributes);
-                DB::commit();
+                if (!$hasTransaction) {
+                    DB::commit();
+                }
                 return $result;
             }
-            DB::rollBack();
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
 
             return false;
         } catch (\Throwable $th) {
             Log::error($th);
-            DB::rollBack();
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
             return false;
         }
     }

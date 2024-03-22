@@ -6,20 +6,25 @@ use App\Repositories\OrderRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OrderDetailRepository;
 use Illuminate\Support\Facades\Date;
-use Carbon\Carbon;
-use function Nette\Utils\data;
+use Illuminate\Support\Facades\DB;
 
 class OrderService extends BaseService
 {
     protected $orderRepository;
     protected $discountRepository;
     protected $orderDetailRepository;
+    protected $customerService;
 
-    public function __construct(OrderRepository $orderRepository, DiscountRepository $discountRepository, OrderDetailRepository $orderDetailRepository)
-    {
+    public function __construct(
+        OrderRepository $orderRepository,
+        DiscountRepository $discountRepository,
+        OrderDetailRepository $orderDetailRepository,
+        CustomerService $customerService
+    ) {
         $this->orderRepository = $orderRepository;
         $this->discountRepository = $discountRepository;
         $this->orderDetailRepository = $orderDetailRepository;
+        $this->customerService = $customerService;
         $this->setRepository();
     }
 
@@ -66,12 +71,13 @@ class OrderService extends BaseService
 
     private function processOrder(array $data, $id = null)
     {
+        DB::beginTransaction();
         if ($id === null) {
             $data['customer_id'] = intval($data['customer_id']);
             $data['order_total'] = floatval($data['order_total']);
             $data['order_discount'] = floatval($data['order_discount']);
             $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
-            $data['status'] = AWAITING;
+            $data['status'] = DRAFT;
             $data['product_id'] = array_values(array_filter($data['product_id']));
             $data['quantity'] = array_values(array_filter($data['quantity']));
             $data['unit_price'] = array_values(array_filter($data['unit_price']));
@@ -80,16 +86,29 @@ class OrderService extends BaseService
                 return false;
             }
 
-            $order = $this->create($data);
-            if (!$order || !$this->processOrderDetail($data, $order->id)) {
+            $order = $this->create($data, true);
+            if (!$order
+                || !$this->processOrderDetail($data, $order->id)
+                || !$this->customerService->processDiscount($data, $order->customer_id, true)
+            ) {
+                DB::rollBack();
                 return false;
             }
+            DB::commit();
             return $order;
         }
-        if (!$this->processOrderDetail($data, $id)) {
+        if (!$this->processOrderDetail($data, $id)
+            || !$this->customerService->processDiscount($data, intval($data['customer_id'], true))
+        ) {
+            DB::rollBack();
             return false;
         }
-        return $this->update($id, $data);
+        $order = $this->update($id, $data, true);
+        if (!$order) {
+            DB::rollBack();
+        }
+        DB::commit();
+        return $order;
     }
 
     public function processOrderDetail(array $data, $orderId)
@@ -109,12 +128,12 @@ class OrderService extends BaseService
         foreach ($orderDetails as $key => $orderDetail) {
             if (in_array($orderDetail['product_id'], $orderDetailProductIdMap)) {
                 $orderDetailId = $orderDetailsIdMap[$orderDetails['product_id']];
-                if (!$this->orderDetailRepository->update($orderDetailId, $orderDetail)) {
+                if (!$this->orderDetailRepository->update($orderDetailId, $orderDetail, true)) {
                     return false;
                 }
                 continue;
             }
-            if (!$this->orderDetailRepository->create($orderDetail)) {
+            if (!$this->orderDetailRepository->create($orderDetail, true)) {
                 return false;
             }
         }

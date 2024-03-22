@@ -27,19 +27,13 @@ class CreateUpdateOrderRequest extends FormRequest
             return  [];
         }
 
-        $rules = [
-            'order_number' => 'required',
+        return [
+            'order_number' => 'required|unique:orders,order_number',
             'customer_id' => 'required',
             'product_id' => 'required|array',
             'quantity' => 'required|array',
             'unit_price' => 'required|array',
         ];
-
-        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
-            $rules['order_number'] .= '|unique:order,order_number';
-        }
-
-        return $rules;
     }
 
     public function messages(): array

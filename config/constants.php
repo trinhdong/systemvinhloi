@@ -22,9 +22,31 @@ const ROLE_TYPE_NAME = [
     ACCOUNTANT => 'Kế toán',
     WAREHOUSE_STAFF => 'Nhân viên kho',
 ];
-const AWAITING = 1;
-const CONFIRMED = 2;
-const STATUS_ORDER_TYPE = [
+const DRAFT = 1;
+const AWAITING = 2;
+const CONFIRMED = 3;
+const DELIVERY = 4;
+const DELIVERED = 5;
+const COMPLETE = 10;
+const REJECTED = 11;
+
+const STATUS_ORDER = [
+    DRAFT => 'Chưa xác nhận',
     AWAITING => 'Chờ xác nhận',
-    CONFIRMED => 'Đã xác nhận'
+    CONFIRMED => 'Đã xác nhận',
+    DELIVERY => 'Đang giao hàng',
+    DELIVERED => 'Đã giao',
+    COMPLETE => 'Hoàn thành',
+    REJECTED => 'Từ chối',
+];
+
+const UNPAID = 1;
+const PARITAL_PAYMENT = 2;
+const PAID = 3;
+const CANCEL = 4;
+const STATUS_PAYMENT = [
+    UNPAID => 'Chưa thanh toán',
+    PARITAL_PAYMENT => 'Đã cọc',
+    PAID => 'Đã thanh toán',
+    COMPLETE => 'Hoàn thành',
 ];

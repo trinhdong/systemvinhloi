@@ -41,3 +41,7 @@ table.last-child-right tr td:last-child {
 tr.hover-able:hover {
     background-color: #f0fbff;
 }
+.disabled {
+    background-color: #e9ecef;
+    pointer-events: none;
+}

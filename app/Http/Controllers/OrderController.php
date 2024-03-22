@@ -47,7 +47,7 @@ class OrderController extends Controller
             $discounts = $this->orderService->mapDiscounts();
             return view('order.add', compact('customers', 'categories', 'discounts'));
         }
-        $data = $request->only(['order_number', 'customer_id', 'product_id', 'order_total', 'order_discount', 'quantity', 'unit_price']);
+        $data = $request->only(['order_number', 'customer_id', 'product_id', 'order_total', 'order_discount', 'quantity', 'unit_price', 'discount_percent']);
         $order = $this->orderService->createOrder($data);
         if ($order) {
             return redirect()->route('order.index')->with(

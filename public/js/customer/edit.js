@@ -15,10 +15,27 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.success) {
+                    Lobibox.notify('success', {
+                        title: 'Thành công',
+                        pauseDelayOnHover: true,
+                        continueDelayOnInactiveTab: false,
+                        position: 'top right',
+                        icon: 'bx bx-check-circle',
+                        msg: "Xóa thành công"
+                    });
                     $(`#discount${discountId}`).remove();
+                    console.error('sádsa');
                 }
             },
             error: function (xhr, status, error) {
+                Lobibox.notify('error', {
+                    title: 'Lỗi',
+                    pauseDelayOnHover: true,
+                    continueDelayOnInactiveTab: false,
+                    position: 'top right',
+                    icon: 'bx bx-x-circle',
+                    msg: "Xóa thất bại"
+                });
                 console.error('Error deleting data:', error);
             }
         });

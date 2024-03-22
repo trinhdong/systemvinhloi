@@ -31,7 +31,7 @@
                             <div class="col-2">
                                 <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái</option>
-                                    @foreach(STATUS_ORDER_TYPE as $status => $statusName)
+                                    @foreach(STATUS_ORDER as $status => $statusName)
                                         <option value="{{ $status }}"
                                                 @if(intval(request('status')) === $status) selected @endif>{{ $statusName }}</option>
                                     @endforeach
@@ -76,7 +76,7 @@
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
                                         <td>{{ number_format($order->order_total) }}</td>
-                                        <td>{{ STATUS_ORDER_TYPE[$order->status] }}</td>
+                                        <td>{{ STATUS_ORDER[$order->status] }}</td>
                                         <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6">

@@ -4,12 +4,11 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{route('user.edit', $user->id)}}" class="btn btn-sm btn-primary me-2">Chỉnh sửa</a>
         <a href="{{route('user.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 @section('breadcrumb')
-    {{$user->name}}
+    {{$order->name}}
 @endsection
 @section('content')
     <div class="card">
@@ -27,25 +26,58 @@
                                 <th class="sz-col-170">
                                     <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Tên
                                 </th>
-                                <td>{{$user->name}}</td>
+                                <td>{{$order->name}}</td>
                             </tr>
                             <tr>
                                 <th class="sz-col-170">
                                     <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Email
                                 </th>
-                                <td>{{$user->email}}</td>
+                                <td>{{$order->email}}</td>
                             </tr>
                             <tr>
                                 <th class="sz-col-170">
                                     <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Chức vụ
                                 </th>
-                                <td>{{ROLE_TYPE_NAME[$user->role]}}</td>
+                                <td>{{ROLE_TYPE_NAME[$order->role]}}</td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            <a href="{{route('order.edit', $order->id)}}" style="width: 80px;" class="btn btn-primary mt-3">Sửa</a>
+            <form class="d-none" id="formDeleteOrder{{$order->id}}"
+                  action="{{ route('order.delete', $order->id) }}" method="POST">
+                @csrf
+                @method('DELETE')
+            </form>
+            <a style="width: 80px;" href="javascript:;" id="deleteOrderModalBtn"
+               class="btn btn-danger mt-3"
+               data-bs-tooltip="tooltip"
+               data-bs-toggle="modal"
+               data-bs-placement="bottom" title="Xóa"
+               data-bs-target="#deleteOrderModal" data-order-id="{{$order->id}}">
+                Xóa
+            </a>
         </div>
     </div>
+    <div class="modal fade" id="deleteOrderModal" tabindex="-1" aria-labelledby="deleteOrderModalLabel"
+         aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteOrderModalLabel">Xóa đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Bạn có chắc muốn xóa đơn hàng này?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button id="deleteOrder" type="button" class="btn btn-danger">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('script')
+    <script src="js/order/index.js"></script>
 @endsection
