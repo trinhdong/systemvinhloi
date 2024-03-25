@@ -11,6 +11,7 @@
     </div>
     <!--navigation-->
     <ul class="metismenu" id="menu">
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
         <li class="<?= (request()->is('dashboard*')) ? 'mm-active' : '' ?>">
             <a href="{{route('dashboard')}}">
                 <div class="parent-icon"><i class="lni lni-dashboard"></i>
@@ -18,7 +19,6 @@
                 <div class="menu-title">Quản lý thống kê</div>
             </a>
         </li>
-        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
         <li class="<?= (request()->is('user*')) ? 'mm-active' : '' ?>">
             <a href="{{route('user.index')}}">
                 <div class="parent-icon"><i class="lni lni-user"></i>
@@ -27,6 +27,7 @@
             </a>
         </li>
         @endif
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === WAREHOUSE_STAFF)
         <li class="<?= (request()->is('category*')) ? 'mm-active' : '' ?>">
             <a href="{{route('category.list')}}">
                 <div class="parent-icon"><i class="lni lni-list"></i>
@@ -41,6 +42,8 @@
                 <div class="menu-title">Quản lý sản phẩm</div>
             </a>
         </li>
+        @endif
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === SALE)
         <li class="<?= (request()->is('customer*')) ? 'mm-active' : '' ?>">
             <a href="{{route('customer.index')}}">
                 <div class="parent-icon"><i class="lni lni-customer"></i>
@@ -62,5 +65,24 @@
                 <div class="menu-title">Quản lý khu vực</div>
             </a>
         </li>
+        @endif
+        @if (Auth::user()->role === WAREHOUSE_STAFF)
+            <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
+                <a href="{{route('warehouse-staff.order.index')}}">
+                    <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
+                    </div>
+                    <div class="menu-title">Quản lý đơn hàng</div>
+                </a>
+            </li>
+        @endif
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === ACCOUNTANT)
+            <li class="<?= (request()->is('payment*')) ? 'mm-active' : '' ?>">
+                <a href="{{route('payment.indexPayment')}}">
+                    <div class="parent-icon"><i class="bi bi-credit-card"></i></i>
+                    </div>
+                    <div class="menu-title">Quản lý thanh toán</div>
+                </a>
+            </li>
+        @endif
     </ul>
 </aside>

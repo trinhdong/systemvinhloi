@@ -285,16 +285,15 @@ $(document).ready(function () {
     $(document).on('change', '#payment-type', function () {
         if ($(this).val() == 1 || $(this).val() == 2) {
             $('#payment-method').removeClass('d-none');
+            $('#payment-method').trigger('change');
         } else {
             $('#payment-method').addClass('d-none').val('');
             if (!$('#payment-method-info').hasClass('d-none')) {
                 $('#payment-method-info').addClass('d-none').find('input').val('');
             }
-        }
-        if ($('#payment-type').val() != 2 && !$('#deposit').hasClass('d-none')) {
-            $('#deposit').addClass('d-none').find('input').val('');
-        } else {
-            $('#deposit').removeClass('d-none');
+            if (!$('#deposit').hasClass('d-none')) {
+                $('#deposit').addClass('d-none').find('input').val('');
+            }
         }
     })
     $(document).on('change', '#red-bill', function () {

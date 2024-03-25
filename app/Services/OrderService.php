@@ -44,6 +44,9 @@ class OrderService extends BaseService
         if (!empty($request['status'])) {
             $filters['status'] = intval($request['status']);
         }
+        if (!empty($request['payment_status'])) {
+            $filters['payment_status'] = intval($request['payment_status']);
+        }
         if (!empty($request['customer_id'])) {
             $filters['customer_id'] = intval($request['customer_id']);
         }
@@ -84,7 +87,9 @@ class OrderService extends BaseService
         $data['unit_price'] = array_values(array_filter($data['unit_price']));
         $data['product_price'] = array_values(array_filter($data['product_price']));
         $data['discount_percent'] = array_values(array_filter($data['discount_percent']));
+        $data['payment_status'] = UNPAID;
         if (!empty($data['deposit'])) {
+            $data['payment_status'] = PARITAL_PAYMENT;
             $data['deposit'] = (float) str_replace(',', '', $data['deposit']);
         }
         foreach ($data['note'] as $k => $note) {
@@ -107,7 +112,6 @@ class OrderService extends BaseService
         }
         if ($id === null) {
             $data['status'] = DRAFT;
-            $data['payment_status'] = UNPAID;
             $data['customer_id'] = intval($data['customer_id']);
             $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
             $order = $this->create($data, true);

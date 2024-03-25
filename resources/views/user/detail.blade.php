@@ -45,22 +45,24 @@
                     </div>
                 </div>
             </div>
-            <a href="{{route('user.edit', $user->id)}}" style="width: 80px;" class="btn btn-primary mt-3">Sửa</a>
-            @if(Auth::User()->id !== $user->id)
-                <form class="d-none" id="formDeleteUser{{$user->id}}"
-                      action="{{ route('user.delete', $user->id) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                </form>
-                <a style="width: 80px;" href="javascript:;" id="deleteUserModalBtn"
-                   class="btn btn-danger mt-3"
-                   data-bs-tooltip="tooltip"
-                   data-bs-toggle="modal"
-                   data-bs-placement="bottom" title="Xóa"
-                   data-bs-target="#deleteUserModal" data-user-id="{{$user->id}}">
-                    Xóa
-                </a>
-            @endif
+            <div class="d-flex justify-content-center align-items-center">
+                <a href="{{route('user.edit', $user->id)}}" style="width: 80px;" class="btn btn-primary mt-3 me-2">Sửa</a>
+                @if(Auth::User()->id !== $user->id)
+                    <form class="d-none" id="formDeleteUser{{$user->id}}"
+                          action="{{ route('user.delete', $user->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                    <a style="width: 80px;" href="javascript:;" id="deleteUserModalBtn"
+                       class="btn btn-danger mt-3"
+                       data-bs-tooltip="tooltip"
+                       data-bs-toggle="modal"
+                       data-bs-placement="bottom" title="Xóa"
+                       data-bs-target="#deleteUserModal" data-user-id="{{$user->id}}">
+                        Xóa
+                    </a>
+                @endif
+            </div>
         </div>
     </div>
     <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"

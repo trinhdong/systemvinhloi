@@ -59,6 +59,12 @@ const STATUS_PAYMENT = [
     PAID => 'Đã thanh toán',
     COMPLETE => 'Hoàn thành',
 ];
+const STATUS_PAYMENT_COLOR = [
+    UNPAID => 'secondary',
+    PARITAL_PAYMENT => 'success',
+    PAID => 'success',
+    COMPLETE => 'success',
+];
 
 const TRANFER = 1;
 const CASH = 2;

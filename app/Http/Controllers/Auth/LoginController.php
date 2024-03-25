@@ -45,6 +45,15 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
+            if (Auth::user()->role === SALE) {
+                return redirect()->route('order.index');
+            }
+            if (Auth::user()->role === WAREHOUSE_STAFF) {
+                return redirect()->route('warehouse-staff.order.index');
+            }
+            if (Auth::user()->role === ACCOUNTANT) {
+                return redirect()->route('payment.indexPayment');
+            }
             return redirect()->intended('/');
         }
 

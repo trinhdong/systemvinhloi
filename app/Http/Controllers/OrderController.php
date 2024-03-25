@@ -8,6 +8,7 @@ use App\Services\OrderService;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -34,6 +35,11 @@ class OrderController extends Controller
     {
         $query = $request->input('query');
         $orders = $this->orderService->searchQuery($query, $request->input());
+        foreach ($orders as $k => $order) {
+            if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING, REJECTED])) {
+                unset($orders[$k]);
+            }
+        }
 //        foreach ($orders as $k => $order) {
 //            if ($order->orderDetail->isEmpty()) {
 //                $this->orderService->delete($order->id);
@@ -47,6 +53,12 @@ class OrderController extends Controller
     public function detail($id)
     {
         $order = $this->orderService->find($id);
+        if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING, REJECTED])) {
+            return abort(403, 'Unauthorized');
+        }
+        if (!empty($order->customer_info)) {
+            $order->customer = json_decode($order->customer_info);
+        }
         return view('order.detail', compact('order'));
     }
 
@@ -96,6 +108,9 @@ class OrderController extends Controller
     public function edit(CreateUpdateOrderRequest $request, $id)
     {
         $order = $this->orderService->find($id);
+        if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING, REJECTED])) {
+            return abort(403, 'Unauthorized');
+        }
         if (!$order) {
             return redirect()->route('order.index')->with(
                 ['flash_level' => 'error', 'flash_message' => 'Đơn hàng không tồn tại']
@@ -177,15 +192,51 @@ class OrderController extends Controller
 
     public function updateStatusOrder(Request $request, $id, $status)
     {
+        $dataUpdate = ['status' => intval($status)];
         if ($request->isMethod('put')) {
-            if ($this->orderService->update(intval($id), ['status' => intval($status)])) {
-                return redirect()->route('order.detail', $id)->with(
+            if ($status == CONFIRMED) {
+                $order = $this->orderService->find(intval($id));
+                $dataUpdate['customer_info'] = json_encode($order->customer);
+            }
+            if ($this->orderService->update(intval($id), $dataUpdate)) {
+                return redirect()->route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.index' : 'order.index')->with(
                     ['flash_level' => 'success', 'flash_message' => 'Cập nhật trạng thái đơn hàng thành công']
                 );
             }
-            return redirect()->route('order.detail', $id)->with(
+            return redirect()->route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.index' : 'order.index')->with(
                 ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái đơn hàng thất bại']
             );
         }
+    }
+
+    public function indexPayment(Request $request)
+    {
+        $query = $request->input('query');
+        $orders = $this->orderService->searchQuery($query, $request->input());
+//        foreach ($orders as $k => $order) {
+//            if ($order->orderDetail->isEmpty()) {
+//                $this->orderService->delete($order->id);
+//                unset($orders[$k]);
+//            }
+//        }
+        $customers = $this->customerRepository->getList('customer_name');
+        return view('payment.indexPayment', compact('orders', 'customers'));
+    }
+
+    public function detailPayment($id)
+    {
+        $order = $this->orderService->find($id);
+        if (!empty($order->customer_info)) {
+            $order->customer = json_decode($order->customer_info);
+        }
+        return view('payment.detailPayment', compact('order'));
+    }
+    public function updatePayment($id)
+    {
+        $order = $this->orderService->find($id);
+        if (!empty($order->customer_info)) {
+            $order->customer = json_decode($order->customer_info);
+        }
+        return view('payment.detailPayment', compact('order'));
     }
 }
