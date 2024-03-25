@@ -38,6 +38,14 @@
                         <input name="address" type="text" class="form-control" id="validationAddress">
                         <div class="invalid-feedback">Vui lòng nhập địa chỉ</div>
                     </div>
+                    <div class="col-md-8 mt-2">
+                        <label class="form-label">Tên công ty</label>
+                        <input name="company" type="text" class="form-control">
+                    </div>
+                    <div class="col-md-8 mt-2">
+                        <label class="form-label">Mã số thuế</label>
+                        <input name="tax_code" type="text" class="form-control">
+                    </div>
                     <div class="col-md-3 mt-2">
                         <label for="validationRole" class="form-label">Khu vực</label>
                         <select name="area_id" class="form-select" id="validationRole">

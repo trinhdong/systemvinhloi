@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use function League\Flysystem\has;
 
 abstract class BaseRepository
 {
@@ -453,21 +454,29 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function delete($id)
+    public function delete($id, $hasTransaction = false)
     {
-        DB::beginTransaction();
+        if (!$hasTransaction) {
+            DB::beginTransaction();
+        }
         try {
             $result = $this->model->find($id);
             if ($result) {
                 $result->delete();
-                DB::commit();
+                if (!$hasTransaction) {
+                    DB::commit();
+                }
                 return true;
             }
-            DB::rollBack();
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
             return false;
         } catch (\Throwable $th) {
             Log::error($th);
-            DB::rollBack();
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
             return false;
         }
     }
@@ -493,5 +502,17 @@ abstract class BaseRepository
     public function get()
     {
         return $this->model->get();
+    }
+
+    public function deleteAll($key, $value)
+    {
+        try {
+            if ($this->model->where($key, $value)->delete()) {
+                return true;
+            }
+            return false;
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 }

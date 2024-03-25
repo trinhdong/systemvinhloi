@@ -39,6 +39,15 @@ const STATUS_ORDER = [
     COMPLETE => 'Hoàn thành',
     REJECTED => 'Từ chối',
 ];
+const STATUS_COLOR = [
+    DRAFT => 'secondary',
+    AWAITING => 'warning',
+    CONFIRMED => 'primary',
+    DELIVERY => 'info',
+    DELIVERED => 'success',
+    COMPLETE => 'success',
+    REJECTED => 'danger',
+];
 
 const UNPAID = 1;
 const PARITAL_PAYMENT = 2;
@@ -49,4 +58,20 @@ const STATUS_PAYMENT = [
     PARITAL_PAYMENT => 'Đã cọc',
     PAID => 'Đã thanh toán',
     COMPLETE => 'Hoàn thành',
+];
+
+const TRANFER = 1;
+const CASH = 2;
+const PAYMENTS_METHOD = [
+    TRANFER => 'Chuyển khoản',
+    CASH => 'Tiền mặt',
+];
+
+const PAY_FULL = 1;
+const DEPOSIT = 2;
+const PAYMENT_ON_DELIVERY = 3;
+const PAYMENTS_TYPE = [
+    PAY_FULL => 'Thanh toán toàn bộ',
+    DEPOSIT => 'Đặt cọc',
+    PAYMENT_ON_DELIVERY => 'Thanh toán khi nhận hàng',
 ];

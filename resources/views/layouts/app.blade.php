@@ -24,7 +24,7 @@
   <link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
   <link href="assets/plugins/select2/css/select2.min.css" rel="stylesheet" />
   <link href="assets/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+  <link href="assets/css/datepicker.css" rel="stylesheet" />
 
   <!-- loader-->
   <link href="assets/css/pace.min.css" rel="stylesheet" />
@@ -62,7 +62,8 @@
   <script src="assets/plugins/notifications/js/notification-custom-script.js"></script>
   <script src="assets/plugins/select2/js/select2.min.js"></script>
   <script src="assets/js/form-select2.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+  <script src="assets/js/bootstrap-datepicker.js"></script>
+  <script src="assets/js/jquery.formatCurrency-1.4.0.min.js"></script>
   <!--app-->
   <script src="assets/js/app.js"></script>
   <script>

@@ -72,20 +72,44 @@ class OrderService extends BaseService
     private function processOrder(array $data, $id = null)
     {
         DB::beginTransaction();
-        if ($id === null) {
-            $data['customer_id'] = intval($data['customer_id']);
-            $data['order_total'] = floatval($data['order_total']);
-            $data['order_discount'] = floatval($data['order_discount']);
-            $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
-            $data['status'] = DRAFT;
-            $data['product_id'] = array_values(array_filter($data['product_id']));
-            $data['quantity'] = array_values(array_filter($data['quantity']));
-            $data['unit_price'] = array_values(array_filter($data['unit_price']));
-
-            if (count($data['product_id']) !== count($data['quantity']) || count($data['product_id']) !== count($data['unit_price'])) {
-                return false;
+        $data['order_total'] = floatval($data['order_total']);
+        $data['order_discount'] = floatval($data['order_discount']);
+        $data['order_total_product_price'] = floatval($data['order_total_product_price']);
+        $data['payment_type'] = intval($data['payment_type']);
+        $data['payment_method'] = intval($data['payment_method']);
+        $data['product_id'] = array_values(array_filter($data['product_id']));
+        $data['quantity'] = array_values(array_filter(array_map(function ($quantity) {
+            return str_replace(',', '', $quantity);
+        }, $data['quantity'])));
+        $data['unit_price'] = array_values(array_filter($data['unit_price']));
+        $data['product_price'] = array_values(array_filter($data['product_price']));
+        $data['discount_percent'] = array_values(array_filter($data['discount_percent']));
+        if (!empty($data['deposit'])) {
+            $data['deposit'] = (float) str_replace(',', '', $data['deposit']);
+        }
+        foreach ($data['note'] as $k => $note) {
+            if ($note == null) {
+                unset($data['note'][$k]);
             }
+        }
+        $data['note'] = array_values($data['note']);
+        if (!empty($data['is_print_red_invoice'])) {
+            $data['is_print_red_invoice'] = intval($data['is_print_red_invoice']);
+        }
 
+        if (count($data['product_id']) !== count($data['quantity'])
+            || count($data['product_id']) !== count($data['unit_price'])
+            || count($data['product_id']) !== count($data['product_price'])
+            || count($data['product_id']) !== count($data['discount_percent'])
+            || count($data['product_id']) !== count($data['note'])
+        ) {
+            return false;
+        }
+        if ($id === null) {
+            $data['status'] = DRAFT;
+            $data['payment_status'] = UNPAID;
+            $data['customer_id'] = intval($data['customer_id']);
+            $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
             $order = $this->create($data, true);
             if (!$order
                 || !$this->processOrderDetail($data, $order->id)
@@ -124,10 +148,13 @@ class OrderService extends BaseService
             $orderDetails[$key]['product_id'] = intval($productId);
             $orderDetails[$key]['quantity'] = floatval($data['quantity'][$key]);
             $orderDetails[$key]['unit_price'] = floatval($data['unit_price'][$key]);
+            $orderDetails[$key]['product_price'] = floatval($data['product_price'][$key]);
+            $orderDetails[$key]['discount_percent'] = floatval($data['discount_percent'][$key]);
+            $orderDetails[$key]['note'] = $data['note'][$key];
         }
         foreach ($orderDetails as $key => $orderDetail) {
             if (in_array($orderDetail['product_id'], $orderDetailProductIdMap)) {
-                $orderDetailId = $orderDetailsIdMap[$orderDetails['product_id']];
+                $orderDetailId = $orderDetailsIdMap[$orderDetail['product_id']];
                 if (!$this->orderDetailRepository->update($orderDetailId, $orderDetail, true)) {
                     return false;
                 }

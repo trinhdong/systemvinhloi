@@ -79,11 +79,11 @@
                                         <td>{{ STATUS_ORDER[$order->status] }}</td>
                                         <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
                                         <td>
-                                            <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                                <a href="#" class="text-primary"
+                                            <div class="table-actions d-flex align-items-center justify-content-center gap-3 fs-6">
+                                                <a href="{{ route('order.detail', $order->id) }}" class="text-primary"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
-                                                <a href="#" class="text-warning"
+                                                <a href="{{ route('order.edit', $order->id) }}" class="text-warning"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom"
                                                    title="Chỉnh sửa">

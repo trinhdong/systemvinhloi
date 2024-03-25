@@ -7,8 +7,10 @@ use App\Repositories\AreaRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\DiscountRepository;
+use App\Repositories\CustomerRepository;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -17,19 +19,22 @@ class CustomerController extends Controller
     protected $productRepository;
     protected $categoryRepository;
     protected $discountRepository;
+    protected $customerRepository;
 
     public function __construct(
         CustomerService $customerService,
         AreaRepository $areaRepository,
         ProductRepository $productRepository,
         CategoryRepository $categoryRepository,
-        DiscountRepository $discountRepository
+        DiscountRepository $discountRepository,
+        CustomerRepository $customerRepository
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;
         $this->productRepository = $productRepository;
         $this->categoryRepository = $categoryRepository;
         $this->discountRepository = $discountRepository;
+        $this->customerRepository = $customerRepository;
     }
 
     public function index(Request $request)
@@ -65,7 +70,7 @@ class CustomerController extends Controller
         }
 
         $data = $request->only(
-            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent']
+            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company']
         );
         $customer = $this->customerService->createCustomer($data);
         if ($customer) {
@@ -101,7 +106,7 @@ class CustomerController extends Controller
         }
 
         $data = $request->only(
-            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent']
+            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company']
         );
         $updated = $this->customerService->updateCustomer($customer->id, $data);
         if ($updated) {
@@ -117,13 +122,16 @@ class CustomerController extends Controller
 
     public function delete($id)
     {
-        $customer = $this->customerService->delete($id);
-        if ($customer) {
-            return redirect()->route('customer.index')->with(
+        DB::beginTransaction();
+        $customer = $this->customerRepository->delete($id, true);
+        if ($customer && $this->discountRepository->deleteAll('customer_id', $id)) {
+            DB::commit();
+            return redirect()->route('order.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Xóa thành công']
             );
         }
-        return redirect()->route('customer.index')->with(
+        DB::rollBack();
+        return redirect()->route('order.index')->with(
             ['flash_level' => 'error', 'flash_message' => 'Lỗi không thể xóa khách hàng']
         );
     }
@@ -141,5 +149,10 @@ class CustomerController extends Controller
             'success' => false,
             'message' => 'Xóa không thành công',
         ]);
+    }
+    public function getCustomerInfo($id)
+    {
+        $customer = $this->customerRepository->getWhere(['id' => $id])->first();
+        return response()->json($customer);
     }
 }

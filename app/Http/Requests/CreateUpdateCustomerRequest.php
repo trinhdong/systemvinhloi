@@ -39,6 +39,10 @@ class CreateUpdateCustomerRequest extends FormRequest
                 $rules['email'] .= '|unique:customers,email';
             }
         }
+        if (!empty($this->input('tax_code'))) {
+            $rules['tax_code'] = 'required';
+            $rules['company'] = 'required';
+        }
 
         return $rules;
     }
@@ -53,6 +57,8 @@ class CreateUpdateCustomerRequest extends FormRequest
             'email.unique' => 'Địa chỉ email này đã tồn tại.',
             'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
+            'tax_code' => 'Vui lòng mã số thuế.',
+            'company' => 'Vui lòng nhập tên công ty.'
         ];
     }
 }

@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/', function () {
+    return view('dashboard');
+})->name('dashboard');
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
-    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('user.index');
         Route::get('/detail/{id}', [UserController::class, 'detail'])->name('user.detail');
@@ -38,18 +37,6 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
 });
 
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE,WAREHOUSE_STAFF'])->group(function () {
-    Route::prefix('customer')->group(function () {
-        Route::get('/', [CustomerController::class, 'index'])->name('customer.index');
-        Route::get('/detail/{id}', [CustomerController::class, 'detail'])->name('customer.detail');
-        Route::delete('/delete/{id}', [CustomerController::class, 'delete'])->name('customer.delete');
-        Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('customer.edit');
-        Route::put('/edit/{id}', [CustomerController::class, 'edit'])->name('customer.update');
-        Route::get('/add', [CustomerController::class, 'add'])->name('customer.add');
-        Route::post('/add', [CustomerController::class, 'add'])->name('customer.create');
-        Route::delete('/delete-discount/{discountId}', [CustomerController::class, 'deleteDiscount'])->name(
-            'customer.deleteDiscount'
-        );
-    });
     Route::controller(CategoryController::class)->prefix('category')->group(function () {
         Route::get('/', 'index')->name('category.list');
         Route::get('/add', 'show')->name('category.create.show');
@@ -70,6 +57,19 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE,WAREHOUSE_STAFF'])-
         Route::get('/getByCategoryId',  'getByCategoryId')->name('product.getByCategoryId');
         Route::get('/search-product',  'searchProduct')->name('product.searchProduct');
     });
+    Route::prefix('customer')->group(function () {
+        Route::get('/', [CustomerController::class, 'index'])->name('customer.index');
+        Route::get('/detail/{id}', [CustomerController::class, 'detail'])->name('customer.detail');
+        Route::delete('/delete/{id}', [CustomerController::class, 'delete'])->name('customer.delete');
+        Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('customer.edit');
+        Route::put('/edit/{id}', [CustomerController::class, 'edit'])->name('customer.update');
+        Route::get('/add', [CustomerController::class, 'add'])->name('customer.add');
+        Route::post('/add', [CustomerController::class, 'add'])->name('customer.create');
+        Route::delete('/delete-discount/{discountId}', [CustomerController::class, 'deleteDiscount'])->name(
+            'customer.deleteDiscount'
+        );
+        Route::get('/customer-info/{id}', [CustomerController::class, 'getCustomerInfo'])->name('customer.getCustomerInfo');
+    });
     Route::prefix('order')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('order.index');
         Route::get('/detail/{id}', [OrderController::class, 'detail'])->name('order.detail');
@@ -78,5 +78,11 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE,WAREHOUSE_STAFF'])-
         Route::put('/edit/{id}', [OrderController::class, 'edit'])->name('order.update');
         Route::get('/add', [OrderController::class, 'add'])->name('order.add');
         Route::post('/add', [OrderController::class, 'add'])->name('order.create');
+        Route::delete('/delete-order-detail/{orderDetailId}', [OrderController::class, 'deleteOrderDetail'])->name(
+            'order.deleteOrderDetail'
+        );
+        Route::put('/order/update-status-order/{id}/{status}', [OrderController::class, 'updateStatusOrder'])->name(
+            'order.updateStatusOrder'
+        );
     });
 });
