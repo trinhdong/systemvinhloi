@@ -48,17 +48,17 @@ function onSearch(e, page) {
                     }).format(product.price);
 
                     template += `
-                                                <tr class="hover-able cursor-pointer product" data-id=${product.id} data-product-image=${product.image_url}  data-product-name=${product.product_name}  data-product-price=${product.price}>
+                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}'>
                                                     <td>
                                                         <div>
-                                                            <a class="d-flex align-items-center gap-2" href="javascript:;">
+                                                            <div class="d-flex align-items-center gap-2"">
                                                                 <div class="product-box">
                                                                     <img src="${product.image_url}" alt="">
                                                                 </div>
                                                                 <div>
                                                                     <p class="mb-0 product-title">${product.product_name}</p>
                                                                 </div>
-                                                            </a>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td>${productPrice}</td>
@@ -123,7 +123,7 @@ $(document).ready(function () {
                 isValid = false;
             }
         })
-        if ($('input[name="discount_percent[]"]').val() == '' || $('input[name="discount_percent[]"]').val() == '') {
+        if ($('.productOrder:not(.d-none)').find($('input[name="product_id[]"]')).length == 0) {
             Lobibox.notify('error', {
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
@@ -134,13 +134,41 @@ $(document).ready(function () {
             });
             isValid = false;
         }
+        if ($('select[name="payment_type"]').val() == '') {
+            $(this).find('select[name="payment_type"]').addClass('is-invalid');
+            isValid = false;
+        } else if ($('select[name="payment_method"]').val() == '') {
+            $(this).find('select[name="payment_method"]').addClass('is-invalid');
+            isValid = false;
+        }
+
+        if ($('#payment-method').val() == 1) {
+            if ($('input[name="bank_customer_name"]').val() == '') {
+                $(this).find('input[name="bank_customer_name"]').addClass('is-invalid');
+                isValid = false;
+            }
+            if ($('input[name="bank_name"]').val() == '') {
+                $(this).find('input[name="bank_name"]').addClass('is-invalid');
+                isValid = false;
+            }
+            if ($('input[name="bank_code"]').val() == '') {
+                $(this).find('input[name="bank_code"]').addClass('is-invalid');
+                isValid = false;
+            }
+        }
+        if ($('#payment-type').val() == 2 && $('input[name="deposit"]').val() == '') {
+            $(this).find('input[name="deposit"]').addClass('is-invalid');
+            isValid = false;
+        }
+
         if (!isValid) {
             return false;
         }
+        $(this).find('button[type="submit"]').prop('disabled',true);
         $(this).submit();
     })
 
-    $(document).on('focus', 'input[name="order_number"], select[name="customer_id"], input[name="discount_percent[]"], input[name="discount_percent[]"]', function () {
+    $(document).on('focus', 'input[name="order_number"], select[name="customer_id"], input[name="discount_percent[]"], input[name="discount_percent[]"], input[name="bank_customer_name"], input[name="bank_name"], input[name="bank_code"], select[name="payment_type"], select[name="payment_method"], input[name="deposit"]', function () {
         $(this).removeClass('is-invalid');
     })
     $(document).on('change', 'select[name="customer_id"]', function () {
@@ -213,17 +241,18 @@ $(document).ready(function () {
         $(this).closest('tr').find('.quantity input').trigger('blur');
         totalOrder();
     });
-    $(document).on('keyup', '.quantity input', function (event) {
-        let quantity = $(this).val();
-        if (!Number.isInteger(parseFloat(quantity)) || quantity == '0') {
-            $(this).val('1');
+    $(document).on('input', '.quantity input', function (event) {
+        $(this).formatCurrency({
+            'symbol': '',
+            'decimalSymbol': '',
+            'digitGroupSymbol': ','
+        });
+        if ($(this).val() == 0) {
+            $(this).val(1)
         }
     })
     $(document).on('blur', '.quantity input', function (event) {
-        let quantity = $(this).val();
-        if (!Number.isInteger(parseFloat(quantity))) {
-            $(this).val('1');
-        }
+        const quantity = $(this).val().replace(/,/g, '');
         const priceDiscount = $(this).closest('tr').find('.unit-price').text().replace(/,/g, '');
         $(this).closest('tr').find('.total').text(1);
         if (!isNaN(quantity) && !isNaN(priceDiscount)) {
@@ -234,6 +263,51 @@ $(document).ready(function () {
         }
         totalOrder()
     })
+    $(document).on('change', '#payment-method', function () {
+        $('#payment-method-info input').removeClass('is-invalid');
+        $('#deposit input').removeClass('is-invalid');
+        if ($(this).val() == 1) {
+            $('#payment-method-info').removeClass('d-none');
+        } else {
+            $('#payment-method-info').addClass('d-none').find('input').val('');
+        }
+        if ($(this).val() == '' || $('#payment-type').val() != 2) {
+            if (!$('#deposit').hasClass('d-none')) {
+                $('#deposit').addClass('d-none').find('input').val('');
+            }
+        } else {
+            $('#deposit').removeClass('d-none');
+        }
+    })
+    $(document).on('change', '#payment-type', function () {
+        if ($(this).val() == 1 || $(this).val() == 2) {
+            $('#payment-method').removeClass('d-none');
+            $('#payment-method').trigger('change');
+        } else {
+            $('#payment-method').addClass('d-none').val('');
+            if (!$('#payment-method-info').hasClass('d-none')) {
+                $('#payment-method-info').addClass('d-none').find('input').val('');
+            }
+            if (!$('#deposit').hasClass('d-none')) {
+                $('#deposit').addClass('d-none').find('input').val('');
+            }
+        }
+    })
+    $(document).on('change', '#red-bill', function () {
+        if ($(this).find('input').is(':checked')) {
+            $('#red-bill-info').removeClass('d-none');
+        } else {
+            $('#red-bill-info').addClass('d-none');
+        }
+    })
+    $(document).on('input', '#deposit input', function()
+    {
+        $(this).formatCurrency({
+            'symbol': '',
+            'decimalSymbol': '',
+            'digitGroupSymbol': ','
+        });
+    });
 });
 function totalOrder() {
     let totalOrder = 0;
@@ -243,7 +317,7 @@ function totalOrder() {
         if ($(this).closest('tr').hasClass('d-none')) {
             return;
         }
-        const quantity = parseFloat($(this).closest('tr').find('.quantity input').val());
+        const quantity = parseInt($(this).closest('tr').find('.quantity input').val().replace(/,/g, ''));
         const totalProductPrice = parseFloat($(this).closest('tr').find('.product-price').text().replace(/,/g, '') || 0)
         const total = parseFloat($(this).text().replace(/,/g, '') || 0)
         const discountPercent = parseFloat($(this).closest('tr').find('.discount-percent input').val() || 0)
@@ -253,6 +327,7 @@ function totalOrder() {
     });
     $('input[name="order_total"]').val(totalOrder);
     $('input[name="order_discount"]').val(totalDiscount);
+    $('input[name="order_total_product_price"]').val(totalProductOrder);
     $('#total-product-order').text(new Intl.NumberFormat("en", {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
@@ -265,4 +340,33 @@ function totalOrder() {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
     }).format(totalDiscount)+'₫');
+}
+function appendCustomerInfo(customerId) {
+    $.ajax({
+        url: '/customer/customer-info/'+customerId,
+        method: 'GET',
+        success: function (customer) {
+            $('#payment-info').removeClass('d-none');
+            $('#delivery-info').removeClass('d-none');
+            $('#delivery-info').find('#delivery-info-name').append(`<span>${customer.customer_name || ''}</span>`);
+            $('#delivery-info').find('#delivery-info-address').append(`<span>${customer.address || ''}</span>`);
+            $('#delivery-info').find('#delivery-info-phone').append(`<span>${customer.phone || ''}</span>`);
+            if (customer.company != null && customer.tax_code != null && customer.email != null) {
+                $('#red-bill').removeClass('d-none');
+                $('#red-bill-info').find('#red-bill-info-company').append(`<span>${customer.company || ''}</span>`);
+                $('#red-bill-info').find('#red-bill-info-tax_code').append(`<span>${customer.tax_code || ''}</span>`);
+                $('#red-bill-info').find('#red-bill-info-email').append(`<span>${customer.email || ''}</span>`);
+            } else {
+                if (!$('#red-bill').hasClass('d-none')) {
+                    $('#red-bill').addClass('d-none');
+                }
+                if (!$('#red-bill-info').hasClass('d-none')) {
+                    $('#red-bill-info').addClass('d-none');
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
 }

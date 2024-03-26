@@ -151,6 +151,7 @@ $(document).ready(function () {
         if (!isValid) {
             return false;
         }
+        $(this).find('button[type="submit"]').prop('disabled',true);
         $(this).submit();
     });
     $(document).on('focus', 'input[name="customer_name"], input[name="phone"], input[name="address"], select[name="area_id"], .discount-row .category, .product, input[name="discount_percent[]"]', function () {

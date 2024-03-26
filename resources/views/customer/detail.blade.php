@@ -6,7 +6,6 @@
 
 @section('action')
     <div class="col-12">
-        <a href="{{route('customer.edit', $customer->id)}}" class="btn btn-sm btn-primary me-2">Chỉnh sửa</a>
         <a href="{{route('customer.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
@@ -71,9 +70,9 @@
                             <tr>
                                 <th class="col-3">Danh mục</th>
                                 <th class="col-3">Sản phẩm</th>
-                                <th>Phần trăm giảm giá</th>
+                                <th>Chiết khấu</th>
                                 <th>Giá</th>
-                                <th>Giá khuyến mãi</th>
+                                <th>Giá sau chiết khấu</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -93,6 +92,41 @@
 
                 </div>
             </div>
+            <a href="{{route('customer.edit', $customer->id)}}" style="width: 80px;" class="btn btn-primary mt-3">Sửa</a>
+            <form class="d-none" id="formDeleteCustomer{{$customer->id}}"
+                  action="{{ route('customer.delete', $customer->id) }}"
+                  method="POST">
+                @csrf
+                @method('DELETE')
+            </form>
+            <a style="width: 80px;" href="javascript:;" id="deleteCustomerModalBtn"
+               class="btn btn-danger mt-3"
+               data-bs-tooltip="tooltip"
+               data-bs-toggle="modal"
+               data-bs-placement="bottom" title="Xóa"
+               data-bs-target="#deleteCustomerModal"
+               data-customer-id="{{$customer->id}}">
+                Xóa
+            </a>
         </div>
     </div>
+    <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel"
+         aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCustomerModalLabel">Xóa khách hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Bạn có chắc muốn xóa khách hàng này?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button id="deleteCustomer" type="button" class="btn btn-danger">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('script')
+    <script src="js/customer/index.js"></script>
 @endsection

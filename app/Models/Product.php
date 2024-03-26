@@ -23,4 +23,12 @@ class Product extends Model
         'updated_by',
         'deleted_at',
     ];
+    public function product()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+    public function discount()
+    {
+        return $this->hasOne(Discount::class);
+    }
 }

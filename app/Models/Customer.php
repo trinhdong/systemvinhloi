@@ -15,6 +15,8 @@ class Customer extends Model
         'email',
         'phone',
         'address',
+        'tax_code',
+        'company',
         'shipping_service_address',
         'created_by',
         'updated_by',
@@ -29,5 +31,9 @@ class Customer extends Model
     public function discount()
     {
         return $this->hasMany(Discount::class);
+    }
+    public function order()
+    {
+        return $this->hasMany(Order::class);
     }
 }

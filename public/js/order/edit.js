@@ -1,14 +1,14 @@
 $(document).ready(function () {
-    $('#deleteDiscountModal').on('show.bs.modal', function (event) {
+    $('#deleteOrderDetailModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
-        const discountId = button.data('discount-id');
-        $('#deleteDiscount').attr('data-discount-id', discountId);
+        const orderDetailId = button.data('order-detail-id');
+        $('#deleteOrderDetail').attr('data-order-detail-id', orderDetailId);
     });
 
-    $('#deleteDiscount').on('click', function () {
-        const discountId = $(this).data('discount-id');
+    $('#deleteOrderDetail').on('click', function () {
+        const orderDetailId = $(this).data('order-detail-id');
         $.ajax({
-            url: '/customer/delete-discount/' + discountId,
+            url: '/order/delete-order-detail/' + orderDetailId,
             type: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': $('input[name="_token"]').val()
@@ -23,7 +23,7 @@ $(document).ready(function () {
                         icon: 'bx bx-check-circle',
                         msg: "Xóa thành công"
                     });
-                    $(`#discount${discountId}`).remove();
+                    $(`#orderDetail${orderDetailId}`).remove();
                 }
             },
             error: function (xhr, status, error) {
@@ -39,6 +39,6 @@ $(document).ready(function () {
             }
         });
 
-        $('#deleteDiscountModal').modal('hide');
+        $('#deleteOrderDetailModal').modal('hide');
     });
 });

@@ -14,6 +14,8 @@ class OrderDetail extends Model
         'product_id',
         'quantity',
         'unit_price',
+        'product_price',
+        'discount_percent',
         'note',
         'created_by',
         'updated_by',
@@ -23,5 +25,9 @@ class OrderDetail extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

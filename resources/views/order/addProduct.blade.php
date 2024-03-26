@@ -11,7 +11,7 @@
                     <div class="card-header py-3 col-12">
                         <div class="row col-6 align-items-center" style="float: right">
                             <div class="col-6">
-                                <select id="category" class="form-select" required="">
+                                <select id="category" class="form-select">
                                     <option selected="" value="">Chọn danh mục</option>
                                     @foreach($categories as $categoryId => $categoryName)
                                         <option value="{{ $categoryId }}">{{ $categoryName }}</option>

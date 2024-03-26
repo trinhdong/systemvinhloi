@@ -31,7 +31,7 @@
                             <div class="col-2">
                                 <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái</option>
-                                    @foreach(STATUS_ORDER_TYPE as $status => $statusName)
+                                    @foreach($statusList as $status => $statusName)
                                         <option value="{{ $status }}"
                                                 @if(intval(request('status')) === $status) selected @endif>{{ $statusName }}</option>
                                     @endforeach
@@ -46,7 +46,9 @@
                     </form>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('order.add')}}" class="btn btn-primary float-end">Thêm đơn hàng</a>
+                    @if(Auth::user()->role == ADMIN || Auth::user()->role == SUPER_ADMIN || Auth::user()->role == SALE)
+                        <a href="{{route('order.add')}}" class="btn btn-primary float-end">Thêm đơn hàng</a>
+                    @endif
                 </div>
             </div>
             <div class="card">
@@ -71,36 +73,68 @@
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
+                                    <?php $enableButton = $order->enableButtonByRole(Auth::user()->role) ?>
                                     <tr>
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
                                         <td>{{ number_format($order->order_total) }}</td>
-                                        <td>{{ STATUS_ORDER_TYPE[$order->status] }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
+                                        </td>
                                         <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
                                         <td>
-                                            <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                                <a href="#" class="text-primary"
-                                                   data-bs-toggle="tooltip"
-                                                   data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
-                                                <a href="#" class="text-warning"
-                                                   data-bs-toggle="tooltip"
-                                                   data-bs-placement="bottom"
-                                                   title="Chỉnh sửa">
-                                                    <i class="bi bi-pencil-fill"></i></a>
-                                                <form class="d-none" id="formDeleteOrder{{$order->id}}"
-                                                      action="{{ route('order.delete', $order->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                                <a href="javascript:;" id="deleteOrderModalBtn"
-                                                   class="text-danger pointer-event"
-                                                   data-bs-tooltip="tooltip"
-                                                   data-bs-toggle="modal"
-                                                   data-bs-placement="bottom" title="Xóa"
-                                                   data-bs-target="#deleteOrderModal" data-order-id="{{$order->id}}">
-                                                    <i class="bi bi-trash-fill"></i>
-                                                </a>
+                                            <div class="table-actions d-flex align-items-center justify-content-center gap-3 fs-6">
+                                                @if(Auth::user()->role == WAREHOUSE_STAFF)
+                                                    <a href="{{ route('warehouse-staff.order.detail', $order->id) }}" class="text-primary"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
+                                                @else
+                                                    @if($enableButton['view'])
+                                                    <a href="{{ route('order.detail', $order->id) }}" class="text-primary"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
+                                                    @else
+                                                        <div class="text-primary"
+                                                           data-bs-toggle="tooltip"
+                                                           data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill" style="color: #e9ecef"></i></div>
+                                                    @endif
+                                                    @if($enableButton['edit'])
+                                                    <a href="{{ route('order.edit', $order->id) }}" class="text-warning"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-placement="bottom"
+                                                       title="Chỉnh sửa">
+                                                        <i class="bi bi-pencil-fill"></i></a>
+                                                    @else
+                                                            <div class="text-warning"
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-placement="bottom"
+                                                               title="Chỉnh sửa">
+                                                                <i class="bi bi-pencil-fill" style="color: #e9ecef"></i></div>
+                                                    @endif
+                                                    @if($enableButton['delete'])
+                                                    <form class="d-none" id="formDeleteOrder{{$order->id}}"
+                                                          action="{{ route('order.delete', $order->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                    <a href="javascript:;" id="deleteOrderModalBtn"
+                                                       class="text-danger pointer-event"
+                                                       data-bs-tooltip="tooltip"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-placement="bottom" title="Xóa"
+                                                       data-bs-target="#deleteOrderModal" data-order-id="{{$order->id}}">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </a>
+                                                    @else
+                                                            <div
+                                                               class="text-danger pointer-event"
+                                                               data-bs-tooltip="tooltip"
+                                                               data-bs-placement="bottom" title="Xóa">
+                                                                <i class="bi bi-trash-fill" style="color: #e9ecef"></i>
+                                                            </div>
+                                                    @endif
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

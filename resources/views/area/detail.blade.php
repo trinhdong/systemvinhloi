@@ -7,7 +7,6 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{route('area.edit', $area->id)}}" class="btn btn-sm btn-primary me-2">Chỉnh sửa</a>
         <a href="{{route('area.list')}}" class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
@@ -31,12 +30,40 @@
                             </div>
                         </div>
                 </div>
-                <div class="d-flex justify-content-center mb-5">
-                    <div>
-                        <a href="{{route('area.list')}}" type="button" class="btn btn-primary px-5 mx-2">Quay lại</a>
-                    </div>
+            </div>
+            <a href="{{route('area.edit', $area->id)}}" style="width: 80px;" class="btn btn-primary">Sửa</a>
+            <form class="d-none" id="formDeleteArea{{$area->id}}"
+                  action="{{ route('area.delete', $area->id) }}" method="POST">
+                @csrf
+                @method('DELETE')
+            </form>
+            <a style="width: 80px;" href="javascript:;" id="deleteAreaModalBtn"
+               class="btn btn-danger"
+               data-bs-tooltip="tooltip"
+               data-bs-toggle="modal"
+               data-bs-placement="bottom" title="Xóa"
+               data-bs-target="#deleteAreaModal" data-area-id="{{$area->id}}">
+              Xóa
+            </a>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-labelledby="deleteAreaModalLabel"
+         aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAreaModalLabel">Xóa khu vực</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Bạn có chắc muốn xóa khu vực này?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button id="deleteArea" type="button" class="btn btn-danger">Xóa</button>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script src="js/area/index.js"></script>
 @endsection

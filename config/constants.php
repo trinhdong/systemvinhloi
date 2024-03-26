@@ -22,9 +22,67 @@ const ROLE_TYPE_NAME = [
     ACCOUNTANT => 'Kế toán',
     WAREHOUSE_STAFF => 'Nhân viên kho',
 ];
-const AWAITING = 1;
-const CONFIRMED = 2;
-const STATUS_ORDER_TYPE = [
+const DRAFT = 1;
+const AWAITING = 2;
+const CONFIRMED = 3;
+const DELIVERY = 4;
+const DELIVERED = 5;
+const COMPLETE = 10;
+const REJECTED = 11;
+
+const STATUS_ORDER = [
+    DRAFT => 'Chưa xác nhận',
     AWAITING => 'Chờ xác nhận',
-    CONFIRMED => 'Đã xác nhận'
+    CONFIRMED => 'Đã xác nhận',
+    DELIVERY => 'Đang giao hàng',
+    DELIVERED => 'Đã giao hàng',
+    COMPLETE => 'Hoàn thành',
+    REJECTED => 'Từ chối',
 ];
+const STATUS_COLOR = [
+    DRAFT => 'secondary',
+    AWAITING => 'primary',
+    CONFIRMED => 'success',
+    DELIVERY => 'info',
+    DELIVERED => 'success',
+    COMPLETE => 'secondary',
+    REJECTED => 'danger',
+];
+
+const UNPAID = 1;
+const PARITAL_PAYMENT = 2;
+const PAID = 3;
+const CANCEL = 4;
+const STATUS_PAYMENT = [
+    UNPAID => 'Chưa thanh toán',
+    PARITAL_PAYMENT => 'Đã cọc',
+    PAID => 'Đã thanh toán',
+    COMPLETE => 'Hoàn thành',
+    REJECTED => 'Từ chối'
+];
+const STATUS_PAYMENT_COLOR = [
+    UNPAID => 'primary',
+    PARITAL_PAYMENT => 'success',
+    PAID => 'success',
+    COMPLETE => 'secondary',
+    REJECTED => 'danger'
+];
+
+const TRANFER = 1;
+const CASH = 2;
+const PAYMENTS_METHOD = [
+    TRANFER => 'Chuyển khoản',
+    CASH => 'Tiền mặt',
+];
+
+const PAY_FULL = 1;
+const DEPOSIT = 2;
+const PAYMENT_ON_DELIVERY = 3;
+const PAYMENTS_TYPE = [
+    PAY_FULL => 'Thanh toán toàn bộ',
+    DEPOSIT => 'Đặt cọc',
+    PAYMENT_ON_DELIVERY => 'Thanh toán khi nhận hàng',
+];
+
+const COMMENT_TYPE_ORDER = 1;
+const COMMENT_TYPE_PAYMENT = 2;
