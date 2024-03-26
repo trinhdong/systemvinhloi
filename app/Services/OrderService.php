@@ -41,6 +41,21 @@ class OrderService extends BaseService
                 'value' => '%' . $query . '%'
             ],
         ];
+        if (!empty($request['status_not_in'])) {
+            $filters['status'] = [
+                'logical_operator' => 'AND',
+                'operator' => 'NOT IN',
+                'value' => $request['status_not_in']
+            ];
+        }
+        if (!empty($request['payment_status_not_in'])) {
+            $filters['payment_status'] = [
+                'logical_operator' => 'AND',
+                'operator' => 'NOT IN',
+                'value' => $request['payment_status_not_in']
+            ];
+
+        }
         if (!empty($request['status'])) {
             $filters['status'] = intval($request['status']);
         }
@@ -89,7 +104,6 @@ class OrderService extends BaseService
         $data['discount_percent'] = array_values(array_filter($data['discount_percent']));
         $data['payment_status'] = UNPAID;
         if (!empty($data['deposit'])) {
-            $data['payment_status'] = PARITAL_PAYMENT;
             $data['deposit'] = (float) str_replace(',', '', $data['deposit']);
         }
         foreach ($data['note'] as $k => $note) {

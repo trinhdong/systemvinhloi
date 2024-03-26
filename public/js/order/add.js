@@ -161,13 +161,10 @@ $(document).ready(function () {
             isValid = false;
         }
 
-        // $(this).find('input[name="quantity[]"]').each(function () {
-        //     $(this)
-        // })
-
         if (!isValid) {
             return false;
         }
+        $(this).find('button[type="submit"]').prop('disabled',true);
         $(this).submit();
     })
 

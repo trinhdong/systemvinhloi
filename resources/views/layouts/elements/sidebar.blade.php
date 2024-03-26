@@ -58,13 +58,6 @@
                 <div class="menu-title">Quản lý đơn hàng</div>
             </a>
         </li>
-        <li class="<?= (request()->is('area*')) ? 'mm-active' : '' ?>">
-            <a href="{{route('area.list')}}">
-                <div class="parent-icon"><i class="bi bi-pin-map-fill"></i>
-                </div>
-                <div class="menu-title">Quản lý khu vực</div>
-            </a>
-        </li>
         @endif
         @if (Auth::user()->role === WAREHOUSE_STAFF)
             <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
@@ -81,6 +74,15 @@
                     <div class="parent-icon"><i class="bi bi-credit-card"></i></i>
                     </div>
                     <div class="menu-title">Quản lý thanh toán</div>
+                </a>
+            </li>
+        @endif
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === SALE)
+            <li class="<?= (request()->is('area*')) ? 'mm-active' : '' ?>">
+                <a href="{{route('area.list')}}">
+                    <div class="parent-icon"><i class="bi bi-pin-map-fill"></i>
+                    </div>
+                    <div class="menu-title">Quản lý khu vực</div>
                 </a>
             </li>
         @endif

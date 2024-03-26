@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUpdateOrderRequest;
 use App\Repositories\CategoryRepository;
+use App\Repositories\UserRepository;
 use App\Services\OrderService;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
+use App\Repositories\CommentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,29 +19,40 @@ class OrderController extends Controller
     protected $customerRepository;
     protected $categoryRepository;
     protected $orderDetailRepository;
+    protected $commentRepository;
+    protected $userRepository;
 
     public function __construct(
         OrderService $orderService,
         CustomerRepository $customerRepository,
         CategoryRepository $categoryRepository,
-        OrderDetailRepository $orderDetailRepository
+        OrderDetailRepository $orderDetailRepository,
+        CommentRepository $commentRepository,
+        UserRepository $userRepository,
     )
     {
         $this->orderService = $orderService;
         $this->customerRepository = $customerRepository;
         $this->categoryRepository = $categoryRepository;
         $this->orderDetailRepository = $orderDetailRepository;
+        $this->commentRepository = $commentRepository;
+        $this->userRepository = $userRepository;
     }
 
     public function index(Request $request)
     {
         $query = $request->input('query');
-        $orders = $this->orderService->searchQuery($query, $request->input());
-        foreach ($orders as $k => $order) {
-            if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING, REJECTED])) {
-                unset($orders[$k]);
-            }
+        $input = $request->input();
+        $statusList = STATUS_ORDER;
+        if (Auth::user()->role == WAREHOUSE_STAFF) {
+            $input['status_not_in'] = [
+                DRAFT, AWAITING, REJECTED
+            ];
+            unset($statusList[DRAFT]);
+            unset($statusList[AWAITING]);
+            unset($statusList[REJECTED]);
         }
+        $orders = $this->orderService->searchQuery($query, $input);
 //        foreach ($orders as $k => $order) {
 //            if ($order->orderDetail->isEmpty()) {
 //                $this->orderService->delete($order->id);
@@ -47,19 +60,24 @@ class OrderController extends Controller
 //            }
 //        }
         $customers = $this->customerRepository->getList('customer_name');
-        return view('order.index', compact('orders', 'customers'));
+        return view('order.index', compact('orders', 'customers', 'statusList'));
     }
 
     public function detail($id)
     {
         $order = $this->orderService->find($id);
-        if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING, REJECTED])) {
+        if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING, REJECTED, COMPLETE])) {
             return abort(403, 'Unauthorized');
         }
         if (!empty($order->customer_info)) {
             $order->customer = json_decode($order->customer_info);
         }
-        return view('order.detail', compact('order'));
+        $comments = $this->commentRepository->getWhere([
+            'order_id' => $id,
+            'type' => COMMENT_TYPE_ORDER
+        ]);
+        $users = $this->userRepository->getList('name');
+        return view('order.detail', compact('order', 'comments', 'users'));
     }
 
     public function add(CreateUpdateOrderRequest $request)
@@ -199,6 +217,14 @@ class OrderController extends Controller
                 $dataUpdate['customer_info'] = json_encode($order->customer);
             }
             if ($this->orderService->update(intval($id), $dataUpdate)) {
+                if (!empty($request->input('note'))) {
+                    $this->commentRepository->create([
+                        'order_id' => intval($id),
+                        'type' => COMMENT_TYPE_ORDER,
+                        'status' => intval($status),
+                        'note' => $request->input('note')
+                    ]);
+                }
                 return redirect()->route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.index' : 'order.index')->with(
                     ['flash_level' => 'success', 'flash_message' => 'Cập nhật trạng thái đơn hàng thành công']
                 );
@@ -211,8 +237,19 @@ class OrderController extends Controller
 
     public function indexPayment(Request $request)
     {
+        $statusPayment = STATUS_PAYMENT;
         $query = $request->input('query');
-        $orders = $this->orderService->searchQuery($query, $request->input());
+        $input = $request->input();
+        if (Auth::user()->role == ACCOUNTANT) {
+            $input['payment_status_not_in'] = [
+                PAID
+            ];
+            $input['status_not_in'] = [
+                DRAFT, REJECTED, CONFIRMED, DELIVERY
+            ];
+            unset($statusPayment[PAID]);
+        }
+        $orders = $this->orderService->searchQuery($query, $input);
 //        foreach ($orders as $k => $order) {
 //            if ($order->orderDetail->isEmpty()) {
 //                $this->orderService->delete($order->id);
@@ -220,23 +257,87 @@ class OrderController extends Controller
 //            }
 //        }
         $customers = $this->customerRepository->getList('customer_name');
-        return view('payment.indexPayment', compact('orders', 'customers'));
+        return view('payment.indexPayment', compact('orders', 'customers', 'statusPayment'));
     }
 
     public function detailPayment($id)
     {
         $order = $this->orderService->find($id);
+        if (Auth::user()->role == ACCOUNTANT
+            && (in_array($order->status, [DRAFT, REJECTED, CONFIRMED, DELIVERY]) || in_array($order->payment_status, [PAID]))
+        ) {
+            return abort(403, 'Unauthorized');
+        }
         if (!empty($order->customer_info)) {
             $order->customer = json_decode($order->customer_info);
         }
-        return view('payment.detailPayment', compact('order'));
+        $comments = $this->commentRepository->getWhere([
+            'order_id' => $id,
+            'type' => COMMENT_TYPE_PAYMENT
+        ]);
+        $users = $this->userRepository->getList('name');
+        return view('payment.detailPayment', compact('order', 'users', 'comments'));
     }
-    public function updatePayment($id)
+    public function updateStatusPayment(Request $request, $id, $status = null)
     {
-        $order = $this->orderService->find($id);
-        if (!empty($order->customer_info)) {
-            $order->customer = json_decode($order->customer_info);
+        $dataUpdate = ['payment_status' => PAID];
+        if ($request->isMethod('put')) {
+            $order = $this->orderService->find(intval($id));
+            if ($order->status == AWAITING && $order->payment_type == DEPOSIT) {
+                $dataUpdate = [
+                    'status' => CONFIRMED,
+                    'payment_status' => PARITAL_PAYMENT
+                ];
+                $dataUpdate['customer_info'] = json_encode($order->customer);
+            }
+            if ($order->status == AWAITING && $order->payment_type == PAY_FULL) {
+                $dataUpdate = [
+                    'status' => CONFIRMED,
+                    'payment_status' => PAID
+                ];
+                $dataUpdate['customer_info'] = json_encode($order->customer);
+            }
+            if ($order->status == DELIVERED && $order->payment_status == PAID) {
+                $dataUpdate = [
+                    'status' => COMPLETE,
+                    'payment_status' => COMPLETE
+                ];
+            }
+            if (isset($status) && $status == REJECTED) {
+                $dataUpdate = [
+                    'status' => REJECTED,
+                ];
+                if ($order->status == DELIVERED && $order->payment_status == PAID) {
+                    $dataUpdate = [
+                        'payment_status' => REJECTED
+                    ];
+                }
+            }
+            $order =$this->orderService->update(intval($id), $dataUpdate);
+            if ($order) {
+                if (!empty($request->input('note'))) {
+                    if (!empty($dataUpdate['status'])) {
+                        $this->commentRepository->create([
+                            'order_id' => intval($id),
+                            'type' => COMMENT_TYPE_ORDER,
+                            'status' => $order->status,
+                            'note' => $request->input('note')
+                        ]);
+                    }
+                    $this->commentRepository->create([
+                        'order_id' => intval($id),
+                        'type' => COMMENT_TYPE_PAYMENT,
+                        'status' => $order->payment_status,
+                        'note' => $request->input('note')
+                    ]);
+                }
+                return redirect()->route('payment.indexPayment')->with(
+                    ['flash_level' => 'success', 'flash_message' => 'Cập nhật trạng thái thanh toán thành công']
+                );
+            }
+            return redirect()->route('payment.indexPayment')->with(
+                ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái thanh toán thất bại']
+            );
         }
-        return view('payment.detailPayment', compact('order'));
     }
 }

@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('order_id');
+            $table->integer('type');
             $table->integer('status');
             $table->string('note');
             $table->integer('created_by');
-            $table->integer('updated_by');
             $table->timestamps();
         });
     }

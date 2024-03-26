@@ -31,7 +31,7 @@
                             <div class="col-2">
                                 <select onchange="$('#form-search').submit()" name="payment_status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái</option>
-                                    @foreach(STATUS_PAYMENT as $status => $statusName)
+                                    @foreach($statusPayment as $status => $statusName)
                                         <option value="{{ $status }}"
                                                 @if(intval(request('status')) === $status) selected @endif>{{ $statusName }}</option>
                                     @endforeach

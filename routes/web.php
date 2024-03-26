@@ -102,9 +102,8 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT'])->group(fun
     Route::prefix('/payment')->group(function () {
         Route::get('/', [OrderController::class, 'indexPayment'])->name('payment.indexPayment');
         Route::get('/detail-payment/{id}', [OrderController::class, 'detailPayment'])->name('payment.detailPayment');
-        Route::get('/update-payment/{id}', [OrderController::class, 'updatePayment'])->name('payment.updatePayment');
-        Route::put('/order/update-status-order/{id}/{status}', [OrderController::class, 'updateStatusOrder'])->name(
-            'payment.order.updateStatusOrder'
+        Route::put('/payment/update-status-payment/{id}/{status?}', [OrderController::class, 'updateStatusPayment'])->name(
+            'payment.updateStatusPayment'
         );
     });
 });

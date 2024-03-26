@@ -19,6 +19,7 @@ $(document).on('submit', 'form', function () {
     if (!isValid) {
         return false;
     }
+    $(this).find('button[type="submit"]').prop('disabled',true);
     $(this).submit();
 })
 $(document).on('focus', 'input[name="name"], input[name="email"], input[name="password"], select[name="role"]', function () {

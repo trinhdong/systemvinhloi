@@ -4,7 +4,8 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{Auth::user()->role == WAREHOUSE_STAFF ? route('warehouse-staff.order.index') : route('order.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+        <a href="{{Auth::user()->role == WAREHOUSE_STAFF ? route('warehouse-staff.order.index') : route('order.index')}}"
+           class="btn btn-sm btn-secondary">Quay lại</a>
     </div>
 @endsection
 @section('breadcrumb')
@@ -99,7 +100,8 @@
                                             <strong>Tên: </strong><span>{{$order->customer->customer_name}}</span></p>
                                         <p id="delivery-info-address" class="d-flex justify-content-between"><strong>Địa
                                                 chỉ: </strong><span>{{$order->customer->address}}</span></p>
-                                        <p id="delivery-info-phone" class="d-flex justify-content-between"><strong>Số điện
+                                        <p id="delivery-info-phone" class="d-flex justify-content-between"><strong>Số
+                                                điện
                                                 thoại: </strong><span>{{$order->customer->phone}}</span></p>
                                         @if (!empty($order->shipping_address))
                                             <div class="align-items-center d-flex justify-content-between">
@@ -121,9 +123,11 @@
                                                 <h5 class="mb-0">Thông tin xuất hoá đơn</h5>
                                             </div>
                                         </div>
-                                        <p id="red-bill-info-company" class="d-flex justify-content-between"><strong>Tên công
+                                        <p id="red-bill-info-company" class="d-flex justify-content-between"><strong>Tên
+                                                công
                                                 ty: </strong><span>{{$order->customer->company}}</span></p>
-                                        <p id="red-bill-info-tax_code" class="d-flex justify-content-between"><strong>Mã số
+                                        <p id="red-bill-info-tax_code" class="d-flex justify-content-between"><strong>Mã
+                                                số
                                                 thuế: </strong><span>{{$order->customer->tax_code}}</span></p>
                                         <p id="red-bill-info-email" class="d-flex justify-content-between">
                                             <strong>Email: </strong><span>{{$order->customer->email}}</span></p>
@@ -145,6 +149,7 @@
                                 </div>
                             </div>
                         </div>
+                        @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]))
                         <div class="col-5">
                             <div class="col-12">
                                 <div class="card border shadow-none bg-light radius-10">
@@ -160,7 +165,8 @@
                                             </div>
                                             <div class="ms-auto">
                                                 <h5 id="total-product-order"
-                                                    class="mb-0">{{number_format($order->order_total_product_price)}}₫</h5>
+                                                    class="mb-0">{{number_format($order->order_total_product_price)}}
+                                                    ₫</h5>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -169,7 +175,8 @@
                                             </div>
                                             <div class="ms-auto">
                                                 <h5 id="total-discount"
-                                                    class="mb-0 text-danger">{{number_format($order->order_discount)}}₫</h5>
+                                                    class="mb-0 text-danger">{{number_format($order->order_discount)}}
+                                                    ₫</h5>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
@@ -178,7 +185,8 @@
                                             </div>
                                             <div class="ms-auto">
                                                 <h5 id="total-order"
-                                                    class="mb-0 text-danger">{{number_format($order->order_total)}}₫</h5>
+                                                    class="mb-0 text-danger">{{number_format($order->order_total)}}
+                                                    ₫</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -193,21 +201,26 @@
                                             </div>
                                         </div>
                                         <div class="mb-3 d-flex justify-content-between">
-                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Hình thức thanh toán: </label>
+                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Hình thức
+                                                thanh toán: </label>
                                             {{PAYMENTS_TYPE[$order->payment_type]}}
                                         </div>
                                         <div class=" d-flex justify-content-between">
-                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Phương thức thanh toán: </label>
+                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Phương thức
+                                                thanh toán: </label>
                                             {{PAYMENTS_METHOD[$order->payment_method]}}
                                         </div>
-                                        <div id="payment-method-info" class="{{$order->payment_method == 1 ? '' : 'd-none'}}">
+                                        <div id="payment-method-info"
+                                             class="{{$order->payment_method == 1 ? '' : 'd-none'}}">
                                             <div class="align-items-center mt-3 d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chủ tài
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chủ
+                                                    tài
                                                     khoản: </label>
                                                 {{$order->bank_customer_name}}
                                             </div>
                                             <div class="align-items-center mt-3 d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên ngân
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên
+                                                    ngân
                                                     hàng: </label>
                                                 {{$order->bank_name}}
                                             </div>
@@ -217,22 +230,52 @@
                                                 {{$order->bank_code}}
                                             </div>
                                         </div>
-                                        <div id="deposit" class="{{$order->payment_type == 2 ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                        <div id="deposit"
+                                             class="{{$order->payment_type == 2 ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
                                             <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền
                                                 cọc: </label>
                                             <h5 class="mb-0 text-danger">{{number_format($order->deposit)}}₫</h5>
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            @if(!$comments->isEmpty())
+                <div class="card">
+                    <div class="card-body col-7">
+                        <table class="table align-middle border">
+                            <thead class="table-secondary">
+                            <tr>
+                                <th>Nhân viên</th>
+                                <th>Trạng thái</th>
+                                <th class="">Ghi chú</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bd-content-stable">
+                            @foreach($comments as $comment)
+                                <tr>
+                                    <td>{{$users[$comment->created_by]}}</td>
+                                    <td>
+                                        <span class="badge rounded-pill bg-{{STATUS_COLOR[$comment->status]}}">{{STATUS_ORDER[$comment->status]}}</span>
+                                    </td>
+                                    <td>{{$comment->note}}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-4">
                     @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]) && ($order->status == DRAFT || $order->status == REJECTED))
-                        <a href="{{route('order.edit', $order->id)}}" style="width: 80px;" class="btn btn-primary">Sửa</a>
+                        <a href="{{route('order.edit', $order->id)}}" style="width: 80px;"
+                           class="btn btn-primary">Sửa</a>
                         <form class="d-none" id="formDeleteOrder{{$order->id}}"
                               action="{{ route('order.delete', $order->id) }}"
                               method="POST">
@@ -254,32 +297,42 @@
                     <div class="d-flex justify-content-center align-items-center">
                         @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]) && ($order->status == DRAFT || $order->status == REJECTED || $order->status == DELIVERY))
                             @if($order->status == DELIVERY)
-                                <form class="d-none" id="update-status-order" method="POST" action="{{ route('order.updateStatusOrder', ['id' => $order->id, 'status' => DELIVERED]) }}">
+                                <form class="d-none" id="update-status-order" method="POST"
+                                      action="{{ route('order.updateStatusOrder', ['id' => $order->id, 'status' => DELIVERED]) }}">
                                     @csrf
                                     @method('PUT')
                                 </form>
                             @else
-                            <form class="d-none" id="update-status-order" method="POST" action="{{ route('order.updateStatusOrder', ['id' => $order->id, 'status' => $order->payment_type = PAYMENT_ON_DELIVERY ? CONFIRMED : AWAITING]) }}">
-                                @csrf
-                                @method('PUT')
-                            </form>
+                                <form class="d-none" id="update-status-order" method="POST"
+                                      action="{{ route('order.updateStatusOrder', ['id' => $order->id, 'status' => $order->payment_type == PAYMENT_ON_DELIVERY ? CONFIRMED : AWAITING]) }}">
+                                    @csrf
+                                    @method('PUT')
+                                </form>
                             @endif
-                            <button id="sendOrderModalBtn" data-bs-target="#sendOrderModal" data-bs-toggle="modal" class="text-center btn btn-success me-2">Phê duyệt</button>
+                            <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-bs-toggle="modal"
+                                    class="text-center btn btn-primary me-2">Phê duyệt
+                            </button>
                         @endif
                         @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, WAREHOUSE_STAFF]) && $order->status == CONFIRMED)
-                            <form class="d-none" id="update-status-order-reject" method="POST" action="{{ route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => REJECTED]) }}">
+                            <form class="d-none" id="update-status-order-reject" method="POST"
+                                  action="{{ route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => REJECTED]) }}">
                                 @csrf
                                 @method('PUT')
                             </form>
-                            <button id="rejectOrderModalBtn" data-bs-target="#rejectOrderModal" data-bs-toggle="modal" class="text-center btn btn-danger me-2">Từ chối</button>
-                            <form class="d-none" id="update-status-order" method="POST" action="{{ route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => DELIVERY]) }}">
+                            <button id="rejectOrderModalBtn" data-bs-target="#rejectOrderModal" data-bs-toggle="modal"
+                                    class="text-center btn btn-danger me-2">Từ chối
+                            </button>
+                            <form class="d-none" id="update-status-order" method="POST"
+                                  action="{{ route(Auth::user()->role == WAREHOUSE_STAFF ? 'warehouse-staff.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => DELIVERY]) }}">
                                 @csrf
                                 @method('PUT')
                             </form>
-                            <button id="sendOrderModalBtn" data-bs-target="#sendOrderModal" data-bs-toggle="modal" class="text-center btn btn-success me-2">Phê duyệt</button>
+                            <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-bs-toggle="modal"
+                                    class="text-center btn btn-primary me-2">Phê duyệt
+                            </button>
                         @endif
                         @if(in_array($order->status, [CONFIRMED, DELIVERY, DELIVERED, COMPLETE]))
-                            <button type="button" class="btn btn-primary"><i class="bi bi-printer-fill"></i> In</button>
+                            <button type="button" class="btn btn-success"><i class="bi bi-printer-fill"></i> In</button>
                         @endif
                     </div>
                 </div>
@@ -303,18 +356,25 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="sendOrderModal" tabindex="-1" aria-labelledby="sendOrderModalLabel"
+    <div class="modal fade" id="approveOrderModal" tabindex="-1" aria-labelledby="approveOrderModalLabel"
          aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="sendOrderModalLabel">Phê duyệt đơn hàng</h5>
+                    <h5 class="modal-title" id="approveOrderModalLabel">Phê duyệt đơn hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">Bạn có chắc muốn phê duyệt đơn hàng này?</div>
+                <div class="modal-body">
+                    Bạn có chắc muốn phê duyệt đơn hàng này?
+                    <div class="mb-3 mt-3">
+                        <label for="approveNote" class="form-label">Ghi chú:</label>
+                        <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                        <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button onclick="$('#update-status-order').submit()" id="sendOrder" type="button" class="btn btn-success">Đồng ý</button>
+                    <button id="approveOrder" type="button" class="btn btn-success">Đồng ý</button>
                 </div>
             </div>
         </div>
@@ -327,10 +387,17 @@
                     <h5 class="modal-title" id="rejectOrderModalLabel">Từ chối đơn hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">Bạn có chắc muốn từ chối đơn hàng này?</div>
+                <div class="modal-body">
+                    Bạn có chắc muốn từ chối đơn hàng này?
+                    <div class="mb-3 mt-3">
+                        <label for="rejectNote" class="form-label">Ghi chú:</label>
+                        <textarea class="form-control" id="rejectNote" name="note" rows="3"></textarea>
+                        <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button onclick="$('#update-status-order-reject').submit()" id="rejectOrder" type="button" class="btn btn-danger">Đồng ý</button>
+                    <button id="rejectOrder" type="button" class="btn btn-danger">Đồng ý</button>
                 </div>
             </div>
         </div>
@@ -338,4 +405,5 @@
 @endsection
 @section('script')
     <script src="js/order/index.js"></script>
+    <script src="js/order/detail.js"></script>
 @endsection
