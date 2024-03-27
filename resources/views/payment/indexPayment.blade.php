@@ -29,11 +29,20 @@
                                 </select>
                             </div>
                             <div class="col-2">
-                                <select onchange="$('#form-search').submit()" name="payment_status" class="form-select single-select">
-                                    <option selected="" value="">Chọn trạng thái</option>
+                                <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
+                                    <option selected="" value="">Chọn trạng thái đơn hàng</option>
                                     @foreach($statusPayment as $status => $statusName)
                                         <option value="{{ $status }}"
                                                 @if(intval(request('status')) === $status) selected @endif>{{ $statusName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <select onchange="$('#form-search').submit()" name="payment_status" class="form-select single-select">
+                                    <option selected="" value="">Chọn trạng thái thanh toán</option>
+                                    @foreach($statusList as $status => $statusName)
+                                        <option value="{{ $status }}"
+                                                @if(intval(request('payment_status')) === $status) selected @endif>{{ $statusName }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -52,13 +61,14 @@
                                 <th>Tên khách hàng</th>
                                 <th>Tổng tiền</th>
                                 <th>Hình thức thanh toán</th>
+                                <th>Trạng thái đơn hàng</th>
                                 <th>Trạng thái thanh toán</th>
                             </tr>
                             </thead>
                             <tbody>
                             @if($orders->isEmpty())
                                 <tr>
-                                    <td colspan="7" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="8" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
@@ -69,6 +79,9 @@
                                         <td>{{ $customers[$order->customer_id] }}</td>
                                         <td>{{ number_format($order->order_total) }}</td>
                                         <td>{{ PAYMENTS_TYPE[$order->payment_type] }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
+                                        </td>
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_PAYMENT_COLOR[$order->payment_status]}}">{{STATUS_PAYMENT[$order->payment_status]}}</span>
                                         </td>

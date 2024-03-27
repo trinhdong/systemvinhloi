@@ -308,6 +308,109 @@ $(document).ready(function () {
             'digitGroupSymbol': ','
         });
     });
+    $(document).on('click', '#productList tr.product', function () {
+        // if ($(this).hasClass('disabledOnClick')) {
+        //     return false;
+        // }
+        const customerId = parseInt($('#customer').val());
+        const productId = parseInt($(this).data('id'));
+        const productName = $(this).data('product-name');
+        const productPrice = $(this).data('product-price');
+        const productPriceFormat = new Intl.NumberFormat("en", {
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0,
+        }).format(productPrice);
+        const productImage = $(this).data('product-image');
+        const $productOrder = $('#orderlist').find('.productOrder.d-none').clone();
+        $productOrder.removeClass('d-none');
+        $productOrder.attr('data-id', productId);
+        $productOrder.find('button, input, textarea').removeAttr('disabled');
+        $productOrder.find('input[name="product_id[]"]').val(productId);
+        $productOrder.find('.product-image img').attr('src', productImage);
+        $productOrder.find('.product-price').text(productPriceFormat);
+        $productOrder.find('.product-title').text(productName);
+        $productOrder.find('.discount-percent input').val(0);
+        $productOrder.find('.unit-price').text(productPriceFormat);
+        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
+        $productOrder.find('.product-price').closest('td').find('input:hidden').val(productPrice);
+        $productOrder.find('.total').text(productPriceFormat);
+        $productOrder.find('.quantity input').val(1);
+        if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId])) {
+            const discountPercent = discounts[customerId + '_' + productId];
+            const pricePercent = new Intl.NumberFormat("en", {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0,
+            }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
+            $productOrder.find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discounts[customerId + '_' + productId]);
+            $productOrder.find('.unit-price').text(pricePercent);
+            $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
+            $productOrder.find('.total').text(pricePercent);
+        }
+        $('#orderlist').prepend($productOrder);
+        $('#empty-row').addClass('d-none');
+        $(this).remove();
+        if ($('#productList .product').length == 0) {
+            $('#productList').append(`
+                <tr>
+                    <td class="text-center" colspan='2'>
+                        Không có dữ liệu
+                    </td>
+                </tr>
+                `);
+        }
+        // onSearch($(this));
+        totalOrder()
+    });
+
+    $(document).on('change', '#customer', function () {
+        const customerId = $(this).val();
+        $('#delivery-info').find('span').text('');
+        $('#red-bill-info').find('span').text('');
+        $('#red-bill').find('input').removeAttr('checked');
+        $('#payment-info').find('input').removeClass('is-invalid').val('');
+        $('#payment-type').removeClass('is-invalid');
+        if (customerId && customerId !== '') {
+            appendCustomerInfo(customerId);
+        } else {
+            if (!$('#delivery-info').hasClass('d-none')) {
+                $('#delivery-info').addClass('d-none');
+            }
+            if (!$('#payment-type').hasClass('d-none')) {
+                $('#payment-type').addClass('d-none');
+            }
+            if (!$('#payment-method').hasClass('d-none')) {
+                $('#payment-method').addClass('d-none');
+            }
+            if (!$('#payment-method-info').hasClass('d-none')) {
+                $('#payment-method-info').addClass('d-none');
+            }
+            $('#payment-method-info').addClass('d-none').find('input').val('');
+        }
+        $('#orderlist .productOrder').each(function () {
+            if ($(this).hasClass('d-none')) {
+                return;
+            }
+            const productId = parseInt($(this).data('id'));
+            let productPrice = $(this).find('.product-price').text();
+            $(this).find('.discount-percent input').val(0);
+            $(this).find('.unit-price').text(productPrice);
+            $(this).find('.unit-price').closest('td').find('input:hidden').val(productPrice);
+            $(this).find('.discount-percent input').val(0).removeAttr('readonly').removeClass('disabled');
+            if (!isNaN(discounts[customerId + '_' + productId])) {
+                productPrice = parseFloat(productPrice.replace(/,/g, ''));
+                const discountPercent = discounts[customerId + '_' + productId];
+                const pricePercent = new Intl.NumberFormat("en", {
+                    maximumFractionDigits: 0,
+                    minimumFractionDigits: 0,
+                }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
+                $(this).find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discountPercent);
+                $(this).find('.unit-price').text(pricePercent);
+                $(this).find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
+            }
+            $(this).find('.quantity input').trigger('blur');
+        })
+        totalOrder()
+    });
 });
 function totalOrder() {
     let totalOrder = 0;

@@ -21,6 +21,7 @@ class Order extends Model
         'shipping_address',
         'order_note',
         'deposit',
+        'paid',
         'payment_type',
         'is_print_red_invoice',
         'payment_method',
