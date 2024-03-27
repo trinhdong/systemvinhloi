@@ -60,7 +60,7 @@
         </li>
         @endif
         @if (Auth::user()->role === WAREHOUSE_STAFF)
-            <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
+            <li class="<?= (request()->is('warehouse-staff/order*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('warehouse-staff.order.index')}}">
                     <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
                     </div>

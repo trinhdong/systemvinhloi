@@ -56,7 +56,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE'])->group(function 
         Route::delete('/delete-order-detail/{orderDetailId}', [OrderController::class, 'deleteOrderDetail'])->name(
             'order.deleteOrderDetail'
         );
-        Route::put('/order/update-status-order/{id}/{status}', [OrderController::class, 'updateStatusOrder'])->name(
+        Route::put('/order/update-status-order/{id}/{status?}', [OrderController::class, 'updateStatusOrder'])->name(
             'order.updateStatusOrder'
         );
     });
@@ -93,7 +93,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,WAREHOUSE_STAFF'])->grou
     Route::prefix('/warehouse-staff/order')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('warehouse-staff.order.index');
         Route::get('/detail/{id}', [OrderController::class, 'detail'])->name('warehouse-staff.order.detail');
-        Route::put('/order/update-status-order/{id}/{status}', [OrderController::class, 'updateStatusOrder'])->name(
+        Route::put('/order/update-status-order/{id}/{status?}', [OrderController::class, 'updateStatusOrder'])->name(
             'warehouse-staff.order.updateStatusOrder'
         );
     });

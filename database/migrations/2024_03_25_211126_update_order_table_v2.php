@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->json('customer_info')->nullable()->after('order_date');
+            $table->decimal('paid', 20, 2)->nullable(true)->after('deposit');
         });
     }
 

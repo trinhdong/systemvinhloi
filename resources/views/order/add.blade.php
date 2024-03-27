@@ -59,7 +59,7 @@
                                                     </th>
                                                     <th>Sản phẩm</th>
                                                     <th>Ghi chú</th>
-                                                    <th>Giá gốc</th>
+                                                    <th>Giá</th>
                                                     <th>Chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
                                                     <th>Số lượng</th>
@@ -95,7 +95,7 @@
                                                         </div>
                                                     </td>
                                                     <td style="min-width:150px">
-                                                        <textarea name="note[]" id="" cols="1" rows="1"
+                                                        <textarea disabled name="note[]" id="" cols="1" rows="1"
                                                                   class="form-control"></textarea>
                                                     </td>
                                                     <td>
@@ -131,7 +131,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-7">
                                 <div class="col-12">
                                     <div id="delivery-info" class="d-none card border radius-10">
                                         <div class="card-body">
@@ -193,7 +193,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-5">
                                 <div class="col-12">
                                     <div class="card border shadow-none bg-light radius-10">
                                         <div class="card-body">
@@ -318,111 +318,6 @@
     @include('order.addProduct', compact('categories', 'discounts'))
 @endsection
 @section('script')
-    <script src="js/order/add.js"></script>
-    <script>
-        $(document).on('click', '#productList tr.product', function () {
-            // if ($(this).hasClass('disabledOnClick')) {
-            //     return false;
-            // }
-            const discounts = {!! json_encode($discounts) !!};
-            const customerId = parseInt($('#customer').val());
-            const productId = parseInt($(this).data('id'));
-            const productName = $(this).data('product-name');
-            const productPrice = $(this).data('product-price');
-            const productPriceFormat = new Intl.NumberFormat("en", {
-                maximumFractionDigits: 0,
-                minimumFractionDigits: 0,
-            }).format(productPrice);
-            const productImage = $(this).data('product-image');
-            const $productOrder = $('#orderlist').find('.productOrder.d-none').clone();
-            $productOrder.removeClass('d-none');
-            $productOrder.attr('data-id', productId);
-            $productOrder.find('button, input').removeAttr('disabled');
-            $productOrder.find('input[name="product_id[]"]').val(productId);
-            $productOrder.find('.product-image img').attr('src', productImage);
-            $productOrder.find('.product-price').text(productPriceFormat);
-            $productOrder.find('.product-title').text(productName);
-            $productOrder.find('.discount-percent input').val(0);
-            $productOrder.find('.unit-price').text(productPriceFormat);
-            $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
-            $productOrder.find('.product-price').closest('td').find('input:hidden').val(productPrice);
-            $productOrder.find('.total').text(productPriceFormat);
-            $productOrder.find('.quantity input').val(1);
-            if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId])) {
-                const discountPercent = discounts[customerId + '_' + productId];
-                const pricePercent = new Intl.NumberFormat("en", {
-                    maximumFractionDigits: 0,
-                    minimumFractionDigits: 0,
-                }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-                $productOrder.find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discounts[customerId + '_' + productId]);
-                $productOrder.find('.unit-price').text(pricePercent);
-                $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-                $productOrder.find('.total').text(pricePercent);
-            }
-            $('#orderlist').prepend($productOrder);
-            $('#empty-row').addClass('d-none');
-            $(this).remove();
-            if ($('#productList .product').length == 0) {
-                $('#productList').append(`
-                <tr>
-                    <td class="text-center" colspan='2'>
-                        Không có dữ liệu
-                    </td>
-                </tr>
-                `);
-            }
-            // onSearch($(this));
-            totalOrder()
-        });
-
-        $(document).on('change', '#customer', function () {
-            const customerId = $(this).val();
-            $('#delivery-info').find('span').text('');
-            $('#red-bill-info').find('span').text('');
-            $('#payment-info').find('input').removeClass('is-invalid').val('');
-            $('#payment-type').removeClass('is-invalid');
-            if (customerId && customerId !== '') {
-                appendCustomerInfo(customerId);
-            } else {
-                if (!$('#delivery-info').hasClass('d-none')) {
-                    $('#delivery-info').addClass('d-none');
-                }
-                if (!$('#payment-type').hasClass('d-none')) {
-                    $('#payment-type').addClass('d-none');
-                }
-                if (!$('#payment-method').hasClass('d-none')) {
-                    $('#payment-method').addClass('d-none');
-                }
-                if (!$('#payment-method-info').hasClass('d-none')) {
-                    $('#payment-method-info').addClass('d-none');
-                }
-                $('#payment-method-info').addClass('d-none').find('input').val('');
-            }
-            $('#orderlist .productOrder').each(function () {
-                if ($(this).hasClass('d-none')) {
-                    return;
-                }
-                const discounts = {!! json_encode($discounts) !!};
-                const productId = parseInt($(this).data('id'));
-                let productPrice = $(this).find('.product-price').text();
-                $(this).find('.discount-percent input').val(0);
-                $(this).find('.unit-price').text(productPrice);
-                $(this).find('.unit-price').closest('td').find('input:hidden').val(productPrice);
-                $(this).find('.discount-percent input').val(0).removeAttr('readonly').removeClass('disabled');
-                if (!isNaN(discounts[customerId + '_' + productId])) {
-                    productPrice = parseFloat(productPrice.replace(/,/g, ''));
-                    const discountPercent = discounts[customerId + '_' + productId];
-                    const pricePercent = new Intl.NumberFormat("en", {
-                        maximumFractionDigits: 0,
-                        minimumFractionDigits: 0,
-                    }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-                    $(this).find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discountPercent);
-                    $(this).find('.unit-price').text(pricePercent);
-                    $(this).find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
-                }
-                $(this).find('.quantity input').trigger('blur');
-            })
-            totalOrder()
-        });
-    </script>
+    <script>const discounts = {!! json_encode($discounts) !!};</script>
+    <script src="{{ asset('js/order/add.js') }}"></script>
 @endsection

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('order_id');
             $table->integer('type');
             $table->integer('status');
-            $table->string('note');
+            $table->string('note')->nullable();
             $table->integer('created_by');
             $table->timestamps();
         });

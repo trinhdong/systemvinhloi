@@ -30,13 +30,24 @@
                             </div>
                             <div class="col-2">
                                 <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
-                                    <option selected="" value="">Chọn trạng thái</option>
+                                    <option selected="" value="">Chọn trạng thái đơn hàng</option>
                                     @foreach($statusList as $status => $statusName)
                                         <option value="{{ $status }}"
                                                 @if(intval(request('status')) === $status) selected @endif>{{ $statusName }}</option>
                                     @endforeach
                                 </select>
                             </div>
+                            @if($isAdmin || $isSale)
+                            <div class="col-2">
+                                <select onchange="$('#form-search').submit()" name="payment_status" class="form-select single-select">
+                                    <option selected="" value="">Chọn trạng thái thanh toán</option>
+                                    @foreach($paymentStatus as $status => $statusName)
+                                        <option value="{{ $status }}"
+                                                @if(intval(request('payment_status')) === $status) selected @endif>{{ $statusName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
                              <div class="col-2">
                                 <input onchange="$('#form-search').submit()" name="order_date" type="text" id="datepicker"
                                  placeholder="Ngày tạo đơn hàng"
@@ -46,7 +57,7 @@
                     </form>
                 </div>
                 <div class="col-2">
-                    @if(Auth::user()->role == ADMIN || Auth::user()->role == SUPER_ADMIN || Auth::user()->role == SALE)
+                    @if($isAdmin || $isSale)
                         <a href="{{route('order.add')}}" class="btn btn-primary float-end">Thêm đơn hàng</a>
                     @endif
                 </div>
@@ -60,8 +71,13 @@
                                 <th>#</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Tên khách hàng</th>
+                                @if($isAdmin || $isSale)
                                 <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
+                                @endif
+                                <th>Trạng thái đơn hàng</th>
+                                @if($isAdmin || $isSale)
+                                <th>Trạng thái thanh toán</th>
+                                @endif
                                 <th>Ngày tạo</th>
                                 <th class="col-1">Hành động</th>
                             </tr>
@@ -69,7 +85,7 @@
                             <tbody>
                             @if($orders->isEmpty())
                                 <tr>
-                                    <td colspan="7" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="{{$isWareHouseStaff ? 6 : 9}}" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
@@ -78,14 +94,21 @@
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
+                                        @if($isAdmin || $isSale)
                                         <td>{{ number_format($order->order_total) }}</td>
+                                        @endif
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
                                         </td>
-                                        <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
+                                        @if($isAdmin || $isSale)
+                                        <td>
+                                            <span class="badge rounded-pill bg-{{STATUS_PAYMENT_COLOR[$order->payment_status]}}">{{STATUS_PAYMENT[$order->payment_status]}}</span>
+                                        </td>
+                                        @endif
+                                        <td>{{ Date::parse($order->order_date)->format('d/m/Y') }}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center justify-content-center gap-3 fs-6">
-                                                @if(Auth::user()->role == WAREHOUSE_STAFF)
+                                                @if($isWareHouseStaff)
                                                     <a href="{{ route('warehouse-staff.order.detail', $order->id) }}" class="text-primary"
                                                        data-bs-toggle="tooltip"
                                                        data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>

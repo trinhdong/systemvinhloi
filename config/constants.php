@@ -50,19 +50,21 @@ const STATUS_COLOR = [
 ];
 
 const UNPAID = 1;
-const PARITAL_PAYMENT = 2;
-const PAID = 3;
-const CANCEL = 4;
+const IN_PROCESSING = 2;
+const DEPOSITED = 3;
+const PAID = 4;
 const STATUS_PAYMENT = [
     UNPAID => 'Chưa thanh toán',
-    PARITAL_PAYMENT => 'Đã cọc',
+    IN_PROCESSING => 'Đang xử lý',
+    DEPOSITED => 'Đã cọc',
     PAID => 'Đã thanh toán',
     COMPLETE => 'Hoàn thành',
     REJECTED => 'Từ chối'
 ];
 const STATUS_PAYMENT_COLOR = [
     UNPAID => 'primary',
-    PARITAL_PAYMENT => 'success',
+    IN_PROCESSING => 'info',
+    DEPOSITED => 'success',
     PAID => 'success',
     COMPLETE => 'secondary',
     REJECTED => 'danger'

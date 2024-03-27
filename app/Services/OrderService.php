@@ -106,11 +106,6 @@ class OrderService extends BaseService
         if (!empty($data['deposit'])) {
             $data['deposit'] = (float) str_replace(',', '', $data['deposit']);
         }
-        foreach ($data['note'] as $k => $note) {
-            if ($note == null) {
-                unset($data['note'][$k]);
-            }
-        }
         $data['note'] = array_values($data['note']);
         if (!empty($data['is_print_red_invoice'])) {
             $data['is_print_red_invoice'] = intval($data['is_print_red_invoice']);
@@ -196,5 +191,45 @@ class OrderService extends BaseService
         }
 
         return $discountMap;
+    }
+
+    public function updateStatusPayment($id, $order, &$dataUpdate)
+    {
+        $paid = $dataUpdate['paid'];
+        if ($order->status == AWAITING && in_array($order->payment_type, [PAY_FULL, DEPOSIT]) && (in_array($order->payment_status, [UNPAID, IN_PROCESSING]))) {
+            $dataUpdate['status'] = CONFIRMED;
+            $dataUpdate['payment_status'] = $order->payment_type == PAY_FULL ? PAID : DEPOSITED;
+            if (floatval($paid) < $order->deposit) {
+                unset($dataUpdate['status']);
+                $dataUpdate['payment_status'] = IN_PROCESSING;
+            }
+            if (floatval($paid)>= $order->order_total) {
+                $dataUpdate['payment_status'] = PAID;
+            }
+            if (!empty($dataUpdate['status'])) {
+                $dataUpdate['customer_info'] = json_encode($order->customer);
+            }
+        }
+        if ($order->status == DELIVERED && (in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED]))) {
+            $dataUpdate['payment_status'] = PAID;
+            if (floatval($paid) < $order->order_total) {
+                $dataUpdate['payment_status'] = IN_PROCESSING;
+            }
+        }
+        if ($order->status == DELIVERED && $order->payment_status == PAID) {
+            $dataUpdate = [
+                'status' => COMPLETE,
+                'payment_status' => COMPLETE
+            ];
+        }
+        if (isset($status) && $status == REJECTED) {
+            if ($order->status == AWAITING) {
+                $dataUpdate = ['status' => REJECTED];
+            }
+            if ($order->status == DELIVERED && $order->payment_status == PAID) {
+                $dataUpdate = ['payment_status' => REJECTED];
+            }
+        }
+        return $this->update(intval($id), $dataUpdate);
     }
 }

@@ -11,10 +11,10 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#approveOrder', function () {
-        if ($(this).closest('#approveOrderModal').find('#approveNote').val() == '') {
-            $(this).closest('#approveOrderModal').find('#approveNote').addClass('is-invalid')
-            return false;
-        }
+        // if ($(this).closest('#approveOrderModal').find('#approveNote').val() == '') {
+        //     $(this).closest('#approveOrderModal').find('#approveNote').addClass('is-invalid')
+        //     return false;
+        // }
         $('#update-status-order').append($(this).closest('#approveOrderModal').find('#approveNote').clone().removeAttr('id'))
         $('#update-status-order').submit()
         $(this).prop('disabled',true);
