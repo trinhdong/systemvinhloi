@@ -201,13 +201,12 @@ class OrderService extends BaseService
     public function updateStatusPayment($id, $order, &$dataUpdate, $status = null)
     {
         $paid = $dataUpdate['paid'];
-        if ($order->status == AWAITING && in_array($order->payment_type, [PAY_FULL, DEPOSIT]) && (in_array(
-                $order->payment_status,
-                [UNPAID, IN_PROCESSING]
-            ))) {
+        if ($order->status == AWAITING && in_array($order->payment_type, [PAY_FULL, DEPOSIT]) && (in_array($order->payment_status, [UNPAID, IN_PROCESSING]))) {
             $dataUpdate['status'] = CONFIRMED;
             $dataUpdate['payment_status'] = $order->payment_type == PAY_FULL ? PAID : DEPOSITED;
-            if (floatval($paid) < floatval($order->deposit) || floatval($paid) < floatval($order->order_total)) {
+            if (($order->payment_type == PAY_FULL && floatval($paid) < floatval($order->order_total))
+                || ($order->payment_type == DEPOSIT && floatval($paid) < floatval($order->deposit))
+            ) {
                 unset($dataUpdate['status']);
                 $dataUpdate['payment_status'] = IN_PROCESSING;
             }
