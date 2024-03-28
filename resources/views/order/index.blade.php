@@ -135,7 +135,7 @@
                                                                title="Chỉnh sửa">
                                                                 <i class="bi bi-pencil-fill" style="color: #e9ecef"></i></div>
                                                     @endif
-                                                    @if($enableButton['delete'])
+                                                    @if($enableButton['delete'] || $isAdmin)
                                                     <form class="d-none" id="formDeleteOrder{{$order->id}}"
                                                           action="{{ route('order.delete', $order->id) }}" method="POST">
                                                         @csrf

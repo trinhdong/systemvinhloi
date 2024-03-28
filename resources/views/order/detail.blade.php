@@ -79,7 +79,7 @@
                                                     </td>
                                                     @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]))
                                                         <td class="discount-percent">
-                                                            {{ $orderDetail->discount_percent }}
+                                                            {{ $orderDetail->discount_percent }}%
                                                         </td>
                                                         <td>
                                                             {{number_format($orderDetail->unit_price)}}
@@ -181,8 +181,7 @@
                                                 </div>
                                                 <div class="ms-auto">
                                                     <h5 id="total-product-order"
-                                                        class="mb-0">{{number_format($order->order_total_product_price)}}
-                                                        ₫</h5>
+                                                        class="mb-0">{{number_format($order->order_total_product_price)}}₫</h5>
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center mb-3">
@@ -191,8 +190,7 @@
                                                 </div>
                                                 <div class="ms-auto">
                                                     <h5 id="total-discount"
-                                                        class="mb-0 text-danger">{{number_format($order->order_discount)}}
-                                                        ₫</h5>
+                                                        class="mb-0 text-danger">{{number_format($order->order_discount)}}₫</h5>
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center mb-3">
@@ -201,8 +199,7 @@
                                                 </div>
                                                 <div class="ms-auto">
                                                     <h5 id="total-order"
-                                                        class="mb-0 text-danger">{{number_format($order->order_total)}}
-                                                        ₫</h5>
+                                                        class="mb-0 text-danger">{{number_format($order->order_total)}}₫</h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -222,12 +219,14 @@
                                                     thanh toán: </label>
                                                 {{PAYMENTS_TYPE[$order->payment_type]}}
                                             </div>
+                                            @if(!empty($order->payment_method))
                                             <div class=" d-flex justify-content-between">
                                                 <label for="" class="fw-bolder me-1" style="white-space: nowrap">Phương
                                                     thức
                                                     thanh toán: </label>
                                                 {{PAYMENTS_METHOD[$order->payment_method]}}
                                             </div>
+                                            @endif
                                             <div id="payment-method-info"
                                                  class="{{$order->payment_method == 1 ? '' : 'd-none'}}">
                                                 <div class="align-items-center mt-3 d-flex justify-content-between">
@@ -324,8 +323,31 @@
                                 @method('PUT')
                             </form>
                             <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-bs-toggle="modal"
-                                    class="text-center btn btn-primary me-2">Phê duyệt
+                                    class="text-center btn btn-primary me-2">{{STATUS_ORDER_BUTTON[AWAITING]}}
                             </button>
+                            <div class="modal fade" id="approveOrderModal" tabindex="-1" aria-labelledby="approveOrderModalLabel"
+                                 aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="approveOrderModalLabel">Gửi đơn hàng</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn muốn gửi đơn hàng này cho <strong>{{$order->payment_type == PAYMENT_ON_DELIVERY ? ROLE_TYPE_NAME[WAREHOUSE_STAFF] : ROLE_TYPE_NAME[ACCOUNTANT]}}</strong>?
+                                            <div class="mb-3 mt-3">
+                                                <label for="approveNote" class="form-label">Ghi chú:</label>
+                                                <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                                                <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                                            <button id="approveOrder" type="button" class="btn btn-success">Đồng ý</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                         @if(($isAdmin || $isWareHouseStaff) && (in_array($order->status, [CONFIRMED, DELIVERY])))
                             @if($order->status == CONFIRMED && $order->payment_status == UNPAID)
@@ -343,9 +365,32 @@
                                 @csrf
                                 @method('PUT')
                             </form>
-                            <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-bs-toggle="modal"
-                                    class="text-center btn btn-primary me-2">Phê duyệt
+                            <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-modal-body="" data-bs-toggle="modal"
+                                    class="text-center btn btn-primary me-2">{{STATUS_ORDER_BUTTON[$order->status == CONFIRMED ? DELIVERY : DELIVERED]}}
                             </button>
+                            <div class="modal fade" id="approveOrderModal" tabindex="-1" aria-labelledby="approveOrderModalLabel"
+                                 aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="approveOrderModalLabel">Cập nhật tình trạng đơn hàng</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn muốn cập nhật tình trạng đơn hàng là <strong>{{STATUS_ORDER[$order->status == CONFIRMED ? DELIVERY : DELIVERED]}}</strong>?
+                                            <div class="mb-3 mt-3">
+                                                <label for="approveNote" class="form-label">Ghi chú:</label>
+                                                <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                                                <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                                            <button id="approveOrder" type="button" class="btn btn-success">Đồng ý</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                         @if(in_array($order->status, [AWAITING, CONFIRMED, DELIVERY, DELIVERED, COMPLETE]))
                             <button type="button" class="btn btn-success"><i class="bi bi-printer-fill"></i> In</button>
@@ -368,29 +413,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
                     <button id="deleteOrder" type="button" class="btn btn-danger">Xóa</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="approveOrderModal" tabindex="-1" aria-labelledby="approveOrderModalLabel"
-         aria-hidden="true" style="display: none;">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="approveOrderModalLabel">Phê duyệt đơn hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc muốn phê duyệt đơn hàng này?
-                    <div class="mb-3 mt-3">
-                        <label for="approveNote" class="form-label">Ghi chú:</label>
-                        <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
-                        <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button id="approveOrder" type="button" class="btn btn-success">Đồng ý</button>
                 </div>
             </div>
         </div>

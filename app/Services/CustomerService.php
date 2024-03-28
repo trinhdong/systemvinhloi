@@ -95,7 +95,9 @@ class CustomerService extends BaseService
             ->toArray();
         $discountsProductIdMap = array_flip($discountsIdMap);
         $data['product_id'] = array_values(array_filter($data['product_id']));
-        $data['discount_percent'] = array_values(array_filter($data['discount_percent']));
+        $data['discount_percent'] = array_values(array_filter($data['discount_percent'], function ($v) {
+            return floatval($v) >= 0;
+        }));
         foreach ($data['product_id'] as $key => $productId) {
             $discounts[$key]['product_id'] = intval($productId);
             $discounts[$key]['discount_percent'] = floatval($data['discount_percent'][$key]);

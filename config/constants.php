@@ -49,6 +49,15 @@ const STATUS_COLOR = [
     REJECTED => 'danger',
 ];
 
+const STATUS_ORDER_BUTTON = [
+    AWAITING => 'Gửi đơn hàng',
+    CONFIRMED => 'Duyệt đơn hàng',
+    DELIVERY => 'Giao hàng',
+    DELIVERED => 'Đã giao hàng',
+    COMPLETE => 'Hoàn thành',
+    REJECTED => 'Từ chối',
+];
+
 const UNPAID = 1;
 const IN_PROCESSING = 2;
 const DEPOSITED = 3;

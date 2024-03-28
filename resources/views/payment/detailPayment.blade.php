@@ -44,10 +44,12 @@
                                             {{PAYMENTS_TYPE[$order->payment_type]}}
                                         </div>
                                     </div>
+                                    @if(!empty($order->payment_method))
                                     <div class="form-group row mt-3">
                                         <div class="col-7 fw-bold">Phương thức thanh toán</div>
                                         <div class="col-5">{{PAYMENTS_METHOD[$order->payment_method]}}</div>
                                     </div>
+                                    @endif
                                     @if($order->payment_method == TRANFER)
                                         <div class="form-group row mt-3">
                                             <div class="col-7 fw-bold">Tên chủ tài khoản:</div>
@@ -72,16 +74,17 @@
                                             <h5 class="mb-0 col-5 ">{{number_format($order->deposit)}}₫</h5>
                                         </div>
                                     @endif
+                                    @if($order->status != REJECTED)
                                     <div class="form-group row mt-3 d-flex align-items-center">
                                         <div class="col-7 fw-bold">Số tiền đã thanh toán</div>
                                         <div class="col-5">
-                                            @if($order->payment_status == COMPLETE || $order->payment_status == PAID || ($order->payment_status == DEPOSITED && in_array($order->status, [CONFIRMED, DELIVERY, REJECTED])))
-                                                <h5 class="mb-0 col-12 ">{{number_format($order->paid)}}₫</h5>
-                                            @else
+                                            @if(in_array($order->payment_status, [UNPAID, DEPOSITED, REJECTED, IN_PROCESSING]) && in_array($order->status, [AWAITING, DELIVERED]))
                                                 <div class="col-8">
                                                     <input id="paid" type="text" name="paid" class="form-control col-5" value="{{number_format($order->paid)}}">
                                                     <div class="invalid-feedback">Vui lòng nhập số tiền đã thanh toán</div>
                                                 </div>
+                                            @else
+                                                <h5 class="mb-0 col-12 ">{{number_format($order->paid)}}₫</h5>
                                             @endif
                                         </div>
                                     </div>
@@ -89,6 +92,7 @@
                                         <div class=" col-7 fw-bold">Số tiền còn lại</div>
                                         <h5 class="mb-0 col-5 " id="remaining">{{number_format(max($order->order_total - $order->paid, 0))}}₫</h5>
                                     </div>
+                                    @endif
                                     <div class="form-group row mt-3">
                                         <div class="col-7 fw-bold">Trạng thái thanh toán</div>
                                         <div class="col-5">
@@ -157,7 +161,7 @@
                     </div>
                 </div>
             @endif
-            @if(($isAccountant || $isAdmin) && in_array($order->status, [AWAITING, DELIVERED]) && in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED]))
+            @if(in_array($order->status, [AWAITING, DELIVERED]) && in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED]))
                 <div class="text-left py-3">
                     @if($order->status == AWAITING)
                     <form class="d-none" id="update-status-payment-reject" method="POST"
@@ -175,7 +179,7 @@
                         @method('PUT')
                     </form>
                     <button id="approvePaymentModalBtn" data-bs-target="#approvePaymentModal" data-bs-toggle="modal"
-                            class="text-center btn btn-primary me-2">Phê duyệt
+                            class="text-center btn btn-primary me-2">Cập nhật
                     </button>
                 </div>
             @endif
@@ -206,11 +210,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="approvePaymentModalLabel">Phê duyệt thanh toán</h5>
+                    <h5 class="modal-title" id="approvePaymentModalLabel">Cập nhật thanh toán</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc muốn phê duyệt thanh toán của đơn hàng này?
+                    Bạn muốn {{$isAdmin && $order->status == DELIVERED && $order->payment_status == PAID ? 'phê duyệt' : 'cập nhật'}} thanh toán của đơn hàng này?
                     <div class="mb-3 mt-3">
                         <label for="approveNote" class="form-label">Ghi chú:</label>
                         <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>

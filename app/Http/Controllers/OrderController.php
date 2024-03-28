@@ -187,7 +187,7 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = $this->orderService->delete($id, true);
-        if ($order && $this->orderDetailRepository->deleteAll('order_id', $id)) {
+        if ($order && $this->orderDetailRepository->deleteAll('order_id', $id) && $this->commentRepository->deleteAll('order_id', $id)) {
             DB::commit();
             return redirect()->route('order.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Xóa thành công']
@@ -265,12 +265,8 @@ class OrderController extends Controller
         $statusPayment = STATUS_PAYMENT;
         $query = $request->input('query');
         $input = $request->input();
-        if (Auth::user()->role == ACCOUNTANT) {
-            $input['status_not_in'] = [
-                DRAFT
-            ];
-            unset($statusList[DRAFT]);
-        }
+        $input['status_not_in'] = [DRAFT];
+        unset($statusList[DRAFT]);
         $orders = $this->orderService->searchQuery($query, $input);
 //        foreach ($orders as $k => $order) {
 //            if ($order->orderDetail->isEmpty()) {
@@ -285,9 +281,7 @@ class OrderController extends Controller
     public function detailPayment($id)
     {
         $order = $this->orderService->find($id);
-        if (Auth::user()->role == ACCOUNTANT
-            && (in_array($order->status, [DRAFT]))
-        ) {
+        if (in_array($order->status, [DRAFT])) {
             return abort(403, 'Unauthorized');
         }
         if (!empty($order->customer_info)) {
@@ -304,6 +298,9 @@ class OrderController extends Controller
         if ($order->paid == null) {
             $order->paid = !empty($order->deposit) ? $order->deposit : $order->order_total;
         }
+        if ($order->payment_type == PAYMENT_ON_DELIVERY && in_array($order->status, [CONFIRMED, DELIVERY, REJECTED])) {
+            $order->paid = null;
+        }
         $users = $this->userRepository->getList('name');
         $isAccountant = Auth::user()->role == ACCOUNTANT;
         $isAdmin = Auth::user()->role == SUPER_ADMIN || Auth::user()->role == ADMIN;
@@ -313,7 +310,10 @@ class OrderController extends Controller
     {
         $order = $this->orderService->find(intval($id));
         $paid = str_replace(',', '', $request->input('paid') ?? '');
-        if ($status == null && $paid == '' && !($order->status == DELIVERED && $order->payment_status == PAID)) {
+        if ($status == null && $paid == ''
+            && !($order->status == DELIVERED && $order->payment_status == PAID)
+            && !($order->payment_status == UNPAID && $order->payment_type == PAYMENT_ON_DELIVERY && in_array($order->status, [CONFIRMED, DELIVERY, REJECTED]))
+        ) {
             return redirect()->route('payment.detailPayment', $id)->with(
                 ['flash_level' => 'error', 'flash_message' => 'Vui lòng nhập số tiền đã thanh toán']
             );
@@ -321,7 +321,7 @@ class OrderController extends Controller
 
         $dataUpdate = ['paid' => floatval($paid)];
         if ($request->isMethod('put')) {
-            $order = $this->orderService->updateStatusPayment(intval($id), $order, $dataUpdate);
+            $order = $this->orderService->updateStatusPayment(intval($id), $order, $dataUpdate, $status);
             if ($order) {
 //                if (!empty($request->input('note'))) {
                     if (!empty($dataUpdate['status'])) {

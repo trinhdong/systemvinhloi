@@ -137,7 +137,7 @@ $(document).ready(function () {
         if ($('select[name="payment_type"]').val() == '') {
             $(this).find('select[name="payment_type"]').addClass('is-invalid');
             isValid = false;
-        } else if ($('select[name="payment_method"]').val() == '') {
+        } else if ($('select[name="payment_type"]').val() != 3 && $('select[name="payment_method"]').val() == '') {
             $(this).find('select[name="payment_method"]').addClass('is-invalid');
             isValid = false;
         }
@@ -280,6 +280,7 @@ $(document).ready(function () {
         }
     })
     $(document).on('change', '#payment-type', function () {
+        $('#payment-method, #payment-method-info input').removeClass('is-invalid');
         if ($(this).val() == 1 || $(this).val() == 2) {
             $('#payment-method').removeClass('d-none');
             $('#payment-method').trigger('change');
@@ -366,7 +367,9 @@ $(document).ready(function () {
         const customerId = $(this).val();
         $('#delivery-info').find('span').text('');
         $('#red-bill-info').find('span').text('');
+        $('#red-bill-info').addClass('d-none');
         $('#red-bill').find('input').removeAttr('checked');
+        $('#red-bill').find('input').prop('checked', false);
         $('#payment-info').find('input').removeClass('is-invalid').val('');
         $('#payment-type').removeClass('is-invalid');
         if (customerId && customerId !== '') {

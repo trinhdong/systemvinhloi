@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\OrderRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OrderDetailRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +29,8 @@ class OrderService extends BaseService
         $this->setRepository();
     }
 
-    public function getRepository(){
+    public function getRepository()
+    {
         return OrderRepository::class;
     }
 
@@ -54,7 +56,6 @@ class OrderService extends BaseService
                 'operator' => 'NOT IN',
                 'value' => $request['payment_status_not_in']
             ];
-
         }
         if (!empty($request['status'])) {
             $filters['status'] = intval($request['status']);
@@ -67,7 +68,7 @@ class OrderService extends BaseService
         }
 
         if (!empty($request['order_date'])) {
-            $filters['order_date'] =[
+            $filters['order_date'] = [
                 'logical_operator' => 'AND',
                 'operator' => 'LIKE',
                 'value' => $request['order_date'] . '%'
@@ -96,21 +97,25 @@ class OrderService extends BaseService
         $data['payment_type'] = intval($data['payment_type']);
         $data['payment_method'] = intval($data['payment_method']);
         $data['product_id'] = array_values(array_filter($data['product_id']));
-        $data['quantity'] = array_values(array_filter(array_map(function ($quantity) {
-            return str_replace(',', '', $quantity);
-        }, $data['quantity'])));
-        $data['unit_price'] = array_values(array_filter($data['unit_price']));
-        $data['product_price'] = array_values(array_filter($data['product_price']));
-        $data['discount_percent'] = array_values(array_filter($data['discount_percent']));
+        $data['quantity'] = array_values(
+            array_filter(
+                array_map(function ($quantity) {
+                    return str_replace(',', '', $quantity);
+                }, $data['quantity'])
+            )
+        );
+        $data['unit_price'] = array_values(array_filter(str_replace(',', '', $data['unit_price'] ?? '')));
+        $data['product_price'] = array_values(array_filter(str_replace(',', '', $data['product_price'] ?? '')));
+        $data['discount_percent'] = array_values(array_filter($data['discount_percent'], function ($v) {
+                return floatval($v) >= 0;
+            })
+        );
         $data['payment_status'] = UNPAID;
         if (!empty($data['deposit'])) {
-            $data['deposit'] = (float) str_replace(',', '', $data['deposit']);
+            $data['deposit'] = (float)str_replace(',', '', $data['deposit']);
         }
         $data['note'] = array_values($data['note']);
-        if (!empty($data['is_print_red_invoice'])) {
-            $data['is_print_red_invoice'] = intval($data['is_print_red_invoice']);
-        }
-
+        $data['is_print_red_invoice'] = intval($data['is_print_red_invoice'] ?? 0);
         if (count($data['product_id']) !== count($data['quantity'])
             || count($data['product_id']) !== count($data['unit_price'])
             || count($data['product_id']) !== count($data['product_price'])
@@ -193,24 +198,30 @@ class OrderService extends BaseService
         return $discountMap;
     }
 
-    public function updateStatusPayment($id, $order, &$dataUpdate)
+    public function updateStatusPayment($id, $order, &$dataUpdate, $status = null)
     {
         $paid = $dataUpdate['paid'];
-        if ($order->status == AWAITING && in_array($order->payment_type, [PAY_FULL, DEPOSIT]) && (in_array($order->payment_status, [UNPAID, IN_PROCESSING]))) {
+        if ($order->status == AWAITING && in_array($order->payment_type, [PAY_FULL, DEPOSIT]) && (in_array(
+                $order->payment_status,
+                [UNPAID, IN_PROCESSING]
+            ))) {
             $dataUpdate['status'] = CONFIRMED;
             $dataUpdate['payment_status'] = $order->payment_type == PAY_FULL ? PAID : DEPOSITED;
-            if (floatval($paid) < $order->deposit) {
+            if (floatval($paid) < floatval($order->deposit) || floatval($paid) < floatval($order->order_total)) {
                 unset($dataUpdate['status']);
                 $dataUpdate['payment_status'] = IN_PROCESSING;
             }
-            if (floatval($paid)>= $order->order_total) {
+            if (floatval($paid) >= floatval($order->order_total)) {
                 $dataUpdate['payment_status'] = PAID;
             }
             if (!empty($dataUpdate['status'])) {
                 $dataUpdate['customer_info'] = json_encode($order->customer);
             }
         }
-        if ($order->status == DELIVERED && (in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED]))) {
+        if ($order->status == DELIVERED && (in_array(
+                $order->payment_status,
+                [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED]
+            ))) {
             $dataUpdate['payment_status'] = PAID;
             if (floatval($paid) < $order->order_total) {
                 $dataUpdate['payment_status'] = IN_PROCESSING;
@@ -223,8 +234,12 @@ class OrderService extends BaseService
             ];
         }
         if (isset($status) && $status == REJECTED) {
-            if ($order->status == AWAITING) {
-                $dataUpdate = ['status' => REJECTED];
+            if ($order->status == AWAITING || $order->status == IN_PROCESSING) {
+                $dataUpdate = [
+                    'status' => REJECTED,
+                    'payment_status' => UNPAID,
+                    'paid' => null
+                ];
             }
             if ($order->status == DELIVERED && $order->payment_status == PAID) {
                 $dataUpdate = ['payment_status' => REJECTED];

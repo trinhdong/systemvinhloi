@@ -44,6 +44,9 @@ class CreateUpdateOrderRequest extends FormRequest
         if ($this->isMethod('POST')) {
             $rules['order_number'] .= '|unique:orders,order_number';
         }
+        if (!empty($this->input('payment_type') && $this->input('payment_type') == PAYMENT_ON_DELIVERY)) {
+            unset($rules['payment_method']);
+        }
 
         if (!empty($this->input('payment_method')) && $this->input('payment_method') == TRANFER) {
             $rules['bank_customer_name'] = 'required';
