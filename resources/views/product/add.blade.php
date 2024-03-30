@@ -20,7 +20,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('product.create.post') }}" method="post">
+                    <form action="{{ route('product.create.post') }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="p-4 border rounded row mb-4">
                             <div class="col-md-6">
@@ -50,8 +50,8 @@
                                     <div class="invalid-feedback">Vui lòng nhập dung tích sản phẩm</div>
                                 </div>
                                 <div class="mt-2">
-                                    <label for="product_code" class="form-label">Đơn giá</label>
-                                    <input name="product_code" type="number" class="form-control" id="product_code" value="" placeholder="Nhập đơn giá sản phẩm" >
+                                    <label for="price" class="form-label">Đơn giá</label>
+                                    <input name="price" type="number" class="form-control" id="price" value="" placeholder="Nhập đơn giá sản phẩm" >
                                     <div class="invalid-feedback">Vui lòng nhập đơn giá sản phẩm</div>
                                 </div>
                                 <div class="mt-2">

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\ProductRepository;
+use Illuminate\Support\Facades\Log;
 
 class ProductService extends BaseService
 {
@@ -48,5 +49,21 @@ class ProductService extends BaseService
         }
 
         return $this->paginate($filters, 'id');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function storeProductService($data)
+    {
+        try {
+            return $this->productRepository->storeProductRepository($data);
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi lưu sản phẩm: ' . $e->getMessage(), [
+                'exception' => $e,
+                'data' => $data
+            ]);
+            throw $e;
+        }
     }
 }
