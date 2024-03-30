@@ -60,7 +60,6 @@
                                 <th>Mã đơn hàng</th>
                                 <th>Tên khách hàng</th>
                                 <th>Tổng tiền</th>
-                                <th>Hình thức thanh toán</th>
                                 <th>Trạng thái đơn hàng</th>
                                 <th>Trạng thái thanh toán</th>
                             </tr>
@@ -72,13 +71,11 @@
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
-                                    <?php $enableButton = $order->enableButtonByRole(Auth::user()->role) ?>
                                     <tr class="hover-able cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
                                         <td>{{ number_format($order->order_total) }}</td>
-                                        <td>{{ PAYMENTS_TYPE[$order->payment_type] }}</td>
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
                                         </td>

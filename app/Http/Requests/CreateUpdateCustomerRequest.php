@@ -42,6 +42,7 @@ class CreateUpdateCustomerRequest extends FormRequest
         if (!empty($this->input('tax_code'))) {
             $rules['tax_code'] = 'required';
             $rules['company'] = 'required';
+            $rules['company_address'] = 'required';
         }
 
         return $rules;
@@ -58,7 +59,8 @@ class CreateUpdateCustomerRequest extends FormRequest
             'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
             'tax_code' => 'Vui lòng mã số thuế.',
-            'company' => 'Vui lòng nhập tên công ty.'
+            'company' => 'Vui lòng nhập tên công ty.',
+            'company_address' => 'Vui lòng nhập địa chỉ công ty.'
         ];
     }
 }

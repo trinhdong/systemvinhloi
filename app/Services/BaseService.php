@@ -33,7 +33,7 @@ abstract class BaseService
     /**
      * Function paginate: Get record like conditions $filters. Return data as pagination
      */
-    public function paginate($filters = [], $order_by = '' ,$sort = 'ASC', $limit = 20, $with = false){
+    public function paginate($filters = [], $order_by = '' ,$sort = 'DESC', $limit = 20, $with = false){
         return $this->repository->paginate($filters, $order_by, $sort , $limit, $with);
     }
 

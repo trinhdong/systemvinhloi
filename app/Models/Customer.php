@@ -17,6 +17,7 @@ class Customer extends Model
         'address',
         'tax_code',
         'company',
+        'company_address',
         'shipping_service_address',
         'created_by',
         'updated_by',

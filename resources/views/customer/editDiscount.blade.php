@@ -45,7 +45,7 @@
             <td>
                 <div class="input-group has-validation">
                     <input name="discount_percent[]" type="text" class="form-control discountPercent"
-                           placeholder="000.00" autocomplete="off">
+                           placeholder="0" autocomplete="off">
                     <div class="invalid-feedback"></div>
                 </div>
             </td>
@@ -81,7 +81,7 @@
                         <input name="discount_percent[]"
                                value="{{number_format(floatval($discount->discount_percent))}}" type="text"
                                class="form-control discountPercent" required=""
-                               placeholder="000.00" autocomplete="off">
+                               placeholder="0" autocomplete="off">
                         <div class="invalid-feedback"></div>
                     </div>
                 </td>

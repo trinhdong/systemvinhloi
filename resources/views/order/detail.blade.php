@@ -30,7 +30,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="{{$isAdmin || $isSale ? 'col-12' : 'col-7'}}">
+                        <div class="{{$isAdmin || $isSale || $isAccountant ? 'col-12' : 'col-7'}}">
                             <div class="card border shadow-none radius-10">
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -38,16 +38,14 @@
                                             <thead class="table-light">
                                             <tr>
                                                 <th>Sản phẩm</th>
-                                                @if($isAdmin || $isSale)
+                                                @if($isAdmin || $isSale || $isAccountant)
                                                     <th>Ghi chú</th>
-                                                @endif
-                                                <th>Giá</th>
-                                                @if($isAdmin || $isSale)
+                                                    <th>Giá</th>
                                                     <th>Chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
                                                 @endif
                                                 <th>Số lượng</th>
-                                                @if($isAdmin || $isSale)
+                                                @if($isAdmin || $isSale || $isAccountant)
                                                     <th>Tổng tiền sau chiết khấu</th>
                                                 @endif
                                             </tr>
@@ -69,17 +67,15 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]))
+                                                    @if($isAdmin || $isSale || $isAccountant)
                                                         <td style="min-width:150px">
                                                             {{$orderDetail->note}}
                                                         </td>
-                                                    @endif
-                                                    <td>
-                                                        {{number_format($orderDetail->product_price)}}
-                                                    </td>
-                                                    @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]))
+                                                        <td>
+                                                            {{number_format($orderDetail->product_price)}}
+                                                        </td>
                                                         <td class="discount-percent">
-                                                            {{ $orderDetail->discount_percent }}%
+                                                            {{ number_format($orderDetail->discount_percent) }}%
                                                         </td>
                                                         <td>
                                                             {{number_format($orderDetail->unit_price)}}
@@ -88,7 +84,7 @@
                                                     <td class="quantity">
                                                         {{number_format($orderDetail->quantity)}}
                                                     </td>
-                                                    @if(in_array(Auth::user()->role, [SUPER_ADMIN, ADMIN, SALE]))
+                                                    @if($isAdmin || $isSale || $isAccountant)
                                                         <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity)}}</td>
                                                     @endif
                                                 </tr>
@@ -110,24 +106,22 @@
                                         </div>
                                         <p id="delivery-info-name" class="d-flex justify-content-between">
                                             <strong>Tên: </strong><span>{{$order->customer->customer_name}}</span></p>
-                                        <p id="delivery-info-address" class="d-flex justify-content-between"><strong>Địa
-                                                chỉ: </strong><span>{{$order->customer->address}}</span></p>
                                         <p id="delivery-info-phone" class="d-flex justify-content-between"><strong>Số
                                                 điện
                                                 thoại: </strong><span>{{$order->customer->phone}}</span></p>
-                                        @if (!empty($order->shipping_address))
-                                            <div class="align-items-center d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Địa chỉ
-                                                    giao
-                                                    hàng: </label>
-                                                <span>{{$order->shipping_address}}</span>
-                                            </div>
+                                        <p id="delivery-info-address" class="d-flex justify-content-between"><strong>Địa
+                                                chỉ: </strong><span>{{$order->customer->address}}</span></p>
+                                        <div class="align-items-center d-flex justify-content-between">
+                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Địa chỉ
+                                                giao
+                                                hàng: </label>
+                                            <span>{{$order->shipping_address ?? $order->customer->address}}</span>
+                                        </div>
                                     </div>
-                                    @endif
                                 </div>
                             </div>
-                            @if($isAdmin || $isSale)
-                                <div class="col-12 {{!empty($order->customer->tax_code) && !empty($order->customer->email) && !empty($order->customer->company) ? '' : 'd-none'}}">
+                            @if($isAdmin || $isSale || $isAccountant)
+                                <div class="col-12 {{!empty($order->customer->tax_code) && !empty($order->customer->email) && !empty($order->customer->company) && !empty($order->customer->company_address) ? '' : 'd-none'}}">
                                     <div id="red-bill-info"
                                          class="{{$order->is_print_red_invoice == 1 ? '' : 'd-none'}} card border radius-10">
                                         <div class="card-body">
@@ -140,6 +134,8 @@
                                                 <strong>Tên
                                                     công
                                                     ty: </strong><span>{{$order->customer->company}}</span></p>
+                                            <p id="red-bill-info-company-address" class="d-flex justify-content-between">
+                                                <strong>Địa chỉ công ty: </strong><span>{{$order->customer->company_address}}</span></p>
                                             <p id="red-bill-info-tax_code" class="d-flex justify-content-between">
                                                 <strong>Mã
                                                     số
@@ -165,7 +161,7 @@
                                 </div>
                             </div>
                         </div>
-                        @if($isAdmin || $isSale)
+                        @if($isAdmin || $isSale || $isAccountant)
                             <div class="col-5">
                                 <div class="col-12">
                                     <div class="card border shadow-none bg-light radius-10">
@@ -228,7 +224,7 @@
                                             </div>
                                             @endif
                                             <div id="payment-method-info"
-                                                 class="{{$order->payment_method == 1 ? '' : 'd-none'}}">
+                                                 class="{{$order->payment_method == TRANFER ? '' : 'd-none'}}">
                                                 <div class="align-items-center mt-3 d-flex justify-content-between">
                                                     <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên
                                                         chủ
@@ -250,11 +246,18 @@
                                                 </div>
                                             </div>
                                             <div id="deposit"
-                                                 class="{{$order->payment_type == 2 ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                                 class="{{$order->payment_type == DEPOSIT ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
                                                 <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền
                                                     cọc: </label>
                                                 <h5 class="mb-0 text-danger">{{number_format($order->deposit)}}₫</h5>
                                             </div>
+                                            @if($order->payment_status == DEPOSITED || $order->payment_status == PAID)
+                                                <div id="paid"
+                                                     class="{{$order->payment_type == DEPOSIT ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền đã thanh toán: </label>
+                                                    <h5 class="mb-0 text-danger">{{number_format($order->paid)}}₫</h5>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                     @endif
@@ -393,7 +396,7 @@
                             </div>
                         @endif
                         @if(in_array($order->status, [AWAITING, CONFIRMED, DELIVERY, DELIVERED, COMPLETE]))
-                            <button type="button" class="btn btn-success"><i class="bi bi-printer-fill"></i> In</button>
+                            <button id="printButton" type="button" class="btn btn-success"><i class="bi bi-printer-fill"></i> In</button>
                         @endif
                     </div>
                 </div>
@@ -440,8 +443,20 @@
             </div>
         </div>
     </div>
+    @include('order.orderInvoice', compact('order'))
 @endsection
 @section('script')
     <script src="js/order/index.js"></script>
     <script src="js/order/detail.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#printButton').click(function() {
+                var printContents = $('#printableArea').html();
+                var originalContents = $('body').html();
+                $('body').html(printContents);
+                window.print();
+                $('body').html(originalContents);
+            });
+        });
+    </script>
 @endsection

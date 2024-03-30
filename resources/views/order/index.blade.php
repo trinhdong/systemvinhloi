@@ -37,7 +37,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @if($isAdmin || $isSale)
                             <div class="col-2">
                                 <select onchange="$('#form-search').submit()" name="payment_status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái thanh toán</option>
@@ -47,7 +46,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @endif
                              <div class="col-2">
                                 <input onchange="$('#form-search').submit()" name="order_date" type="text" id="datepicker"
                                  placeholder="Ngày tạo đơn hàng"
@@ -71,13 +69,11 @@
                                 <th>#</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Tên khách hàng</th>
-                                @if($isAdmin || $isSale)
+                                @if($isAdmin || $isSale || $isAccountant)
                                 <th>Tổng tiền</th>
                                 @endif
                                 <th>Trạng thái đơn hàng</th>
-                                @if($isAdmin || $isSale)
                                 <th>Trạng thái thanh toán</th>
-                                @endif
                                 <th>Ngày tạo</th>
                                 <th class="col-1">Hành động</th>
                             </tr>
@@ -85,7 +81,7 @@
                             <tbody>
                             @if($orders->isEmpty())
                                 <tr>
-                                    <td colspan="{{$isWareHouseStaff ? 6 : 9}}" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="{{$isWareHouseStaff ? 7 : 9}}" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
@@ -94,22 +90,20 @@
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
-                                        @if($isAdmin || $isSale)
+                                        @if($isAdmin || $isSale || $isAccountant)
                                         <td>{{ number_format($order->order_total) }}</td>
                                         @endif
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
                                         </td>
-                                        @if($isAdmin || $isSale)
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_PAYMENT_COLOR[$order->payment_status]}}">{{STATUS_PAYMENT[$order->payment_status]}}</span>
                                         </td>
-                                        @endif
                                         <td>{{ Date::parse($order->order_date)->format('d/m/Y') }}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center justify-content-center gap-3 fs-6">
-                                                @if($isWareHouseStaff)
-                                                    <a href="{{ route('warehouse-staff.order.detail', $order->id) }}" class="text-primary"
+                                                @if($isWareHouseStaff || $isAccountant)
+                                                    <a href="{{ route($isAccountant ? 'order.detail' : 'warehouse-staff.order.detail', $order->id) }}" class="text-primary"
                                                        data-bs-toggle="tooltip"
                                                        data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
                                                 @else
