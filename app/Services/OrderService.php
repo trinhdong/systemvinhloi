@@ -78,17 +78,17 @@ class OrderService extends BaseService
         return $this->paginate($filters, 'id');
     }
 
-    public function createOrder(array $data)
+    public function createOrder(array $data, &$msg)
     {
-        return $this->processOrder($data);
+        return $this->processOrder($data, null, $msg);
     }
 
-    public function updateOrder($id, array $data)
+    public function updateOrder($id, array $data, &$msg)
     {
-        return $this->processOrder($data, $id);
+        return $this->processOrder($data, $id, $msg);
     }
 
-    private function processOrder(array $data, $id = null)
+    private function processOrder(array $data, $id = null, &$msg = '')
     {
         DB::beginTransaction();
         $data['order_total'] = floatval($data['order_total']);
@@ -114,6 +114,10 @@ class OrderService extends BaseService
         if (!empty($data['deposit'])) {
             $data['deposit'] = (float)str_replace(',', '', $data['deposit']);
         }
+        if (!empty($data['deposit']) && floatval($data['deposit']) >= floatval($data['order_total'])) {
+            $msg = 'Vui lòng nhập số tiền cọc nhỏ hơn tổng tiền';
+            return false;
+        }
         $data['note'] = array_values($data['note']);
         $data['is_print_red_invoice'] = intval($data['is_print_red_invoice'] ?? 0);
         if (count($data['product_id']) !== count($data['quantity'])
@@ -129,19 +133,14 @@ class OrderService extends BaseService
             $data['customer_id'] = intval($data['customer_id']);
             $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
             $order = $this->create($data, true);
-            if (!$order
-                || !$this->processOrderDetail($data, $order->id)
-                || !$this->customerService->processDiscount($data, $order->customer_id, true)
-            ) {
+            if (!$order || !$this->processOrderDetail($data, $order->id)) {
                 DB::rollBack();
                 return false;
             }
             DB::commit();
             return $order;
         }
-        if (!$this->processOrderDetail($data, $id)
-            || !$this->customerService->processDiscount($data, intval($data['customer_id'], true))
-        ) {
+        if (!$this->processOrderDetail($data, $id)) {
             DB::rollBack();
             return false;
         }
@@ -245,5 +244,10 @@ class OrderService extends BaseService
             }
         }
         return $this->update(intval($id), $dataUpdate);
+    }
+
+    public function getDiscountByCustomerId(int $customerId, array $productIdsNotIn = [])
+    {
+        return $this->discountRepository->getDiscountByCustomerId($customerId, $productIdsNotIn);
     }
 }

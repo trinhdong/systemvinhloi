@@ -43,6 +43,10 @@
                         <input name="company" type="text" class="form-control">
                     </div>
                     <div class="col-md-8 mt-2">
+                        <label class="form-label">Địa chỉ công ty</label>
+                        <input name="company_address" type="text" class="form-control">
+                    </div>
+                    <div class="col-md-8 mt-2">
                         <label class="form-label">Mã số thuế</label>
                         <input name="tax_code" type="text" class="form-control">
                     </div>

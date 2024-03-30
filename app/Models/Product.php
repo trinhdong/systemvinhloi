@@ -32,6 +32,6 @@ class Product extends Model
 
     public function discount()
     {
-        return $this->hasOne(Discount::class);
+        return $this->hasMany(Discount::class);
     }
 }

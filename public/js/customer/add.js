@@ -51,28 +51,17 @@ $(document).ready(function () {
         updateProductSelect(productSelectedOption);
     });
     $(document).on('keyup', '.discountPercent', function (event) {
-        let discountPercent = $(this).val();
-        if (isNaN($(this).val()) || [".."].includes(event.key)) {
-            $(this).val('');
+        let discountPercent = !isNaN(parseFloat($(this).val())) ? parseFloat($(this).val()) : 0;
+        $(this).val(discountPercent);
+        if (["."].includes(event.key)) {
+            $(this).val('0');
             return false;
         }
-        let number = ($(this).val().split('.'));
-        let intPart = number[0];
-        let decPart = number[1];
-
-        if (intPart !== undefined && intPart.length > 3) {
-            $(this).val('');
-            return false;
-        }
-        discountPercent = parseFloat($(this).val());
         if (discountPercent <= 0) {
-            $(this).val('');
+            $(this).val('0');
         }
         if (discountPercent > 100) {
-            $(this).val('');
-        }
-        if (decPart !== undefined && decPart.length > 2) {
-            $(this).val(discountPercent.toFixed(2));
+            $(this).val('0');
         }
     });
     $(document).on('blur', '.discountPercent', function (event) {

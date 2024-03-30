@@ -62,6 +62,9 @@
                                                     </th>
                                                     <th>Sản phẩm</th>
                                                     <th>Ghi chú</th>
+                                                    <th>Màu sắc</th>
+                                                    <th>Dung tích</th>
+                                                    <th>Đơn vị tính</th>
                                                     <th>Giá</th>
                                                     <th>Chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
@@ -71,7 +74,7 @@
                                                 </thead>
                                                 <tbody id="orderlist">
                                                 <tr id="empty-row" class="d-none">
-                                                    <td colspan="8" class="text-center">Chưa có sản phẩm nào được thêm
+                                                    <td colspan="11" class="text-center">Chưa có sản phẩm nào được thêm
                                                     </td>
                                                 </tr>
                                                 <tr class="d-none productOrder">
@@ -101,6 +104,9 @@
                                                         <textarea disabled name="note[]" id="" cols="1" rows="1"
                                                                   class="form-control"></textarea>
                                                     </td>
+                                                    <td class="product-color"></td>
+                                                    <td class="product-capacity"></td>
+                                                    <td class="product-unit"></td>
                                                     <td>
                                                         <div class="product-price"></div>
                                                         <input disabled type="hidden" name="product_price[]"/>
@@ -109,7 +115,7 @@
                                                         <div class="input-group has-validation">
                                                             <input disabled name="discount_percent[]" type="text"
                                                                    class="form-control"
-                                                                   placeholder="000.00" autocomplete="off">
+                                                                   placeholder="0" autocomplete="off">
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </td>
@@ -162,6 +168,15 @@
                                                             <textarea name="note[]" id="" cols="1" rows="1"
                                                                       class="form-control">{{ $orderDetail->note }}</textarea>
                                                         </td>
+                                                        <td class="product-color">
+                                                            {{$orderDetail->product->color}}
+                                                        </td>
+                                                        <td class="product-capacity">
+                                                            {{$orderDetail->product->capacity}}
+                                                        </td>
+                                                        <td class="product-unit">
+                                                            {{$orderDetail->product->unit}}
+                                                        </td>
                                                         <td>
                                                             <div class="product-price">{{number_format($orderDetail->product_price)}}</div>
                                                             <input type="hidden" name="product_price[]"
@@ -169,10 +184,10 @@
                                                         </td>
                                                         <td class="discount-percent">
                                                             <div class="input-group has-validation">
-                                                                <input name="discount_percent[]" type="text" readonly=""
-                                                                       class="disabled form-control"
-                                                                       placeholder="000.00" autocomplete="off"
-                                                                       value="{{ $orderDetail->discount_percent }}">
+                                                                <input name="discount_percent[]" type="text" {{isset($discounts[$order->customer_id . '_' . $orderDetail->product_id]) ? 'readonly=""' : ''}}
+                                                                       class="{{isset($discounts[$order->customer_id . '_' . $orderDetail->product_id]) ? 'disabled' : ''}} form-control"
+                                                                       placeholder="0" autocomplete="off"
+                                                                       value="{{ number_format($orderDetail->discount_percent) }}">
                                                                 <div class="invalid-feedback"></div>
                                                             </div>
                                                         </td>
@@ -217,7 +232,7 @@
                                                     chỉ: </strong><span>{{$order->customer->address}}</span></p>
                                             <div class="align-items-center">
                                                 <label for="" class="fw-bolder me-1" style="white-space: nowrap">Địa chỉ
-                                                    giao hàng khác nếu có: </label>
+                                                    giao hàng: </label>
                                                 <input name="shipping_address" type="text" class="form-control"
                                                        placeholder="Nhập địa chỉ giao hàng" autocomplete="off"
                                                        value="{{$order->shipping_address}}">
@@ -243,7 +258,7 @@
                                     </div>
                                 </div>
                                 <div id="red-bill"
-                                     class="{{$order->customer->tax_code != null && $order->customer->email != null && $order->customer->company != null ? '' : 'd-none'}} col-2">
+                                     class="{{$order->customer->tax_code != null && $order->customer->email != null && $order->customer->company != null && $order->customer->company_address != null ? '' : 'd-none'}} col-2">
                                     <div class="form-check">
                                         <input {{$order->is_print_red_invoice == 1 ? 'checked' : ''}} class="form-check-input"
                                                value="1" type="checkbox" id="gridCheck1" name="is_print_red_invoice">
@@ -263,6 +278,7 @@
                                             </div>
                                             <p id="red-bill-info-company" class="d-flex justify-content-between"><strong>Tên công
                                                     ty: </strong><span>{{$order->customer->company}}</span></p>
+                                            <p id="red-bill-info-company-address" class="d-flex justify-content-between"><strong>Địa chỉ công ty: </strong><span>{{$order->customer->company_address}}</span></p>
                                             <p id="red-bill-info-tax_code" class="d-flex justify-content-between"><strong>Mã số
                                                     thuế: </strong><span>{{$order->customer->tax_code}}</span></p>
                                             <p id="red-bill-info-email" class="d-flex justify-content-between">

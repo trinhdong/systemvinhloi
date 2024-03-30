@@ -70,7 +70,7 @@ class CustomerController extends Controller
         }
 
         $data = $request->only(
-            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company']
+            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company', 'company_address']
         );
         $customer = $this->customerService->createCustomer($data);
         if ($customer) {
@@ -106,7 +106,7 @@ class CustomerController extends Controller
         }
 
         $data = $request->only(
-            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company']
+            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company', 'company_address']
         );
         $updated = $this->customerService->updateCustomer($customer->id, $data);
         if ($updated) {

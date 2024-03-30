@@ -58,6 +58,9 @@ class Order extends Model
             case WAREHOUSE_STAFF:
                 return $this->enableButtonByStatus();
                 break;
+            case ACCOUNTANT:
+                return $this->enableButtonByStatus();
+                break;
             default:
                 return $this->enableButtonByStatus();
                 break;

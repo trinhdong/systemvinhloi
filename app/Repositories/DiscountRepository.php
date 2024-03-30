@@ -16,4 +16,12 @@ class DiscountRepository extends BaseRepository
     {
         return Discount::class;
     }
+
+    public function getDiscountByCustomerId(int $customerId, array $productIdsNotIn = [])
+    {
+        return $this->discount
+            ->where('customer_id', '=', $customerId)
+            ->whereNotIn('product_id', $productIdsNotIn)
+            ->get();
+    }
 }

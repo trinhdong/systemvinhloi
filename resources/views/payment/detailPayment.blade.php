@@ -26,7 +26,7 @@
                                 <div class="card-body">
                                     <div class="form-group row">
                                         <div class="col-7 fw-bold">Mã đơn hàng</div>
-                                        <div class="col-5">{{$order->order_number}}</div>
+                                        <div class="col-5"><a href="{{route('order.detail', $order->id)}}">{{$order->order_number}}</a></div>
                                     </div>
                                     <div class="form-group row mt-3">
                                         <div class="col-7 fw-bold">Trạng thái đơn hàng</div>
@@ -88,6 +88,24 @@
                                             @endif
                                         </div>
                                     </div>
+                                    @if(in_array($order->payment_status, [UNPAID, DEPOSITED, REJECTED, IN_PROCESSING]) && in_array($order->status, [AWAITING, DELIVERED]))
+                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                        <div class="col-7 fw-bold">Ngày thanh toán</div>
+                                        <div class="col-5">
+                                            <div class="col-8">
+                                                <input type="text" id="datepicker" name="payment_date" class="form-control col-5" value="{{!empty($order->payment_date) ? date('d/m/Y', strtotime($order->payment_date)) : ''}}" placeholder="Ngày thanh toán">
+                                                <div class="invalid-feedback">Vui lòng nhập ngày thanh toán</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @elseif(!empty($order->payment_date))
+                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                        <div class="col-7 fw-bold">Ngày thanh toán</div>
+                                        <div class="col-5">
+                                            <h5 class="mb-0 col-12 text-danger">{{date('d/m/Y', strtotime($order->payment_date))}}</h5>
+                                        </div>
+                                    </div>
+                                    @endif
                                     <div class="form-group row mt-3">
                                         <div class=" col-7 fw-bold">Số tiền còn lại</div>
                                         <h5 class="mb-0 col-5 " id="remaining">{{number_format(max($order->order_total - $order->paid, 0))}}₫</h5>

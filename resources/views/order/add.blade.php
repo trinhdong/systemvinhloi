@@ -59,6 +59,9 @@
                                                     </th>
                                                     <th>Sản phẩm</th>
                                                     <th>Ghi chú</th>
+                                                    <th>Màu sắc</th>
+                                                    <th>Dung tích</th>
+                                                    <th>Đơn vị tính</th>
                                                     <th>Giá</th>
                                                     <th>Chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
@@ -68,7 +71,7 @@
                                                 </thead>
                                                 <tbody id="orderlist">
                                                 <tr id="empty-row">
-                                                    <td colspan="8" class="text-center">Chưa có sản phẩm nào được thêm
+                                                    <td colspan="11" class="text-center">Chưa có sản phẩm nào được thêm
                                                     </td>
                                                 </tr>
                                                 <tr class="d-none productOrder">
@@ -98,6 +101,9 @@
                                                         <textarea disabled name="note[]" id="" cols="1" rows="1"
                                                                   class="form-control"></textarea>
                                                     </td>
+                                                    <td class="product-color"></td>
+                                                    <td class="product-capacity"></td>
+                                                    <td class="product-unit"></td>
                                                     <td>
                                                         <div class="product-price"></div>
                                                         <input disabled type="hidden" name="product_price[]"/>
@@ -106,7 +112,7 @@
                                                         <div class="input-group has-validation">
                                                             <input disabled name="discount_percent[]" type="text"
                                                                    class="form-control"
-                                                                   placeholder="000.00" autocomplete="off">
+                                                                   placeholder="0" autocomplete="off">
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </td>
@@ -145,7 +151,7 @@
                                             <p id="delivery-info-address" class="d-flex justify-content-between"><strong>Địa chỉ: </strong></p>
                                             <div class="align-items-center justify-content-between">
                                                 <label for="" class="fw-bolder me-1" style="white-space: nowrap">Địa
-                                                    chỉ giao hàng khác nếu có: </label>
+                                                    chỉ giao hàng: </label>
                                                 <input name="shipping_address" type="text" class="form-control"
                                                        placeholder="Nhập địa chỉ giao hàng" autocomplete="off">
                                                 <div>
@@ -187,6 +193,7 @@
                                                 </div>
                                             </div>
                                             <p id="red-bill-info-company" class="d-flex justify-content-between"><strong>Tên công ty: </strong></p>
+                                            <p id="red-bill-info-company-address" class="d-flex justify-content-between"><strong>Địa chỉ công ty: </strong></p>
                                             <p id="red-bill-info-tax_code" class="d-flex justify-content-between"><strong>Mã số thuế: </strong></p>
                                             <p id="red-bill-info-email" class="d-flex justify-content-between"><strong>Email: </strong></p>
                                         </div>
@@ -240,7 +247,7 @@
                                                     <h5 class="mb-0">Thông tin thanh toán</h5>
                                                 </div>
                                             </div>
-                                            <div class="mb-3 d-flex justify-content-between">
+                                            <div class="mb-3">
                                                 <select id="payment-type" name="payment_type" class="form-select">
                                                     <option selected="" value="">Hình thức thanh toán</option>
                                                     @foreach(PAYMENTS_TYPE as $k => $v)
@@ -250,7 +257,7 @@
                                                 <div class="invalid-feedback">Vui lòng nhập hình thức thanh toán
                                                 </div>
                                             </div>
-                                            <div class=" d-flex justify-content-between">
+                                            <div>
                                                 <select id="payment-method" name="payment_method"
                                                         class="d-none form-select d-none">
                                                     <option selected="" value="">Phương thức thanh toán</option>

@@ -52,6 +52,12 @@ class OrderController extends Controller
             unset($statusList[DRAFT]);
             unset($statusList[AWAITING]);
         }
+        if (Auth::user()->role == ACCOUNTANT) {
+            $input['status_not_in'] = [
+                DRAFT
+            ];
+            unset($statusList[DRAFT]);
+        }
         $orders = $this->orderService->searchQuery($query, $input);
 //        foreach ($orders as $k => $order) {
 //            if ($order->orderDetail->isEmpty()) {
@@ -63,13 +69,17 @@ class OrderController extends Controller
         $isAdmin = Auth::user()->role == ADMIN || Auth::user()->role == SUPER_ADMIN;
         $isSale =  Auth::user()->role == SALE;
         $isWareHouseStaff = Auth::user()->role == WAREHOUSE_STAFF;
-        return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff'));
+        $isAccountant =  Auth::user()->role == ACCOUNTANT;
+        return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant'));
     }
 
     public function detail($id)
     {
         $order = $this->orderService->find($id);
         if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, AWAITING])) {
+            return abort(403, 'Unauthorized');
+        }
+        if (Auth::user()->role == ACCOUNTANT && in_array($order->status, [DRAFT])) {
             return abort(403, 'Unauthorized');
         }
         if (!empty($order->customer_info)) {
@@ -83,7 +93,8 @@ class OrderController extends Controller
         $isAdmin = Auth::user()->role == ADMIN || Auth::user()->role == SUPER_ADMIN;
         $isSale =  Auth::user()->role == SALE;
         $isWareHouseStaff = Auth::user()->role == WAREHOUSE_STAFF;
-        return view('order.detail', compact('order', 'comments', 'users', 'isAdmin', 'isSale', 'isWareHouseStaff'));
+        $isAccountant =  Auth::user()->role == ACCOUNTANT;
+        return view('order.detail', compact('order', 'comments', 'users', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant'));
     }
 
     public function add(CreateUpdateOrderRequest $request)
@@ -117,7 +128,8 @@ class OrderController extends Controller
             'order_total_product_price',
             'product_price'
         ]);
-        $order = $this->orderService->createOrder($data);
+        $msg = '';
+        $order = $this->orderService->createOrder($data, $msg);
         if ($order) {
             return redirect()->route('order.detail', $order->id)->with(
                 ['flash_level' => 'success', 'flash_message' => 'Thêm đơn hàng thành công']
@@ -125,7 +137,7 @@ class OrderController extends Controller
         }
 
         return redirect()->route('order.add')->with(
-            ['flash_level' => 'error', 'flash_message' => 'Lỗi không thể thêm đơn hàng']
+            ['flash_level' => 'error', 'flash_message' => $msg !== '' ? $msg : 'Lỗi không thể thêm đơn hàng']
         );
     }
 
@@ -171,7 +183,8 @@ class OrderController extends Controller
             'order_total_product_price',
             'product_price'
         ]);
-        $updated = $this->orderService->updateOrder($order->id, $data);
+        $msg = '';
+        $updated = $this->orderService->updateOrder($order->id, $data, $msg);
         if ($updated) {
             return redirect()->route('order.detail', $order->id)->with(
                 ['flash_level' => 'success', 'flash_message' => 'Cập nhật đơn hàng thành công']
@@ -179,7 +192,7 @@ class OrderController extends Controller
         }
 
         return redirect()->route('order.edit', $id)->with(
-            ['flash_level' => 'error', 'flash_message' => 'Lỗi không thể cập nhật đơn hàng']
+            ['flash_level' => 'error', 'flash_message' => $msg !== '' ? $msg : 'Lỗi không thể cập nhật đơn hàng']
         );
     }
 
@@ -246,15 +259,12 @@ class OrderController extends Controller
                         'note' => $request->input('note') ?? ''
                     ]);
 //                }
-                return redirect()->route($isWareHouseStaff ? 'warehouse-staff.order.index' : 'order.detail', $id)->with(
+                return redirect()->route($isWareHouseStaff ? 'warehouse-staff.order.detail' : 'order.detail', $id)->with(
                     ['flash_level' => 'success', 'flash_message' => 'Cập nhật trạng thái đơn hàng thành công']
                 );
             }
-            return redirect()->route($isWareHouseStaff ? 'warehouse-staff.order.index' : 'order.detail', $id)->with(
-                ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái đơn hàng thất bại']
-            );
         }
-        return redirect()->route($isWareHouseStaff ? 'warehouse-staff.order.index' : 'order.detail', $id)->with(
+        return redirect()->route($isWareHouseStaff ? 'warehouse-staff.order.detail' : 'order.detail', $id)->with(
             ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái đơn hàng thất bại']
         );
     }
@@ -310,16 +320,20 @@ class OrderController extends Controller
     {
         $order = $this->orderService->find(intval($id));
         $paid = str_replace(',', '', $request->input('paid') ?? '');
-        if ($status == null && $paid == ''
+        $dayPaid = \DateTime::createFromFormat('d/m/Y', $request->input('payment_date'));
+        if ($status == null && ($paid == '' || !$dayPaid)
             && !($order->status == DELIVERED && $order->payment_status == PAID)
             && !($order->payment_status == UNPAID && $order->payment_type == PAYMENT_ON_DELIVERY && in_array($order->status, [CONFIRMED, DELIVERY, REJECTED]))
         ) {
             return redirect()->route('payment.detailPayment', $id)->with(
-                ['flash_level' => 'error', 'flash_message' => 'Vui lòng nhập số tiền đã thanh toán']
+                ['flash_level' => 'error', 'flash_message' => $paid == '' ? 'Vui lòng nhập số tiền đã thanh toán' : 'Vui lòng nhập ngày thanh toán']
             );
         }
 
         $dataUpdate = ['paid' => floatval($paid)];
+        if ($dayPaid) {
+            $dataUpdate['payment_date'] = $dayPaid->format(FORMAT_DATE);
+        }
         if ($request->isMethod('put')) {
             $order = $this->orderService->updateStatusPayment(intval($id), $order, $dataUpdate, $status);
             if ($order) {
@@ -347,5 +361,17 @@ class OrderController extends Controller
         return redirect()->route('payment.detailPayment', $id)->with(
             ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái thanh toán thất bại']
         );
+    }
+
+    public function getDiscountByCustomerId(Request $request)
+    {
+        $customerId = intval($request->query('customerId') ?? 0);
+        $productIdsNotIn = array_map('intval', $request->query('productIdsNotIn') ?? []);
+        $discounts = $this->orderService->getDiscountByCustomerId($customerId, $productIdsNotIn);
+        $products = [];
+        foreach ($discounts as $discount) {
+            $products[] = $discount->product;
+        }
+        return response()->json($products);
     }
 }

@@ -38,6 +38,9 @@
                                                 <thead class="table-light">
                                                 <tr>
                                                     <th>Sản phẩm</th>
+                                                    <th>Màu sắc</th>
+                                                    <th>Dung tích</th>
+                                                    <th>Đơn vị tính</th>
                                                     <th>Giá</th>
                                                 </tr>
                                                 </thead>

@@ -27,7 +27,7 @@
             </a>
         </li>
         @endif
-        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === WAREHOUSE_STAFF)
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
         <li class="<?= (request()->is('category*')) ? 'mm-active' : '' ?>">
             <a href="{{route('category.list')}}">
                 <div class="parent-icon"><i class="lni lni-list"></i>
@@ -62,6 +62,15 @@
         @if (Auth::user()->role === WAREHOUSE_STAFF)
             <li class="<?= (request()->is('warehouse-staff/order*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('warehouse-staff.order.index')}}">
+                    <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
+                    </div>
+                    <div class="menu-title">Quản lý đơn hàng</div>
+                </a>
+            </li>
+        @endif
+        @if ( Auth::user()->role === ACCOUNTANT)
+            <li class="<?= (request()->is('order*')) ? 'mm-active' : '' ?>">
+                <a href="{{route('order.index')}}">
                     <div class="parent-icon"><i class="bi bi-basket2-fill"></i>
                     </div>
                     <div class="menu-title">Quản lý đơn hàng</div>

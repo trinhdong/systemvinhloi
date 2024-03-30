@@ -48,7 +48,7 @@ function onSearch(e, page) {
                     }).format(product.price);
 
                     template += `
-                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}'>
+                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}' data-product-color='${product.color}' data-product-capacity='${product.capacity}' data-product-unit='${product.unit}'>
                                                     <td>
                                                         <div>
                                                             <div class="d-flex align-items-center gap-2"">
@@ -61,6 +61,9 @@ function onSearch(e, page) {
                                                             </div>
                                                         </div>
                                                     </td>
+                                                    <td>${product.color}</td>
+                                                    <td>${product.capacity}</td>
+                                                    <td>${product.unit}</td>
                                                     <td>${productPrice}</td>
                                                 </tr>
                                             `;
@@ -68,7 +71,7 @@ function onSearch(e, page) {
                 if (!products || products.length == 0) {
                     template =  `
                             <tr>
-                                <td class="text-center" colspan='2'>
+                                <td class="text-center" colspan='5'>
                                     Không có dữ liệu
                                 </td>
                             </tr>
@@ -134,6 +137,17 @@ $(document).ready(function () {
             });
             isValid = false;
         }
+        if ($('#payment-type').val() == 2 && parseFloat($('input[name="deposit"]').val().replace(/,/g, '')) >= parseFloat($('input[name="order_total"]').val())) {
+            Lobibox.notify('error', {
+                title: 'Lỗi',
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                icon: 'bx bx-x-circle',
+                msg: "Vui lòng nhập số tiền cọc nhỏ hơn tổng tiền"
+            });
+            isValid = false;
+        }
         if ($('select[name="payment_type"]').val() == '') {
             $(this).find('select[name="payment_type"]').addClass('is-invalid');
             isValid = false;
@@ -195,7 +209,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-remove-row', function () {
         $(this).closest('tr').remove();
-        if ($('#productList tr.product').length === 0) {
+        if ($('#orderlist tr.productOrder:not(.d-none)').length === 0) {
             $('#empty-row').removeClass('d-none');
         }
         totalOrder()
@@ -203,15 +217,7 @@ $(document).ready(function () {
 
     $(document).on('keyup', '.discount-percent input', function (event) {
         let discountPercent = $(this).val();
-        if (isNaN($(this).val()) || [".."].includes(event.key)) {
-            $(this).val('0');
-            return false;
-        }
-        let number = ($(this).val().split('.'));
-        let intPart = number[0];
-        let decPart = number[1];
-
-        if (intPart !== undefined && intPart.length > 3) {
+        if (isNaN($(this).val()) || ["."].includes(event.key)) {
             $(this).val('0');
             return false;
         }
@@ -221,9 +227,6 @@ $(document).ready(function () {
         }
         if (discountPercent > 100) {
             $(this).val('0');
-        }
-        if (decPart !== undefined && decPart.length > 2) {
-            $(this).val(discountPercent.toFixed(2));
         }
     });
     $(document).on('blur', '.discount-percent input', function (event) {
@@ -317,43 +320,16 @@ $(document).ready(function () {
         const productId = parseInt($(this).data('id'));
         const productName = $(this).data('product-name');
         const productPrice = $(this).data('product-price');
-        const productPriceFormat = new Intl.NumberFormat("en", {
-            maximumFractionDigits: 0,
-            minimumFractionDigits: 0,
-        }).format(productPrice);
         const productImage = $(this).data('product-image');
-        const $productOrder = $('#orderlist').find('.productOrder.d-none').clone();
-        $productOrder.removeClass('d-none');
-        $productOrder.attr('data-id', productId);
-        $productOrder.find('button, input, textarea').removeAttr('disabled');
-        $productOrder.find('input[name="product_id[]"]').val(productId);
-        $productOrder.find('.product-image img').attr('src', productImage);
-        $productOrder.find('.product-price').text(productPriceFormat);
-        $productOrder.find('.product-title').text(productName);
-        $productOrder.find('.discount-percent input').val(0);
-        $productOrder.find('.unit-price').text(productPriceFormat);
-        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
-        $productOrder.find('.product-price').closest('td').find('input:hidden').val(productPrice);
-        $productOrder.find('.total').text(productPriceFormat);
-        $productOrder.find('.quantity input').val(1);
-        if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId])) {
-            const discountPercent = discounts[customerId + '_' + productId];
-            const pricePercent = new Intl.NumberFormat("en", {
-                maximumFractionDigits: 0,
-                minimumFractionDigits: 0,
-            }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-            $productOrder.find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discounts[customerId + '_' + productId]);
-            $productOrder.find('.unit-price').text(pricePercent);
-            $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-            $productOrder.find('.total').text(pricePercent);
-        }
-        $('#orderlist').prepend($productOrder);
-        $('#empty-row').addClass('d-none');
+        const productColor = $(this).data('product-color');
+        const productCapacity = $(this).data('product-capacity');
+        const productUnit = $(this).data('product-unit');
+        appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit);
         $(this).remove();
         if ($('#productList .product').length == 0) {
             $('#productList').append(`
                 <tr>
-                    <td class="text-center" colspan='2'>
+                    <td class="text-center" colspan='5'>
                         Không có dữ liệu
                     </td>
                 </tr>
@@ -374,6 +350,7 @@ $(document).ready(function () {
         $('#payment-type').removeClass('is-invalid');
         if (customerId && customerId !== '') {
             appendCustomerInfo(customerId);
+            appendProductAjax(customerId);
         } else {
             if (!$('#delivery-info').hasClass('d-none')) {
                 $('#delivery-info').addClass('d-none');
@@ -389,32 +366,33 @@ $(document).ready(function () {
             }
             $('#payment-method-info').addClass('d-none').find('input').val('');
         }
-        $('#orderlist .productOrder').each(function () {
-            if ($(this).hasClass('d-none')) {
-                return;
-            }
-            const productId = parseInt($(this).data('id'));
-            let productPrice = $(this).find('.product-price').text();
-            $(this).find('.discount-percent input').val(0);
-            $(this).find('.unit-price').text(productPrice);
-            $(this).find('.unit-price').closest('td').find('input:hidden').val(productPrice);
-            $(this).find('.discount-percent input').val(0).removeAttr('readonly').removeClass('disabled');
-            if (!isNaN(discounts[customerId + '_' + productId])) {
-                productPrice = parseFloat(productPrice.replace(/,/g, ''));
-                const discountPercent = discounts[customerId + '_' + productId];
-                const pricePercent = new Intl.NumberFormat("en", {
-                    maximumFractionDigits: 0,
-                    minimumFractionDigits: 0,
-                }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
-                $(this).find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discountPercent);
-                $(this).find('.unit-price').text(pricePercent);
-                $(this).find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
-            }
-            $(this).find('.quantity input').trigger('blur');
-        })
-        totalOrder()
     });
 });
+function applyDiscount(customerId) {
+    $('#orderlist .productOrder').each(function () {
+        if ($(this).hasClass('d-none')) {
+            return;
+        }
+        const productId = parseInt($(this).data('id'));
+        let productPrice = $(this).find('.product-price').text();
+        $(this).find('.discount-percent input').val(0);
+        $(this).find('.unit-price').text(productPrice);
+        $(this).find('.unit-price').closest('td').find('input:hidden').val(productPrice);
+        $(this).find('.discount-percent input').val(0).removeAttr('readonly').removeClass('disabled');
+        if (!isNaN(discounts[customerId + '_' + productId])) {
+            productPrice = parseFloat(productPrice.replace(/,/g, ''));
+            const discountPercent = discounts[customerId + '_' + productId];
+            const pricePercent = new Intl.NumberFormat("en", {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0,
+            }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
+            $(this).find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discountPercent);
+            $(this).find('.unit-price').text(pricePercent);
+            $(this).find('.unit-price').closest('td').find('input:hidden').val(pricePercent);
+        }
+        $(this).find('.quantity input').trigger('blur');
+    })
+}
 function totalOrder() {
     let totalOrder = 0;
     let totalDiscount = 0;
@@ -457,9 +435,10 @@ function appendCustomerInfo(customerId) {
             $('#delivery-info').find('#delivery-info-name').append(`<span>${customer.customer_name || ''}</span>`);
             $('#delivery-info').find('#delivery-info-address').append(`<span>${customer.address || ''}</span>`);
             $('#delivery-info').find('#delivery-info-phone').append(`<span>${customer.phone || ''}</span>`);
-            if (customer.company != null && customer.tax_code != null && customer.email != null) {
+            if (customer.company != null && customer.company_address != null && customer.tax_code != null && customer.email != null) {
                 $('#red-bill').removeClass('d-none');
                 $('#red-bill-info').find('#red-bill-info-company').append(`<span>${customer.company || ''}</span>`);
+                $('#red-bill-info').find('#red-bill-info-company-address').append(`<span>${customer.company_address || ''}</span>`);
                 $('#red-bill-info').find('#red-bill-info-tax_code').append(`<span>${customer.tax_code || ''}</span>`);
                 $('#red-bill-info').find('#red-bill-info-email').append(`<span>${customer.email || ''}</span>`);
             } else {
@@ -475,4 +454,68 @@ function appendCustomerInfo(customerId) {
             console.error(xhr.responseText);
         }
     });
+}
+function appendProductAjax(customerId) {
+    const productIdsNotIn = $('#orderlist .productOrder').map(function () {
+        return parseInt($(this).data('id') || 0);
+    }).get();
+
+    $.ajax({
+        url: '/order/getDiscountByCustomerId',
+        type: 'GET',
+        data: {customerId: customerId, productIdsNotIn: productIdsNotIn},
+        success: function (products) {
+            products.forEach(function (product) {
+                const productId = product.id;
+                const productName = product.product_name;
+                const productPrice = product.price;
+                const productImage = product.image_url;
+                const productColor = product.color;
+                const productCapacity = product.capacity;
+                const productUnit = product.unit;
+                appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit)
+            });
+            applyDiscount(customerId);
+            totalOrder();
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    })
+}
+function appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit) {
+    const productPriceFormat = new Intl.NumberFormat("en", {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+    }).format(productPrice);
+    const $productOrder = $('#orderlist').find('.productOrder.d-none').clone();
+    $productOrder.removeClass('d-none');
+    $productOrder.attr('data-id', productId);
+    $productOrder.find('button, input, textarea').removeAttr('disabled');
+    $productOrder.find('input[name="product_id[]"]').val(productId);
+    $productOrder.find('.product-image img').attr('src', productImage);
+    $productOrder.find('.product-price').text(productPriceFormat);
+    $productOrder.find('.product-title').text(productName);
+    $productOrder.find('.product-color').text(productColor);
+    $productOrder.find('.product-capacity').text(productCapacity);
+    $productOrder.find('.product-unit').text(productUnit);
+    $productOrder.find('.discount-percent input').val(0);
+    $productOrder.find('.unit-price').text(productPriceFormat);
+    $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
+    $productOrder.find('.product-price').closest('td').find('input:hidden').val(productPrice);
+    $productOrder.find('.total').text(productPriceFormat);
+    $productOrder.find('.quantity input').val(1);
+    if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId])) {
+        const discountPercent = discounts[customerId + '_' + productId];
+        const pricePercent = new Intl.NumberFormat("en", {
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0,
+        }).format(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
+        $productOrder.find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(discounts[customerId + '_' + productId]);
+        $productOrder.find('.unit-price').text(pricePercent);
+        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice - (productPrice * discountPercent) / 100, 0));
+        $productOrder.find('.total').text(pricePercent);
+    }
+    $('#orderlist').prepend($productOrder);
+    $('#empty-row').addClass('d-none');
 }
