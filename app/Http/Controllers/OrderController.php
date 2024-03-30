@@ -320,16 +320,20 @@ class OrderController extends Controller
     {
         $order = $this->orderService->find(intval($id));
         $paid = str_replace(',', '', $request->input('paid') ?? '');
-        if ($status == null && $paid == ''
+        $dayPaid = \DateTime::createFromFormat('d/m/Y', $request->input('payment_date'));
+        if ($status == null && ($paid == '' || !$dayPaid)
             && !($order->status == DELIVERED && $order->payment_status == PAID)
             && !($order->payment_status == UNPAID && $order->payment_type == PAYMENT_ON_DELIVERY && in_array($order->status, [CONFIRMED, DELIVERY, REJECTED]))
         ) {
             return redirect()->route('payment.detailPayment', $id)->with(
-                ['flash_level' => 'error', 'flash_message' => 'Vui lòng nhập số tiền đã thanh toán']
+                ['flash_level' => 'error', 'flash_message' => $paid == '' ? 'Vui lòng nhập số tiền đã thanh toán' : 'Vui lòng nhập ngày thanh toán']
             );
         }
 
         $dataUpdate = ['paid' => floatval($paid)];
+        if ($dayPaid) {
+            $dataUpdate['payment_date'] = $dayPaid->format(FORMAT_DATE);
+        }
         if ($request->isMethod('put')) {
             $order = $this->orderService->updateStatusPayment(intval($id), $order, $dataUpdate, $status);
             if ($order) {

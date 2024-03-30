@@ -15,27 +15,31 @@ $(document).ready(function () {
         //     $(this).closest('#approvePaymentModal').find('#approveNote').addClass('is-invalid')
         //     return false;
         // }
-        if ($('#paid').length > 0 && isNaN(parseFloat($('#paid').val().replace(/,/g, '')))) {
+        if ($('#paid').length > 0 && isNaN(parseFloat($('#paid').val().replace(/,/g, ''))) || $('#datepicker').val() == '') {
             $(this).closest('#approvePaymentModal').modal('hide');
-            $('#paid').addClass('is-invalid')
+            $($('#datepicker').val() == '' ? '#datepicker' : '#paid').addClass('is-invalid')
             Lobibox.notify('error', {
                 title: 'Lỗi',
                 pauseDelayOnHover: true,
                 continueDelayOnInactiveTab: false,
                 position: 'top right',
                 icon: 'bx bx-x-circle',
-                msg: "Vui lòng nhập số tiền đã thanh toán"
+                msg: $('#datepicker').val() == '' ? "Vui lòng nhập ngày thanh toán" : "Vui lòng nhập số tiền đã thanh toán"
             });
             return false;
         }
         $('#update-status-payment').append($(this).closest('#approvePaymentModal').find('#approveNote').clone().removeAttr('id'))
         $('#update-status-payment').append($('#paid').clone().removeAttr('id'))
+        $('#update-status-payment').append($('#datepicker').clone().removeAttr('id'))
         $('#update-status-payment').submit()
         $(this).prop('disabled',true);
         $(this).closest('#approvePaymentModal').modal('hide');
     })
 
     $(document).on('focus', '#approveNote, #rejectNote, #paid', function () {
+        $(this).removeClass('is-invalid');
+    })
+    $(document).on('change', '#datepicker', function () {
         $(this).removeClass('is-invalid');
     })
 

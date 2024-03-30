@@ -40,6 +40,11 @@
                                                 <th>Sản phẩm</th>
                                                 @if($isAdmin || $isSale || $isAccountant)
                                                     <th>Ghi chú</th>
+                                                @endif
+                                                    <th>Màu sắc</th>
+                                                    <th>Dung tích</th>
+                                                    <th>Đơn vị tính</th>
+                                                @if($isAdmin || $isSale || $isAccountant)
                                                     <th>Giá</th>
                                                     <th>Chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
@@ -71,6 +76,17 @@
                                                         <td style="min-width:150px">
                                                             {{$orderDetail->note}}
                                                         </td>
+                                                    @endif
+                                                    <td>
+                                                        {{$orderDetail->product->color}}
+                                                    </td>
+                                                    <td>
+                                                        {{$orderDetail->product->capacity}}
+                                                    </td>
+                                                    <td>
+                                                        {{$orderDetail->product->unit}}
+                                                    </td>
+                                                    @if($isAdmin || $isSale || $isAccountant)
                                                         <td>
                                                             {{number_format($orderDetail->product_price)}}
                                                         </td>
@@ -443,20 +459,20 @@
             </div>
         </div>
     </div>
-    @include('order.orderInvoice', compact('order'))
+{{--    @include('order.orderInvoice', compact('order'))--}}
 @endsection
 @section('script')
     <script src="js/order/index.js"></script>
     <script src="js/order/detail.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#printButton').click(function() {
-                var printContents = $('#printableArea').html();
-                var originalContents = $('body').html();
-                $('body').html(printContents);
-                window.print();
-                $('body').html(originalContents);
-            });
-        });
-    </script>
+    {{--<script>--}}
+        {{--$(document).ready(function() {--}}
+            {{--$('#printButton').click(function() {--}}
+                {{--var printContents = $('#printableArea').html();--}}
+                {{--var originalContents = $('body').html();--}}
+                {{--$('body').html(printContents);--}}
+                {{--window.print();--}}
+                {{--$('body').html(originalContents);--}}
+            {{--});--}}
+        {{--});--}}
+    {{--</script>--}}
 @endsection

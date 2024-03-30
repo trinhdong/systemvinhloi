@@ -48,7 +48,7 @@ function onSearch(e, page) {
                     }).format(product.price);
 
                     template += `
-                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}'>
+                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}' data-product-color='${product.color}' data-product-capacity='${product.capacity}' data-product-unit='${product.unit}'>
                                                     <td>
                                                         <div>
                                                             <div class="d-flex align-items-center gap-2"">
@@ -61,6 +61,9 @@ function onSearch(e, page) {
                                                             </div>
                                                         </div>
                                                     </td>
+                                                    <td>${product.color}</td>
+                                                    <td>${product.capacity}</td>
+                                                    <td>${product.unit}</td>
                                                     <td>${productPrice}</td>
                                                 </tr>
                                             `;
@@ -68,7 +71,7 @@ function onSearch(e, page) {
                 if (!products || products.length == 0) {
                     template =  `
                             <tr>
-                                <td class="text-center" colspan='2'>
+                                <td class="text-center" colspan='5'>
                                     Không có dữ liệu
                                 </td>
                             </tr>
@@ -206,7 +209,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-remove-row', function () {
         $(this).closest('tr').remove();
-        if ($('#productList tr.product').length === 0) {
+        if ($('#orderlist tr.productOrder:not(.d-none)').length === 0) {
             $('#empty-row').removeClass('d-none');
         }
         totalOrder()
@@ -318,12 +321,15 @@ $(document).ready(function () {
         const productName = $(this).data('product-name');
         const productPrice = $(this).data('product-price');
         const productImage = $(this).data('product-image');
-        appendProduct(customerId, productId, productName, productPrice, productImage)
+        const productColor = $(this).data('product-color');
+        const productCapacity = $(this).data('product-capacity');
+        const productUnit = $(this).data('product-unit');
+        appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit);
         $(this).remove();
         if ($('#productList .product').length == 0) {
             $('#productList').append(`
                 <tr>
-                    <td class="text-center" colspan='2'>
+                    <td class="text-center" colspan='5'>
                         Không có dữ liệu
                     </td>
                 </tr>
@@ -464,7 +470,10 @@ function appendProductAjax(customerId) {
                 const productName = product.product_name;
                 const productPrice = product.price;
                 const productImage = product.image_url;
-                appendProduct(customerId, productId, productName, productPrice, productImage)
+                const productColor = product.color;
+                const productCapacity = product.capacity;
+                const productUnit = product.unit;
+                appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit)
             });
             applyDiscount(customerId);
             totalOrder();
@@ -474,7 +483,7 @@ function appendProductAjax(customerId) {
         }
     })
 }
-function appendProduct(customerId, productId, productName, productPrice, productImage) {
+function appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit) {
     const productPriceFormat = new Intl.NumberFormat("en", {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
@@ -487,6 +496,9 @@ function appendProduct(customerId, productId, productName, productPrice, product
     $productOrder.find('.product-image img').attr('src', productImage);
     $productOrder.find('.product-price').text(productPriceFormat);
     $productOrder.find('.product-title').text(productName);
+    $productOrder.find('.product-color').text(productColor);
+    $productOrder.find('.product-capacity').text(productCapacity);
+    $productOrder.find('.product-unit').text(productUnit);
     $productOrder.find('.discount-percent input').val(0);
     $productOrder.find('.unit-price').text(productPriceFormat);
     $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);

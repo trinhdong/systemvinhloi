@@ -59,6 +59,9 @@
                                                     </th>
                                                     <th>Sản phẩm</th>
                                                     <th>Ghi chú</th>
+                                                    <th>Màu sắc</th>
+                                                    <th>Dung tích</th>
+                                                    <th>Đơn vị tính</th>
                                                     <th>Giá</th>
                                                     <th>Chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
@@ -68,7 +71,7 @@
                                                 </thead>
                                                 <tbody id="orderlist">
                                                 <tr id="empty-row">
-                                                    <td colspan="8" class="text-center">Chưa có sản phẩm nào được thêm
+                                                    <td colspan="11" class="text-center">Chưa có sản phẩm nào được thêm
                                                     </td>
                                                 </tr>
                                                 <tr class="d-none productOrder">
@@ -98,6 +101,9 @@
                                                         <textarea disabled name="note[]" id="" cols="1" rows="1"
                                                                   class="form-control"></textarea>
                                                     </td>
+                                                    <td class="product-color"></td>
+                                                    <td class="product-capacity"></td>
+                                                    <td class="product-unit"></td>
                                                     <td>
                                                         <div class="product-price"></div>
                                                         <input disabled type="hidden" name="product_price[]"/>
