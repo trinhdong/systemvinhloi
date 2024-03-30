@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Product;
@@ -6,6 +7,7 @@ use App\Models\Product;
 class ProductRepository extends BaseRepository
 {
     protected $product;
+
     public function __construct(Product $product)
     {
         $this->product = $product;
@@ -23,5 +25,21 @@ class ProductRepository extends BaseRepository
             ->where('category_id', '=', $categoryId)
             ->whereNotIn('id', $productIdNotIn)
             ->get();
+    }
+
+    public function storeProductRepository($data)
+    {
+        if ($data->hasFile('image_url')) {
+            $file = $data->file('image_url');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('images/products', $filename, 'public');
+            $imagePath = '/storage/' . $filePath;
+        } else {
+            $imagePath = null;
+        }
+        $productData = $data->except(['image_url']);
+        $productData['image_url'] = $imagePath;
+
+        return $this->create($productData);
     }
 }

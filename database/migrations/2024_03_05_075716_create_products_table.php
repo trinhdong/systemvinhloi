@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('product_code')->unique();
             $table->string('product_name');
             $table->decimal('price', 10, 2);
-            $table->integer('quantity')->default(0);
-            $table->text('description')->nullable();
-            $table->string('attributes')->nullable();
+            $table->string('color');
+            $table->string('capacity');
             $table->string('unit')->nullable();
+            $table->text('description')->nullable();
             $table->string('image_url')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateProductRequest;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ class ProductController extends Controller
     }
     public function index(Request $request)
     {
-        $searchTerm = $request->query('search-area', '');
+        $searchTerm = $request->query('search-product', '');
         $filters = [];
         if (!empty($searchTerm)) {
             $filters['whereRaw'] = "product_name LIKE '%" . $searchTerm . "%'";
@@ -43,5 +44,14 @@ class ProductController extends Controller
     {
         $categoryList = $this->categoryService->getAll();
         return view('product.add', compact('categoryList'));
+    }
+    public function create(CreateProductRequest $request)
+    {
+        $insertProduct = $this->productService->storeProductService($request);
+        if ($insertProduct) {
+            return redirect()->route('product.list')->with(['flash_level' => 'success', 'flash_message' => 'Thêm sản phẩm thành công']);
+        } else {
+            return redirect()->back()->withInput()->with(['flash_level' => 'error', 'flash_message' => 'Thêm sản phẩm không thành công']);
+        }
     }
 }
