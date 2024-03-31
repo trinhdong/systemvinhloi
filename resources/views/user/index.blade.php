@@ -67,12 +67,12 @@
                                                 <a href="{{route('user.detail', $user->id)}}" class="text-primary"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
+                                                @if(Auth::User()->id !== $user->id)
                                                 <a href="{{route('user.edit', $user->id)}}" class="text-warning"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom"
                                                    title="Chỉnh sửa">
                                                     <i class="bi bi-pencil-fill"></i></a>
-                                                @if(Auth::User()->id !== $user->id)
                                                     <form class="d-none" id="formDeleteUser{{$user->id}}"
                                                           action="{{ route('user.delete', $user->id) }}" method="POST">
                                                         @csrf

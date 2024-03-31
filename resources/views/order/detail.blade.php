@@ -269,7 +269,7 @@
                                             </div>
                                             @if($order->payment_status == DEPOSITED || $order->payment_status == PAID)
                                                 <div id="paid"
-                                                     class="{{$order->payment_type == DEPOSIT ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                                     class="align-items-center mt-3 d-flex justify-content-between">
                                                     <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền đã thanh toán: </label>
                                                     <h5 class="mb-0 text-danger">{{number_format($order->paid)}}₫</h5>
                                                 </div>

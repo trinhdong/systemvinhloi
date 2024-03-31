@@ -80,7 +80,7 @@
                                 <tr>
                                     <td>{{$categories[$categoryIds[$discount->product_id]] ?? ''}}</td>
                                     <td>{{$products[$discount->product_id]}}</td>
-                                    <td>{{$discount->discount_percent}}%</td>
+                                    <td>{{number_format($discount->discount_percent)}}%</td>
                                     <td>{{number_format($productPrice[$discount->product_id] ?? 0)}}</td>
                                     <td>{{number_format(max($productPrice[$discount->product_id] - ($productPrice[$discount->product_id] * $discount->discount_percent) / 100, 0))}}</td>
                                 </tr>
