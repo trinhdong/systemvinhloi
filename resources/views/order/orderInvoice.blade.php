@@ -1,95 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn hàng</title>
-    <style>
-        body, h1, h2, p, table {
+    <title>Bán hàng Vinh Lợi</title>
+    <base href="{{asset('/')}}">
+    <link href="{{public_path('assets/css/bootstrap.min.css')}}" rel="stylesheet"/>
+    <style type="text/css">
+        * {
+            font-family: DejaVu Sans, sans-serif;
+        }
+        table{
+            font-size: x-small;
+        }
+        tr td{
+            font-size: x-small;
+        }
+        .detail {
             margin: 0;
             padding: 0;
         }
-
-        .container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        .detail tr {
+            margin: 0;
+            padding: 0;
+            border: solid 1px;
+        }
+        .detail th {
+            margin: 0;
+            padding: 0;
+            border: solid 1px;
+        }
+        .detail tr td {
+            margin: 0;
+            padding: 0;
+            border: solid 1px;
         }
 
-        .header {
-            grid-column: span 2;
-            text-align: center;
-        }
-
-        .customer-info,
-        .order-details,
-        .total,
-        .print-button {
-            background-color: #f2f2f2;
-            padding: 20px;
-        }
-
-        .print-button {
-            text-align: center;
-        }
-
-        table {
-            width: 100%;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #ddd;
-        }
     </style>
+
 </head>
 <body>
-<div id="printableArea" class="d-none">
-    <div class="container">
-        <div class="header">
-            <h1>Thông tin đơn hàng</h1>
-        </div>
-        <div class="customer-info">
-            <h2>Thông tin khách hàng</h2>
-            <p><strong>Tên:</strong> John Doe</p>
-            <p><strong>Địa chỉ:</strong> 123 ABC Street, City</p>
-            <p><strong>Email:</strong> john@example.com</p>
-        </div>
-        <div class="order-details">
-            <h2>Chi tiết đơn hàng</h2>
-            <table>
-                <thead>
-                <tr>
-                    <th>Sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Giá</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Product A</td>
-                    <td>2</td>
-                    <td>$20.00</td>
-                </tr>
-                <tr>
-                    <td>Product B</td>
-                    <td>1</td>
-                    <td>$15.00</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="total">
-            <p><strong>Tổng cộng:</strong> $55.00</p>
-        </div>
-    </div>
-</div>
+
+<table width="100%">
+    <tr>
+        <td valign="top"><img src="{{public_path('assets/images/avatars/person.png')}}" alt="" width="100"/></td>
+        <td align="right" style=" width: 200px;">
+            <h5 style="text-align: left; font-weight: bold" >CTY TNHH NHỰA VINH LỢI</h5>
+            <pre style="text-align: left; margin-top: -20px">
+G8/32 Tỉnh lộ 10, Lê Minh Xuân,
+Bình Chánh - TP. Hồ Chí Minh
+ĐT: 3 969 1482 - Fax: 3 960 4613
+            A Diệu
+            </pre>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" colspan="2">
+            <h1 style="font-weight: bold">ĐƠN ĐẶT HÀNG</h1><br>
+            <p style="margin-top: -20px">Ngày 20 tháng 9 năm 2023</p>
+        </td>
+    </tr>
+    <tr>
+        <td align="right" colspan="2" style="text-align:right; width: 400px;">
+            <pre style="text-align: left; margin-top:-10px">
+Người Nhận:      <strong>Thanh Đông Food</strong>
+SĐT: 	0909.987.235
+Đ	403/70 Tân Chánh Hiệp 10, P Tân Chánh Hiệp, Q12
+ĐỊA CHỈ CHÀNH
+            </pre>
+        </td>
+    </tr>
+
+</table>
+
+
+<table width="100%" class="detail">
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Mã đơn hàng</th>
+        <th>Tên sản phẩm</th>
+        <th>Quy cách</th>
+        <th>Số lượng thùng</th>
+        <th>Tổng số lượng</th>
+        <th>Đơn giá</th>
+        <th>Chiết khấu</th>
+        <th>Giá sau chiết khấu</th>
+        <th>Tổng cộng</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>STT</td>
+        <td>Mã đơn hàng</td>
+        <td>Tên sản phẩm</td>
+        <td>Quy cách</td>
+        <td>Số lượng thùng</td>
+        <td>Tổng số lượng</td>
+        <td>Đơn giá</td>
+        <td>Chiết khấu</td>
+        <td>Giá sau chiết khấu</td>
+        <td>Tổng cộng</td>
+    </tr>
+    <tr>
+        <td colspan="8" style="border-right: none; text-align: center">
+            <h3 style="font-weight: bold; margin-top: 1px; margin-bottom: 1px">Tổng cộng</h3>
+        </td>
+        <td colspan="2" style="border-left: none">
+            <h3 style="text-align: right; font-weight: bold; margin-top: 1px; margin-bottom: 1px">1000000</h3>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

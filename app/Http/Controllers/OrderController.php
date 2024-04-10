@@ -13,6 +13,7 @@ use App\Repositories\BankAccountRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -465,5 +466,17 @@ class OrderController extends Controller
     public function getBankAccountById($id)
     {
         return response()->json($this->bankAccountRepository->find($id));
+    }
+
+    public function printInvoice($id = null)
+    {
+        if ($id === null) {
+            return abort('404', 'Page not found');
+        }
+//        return view('order.orderInvoice');
+        $order = $this->orderService->find($id);
+        $pdf = Pdf::loadView('order.orderInvoice', compact('order'));
+        $pdf->set_paper('letter', 'landscape');
+        return $pdf->stream($order->order_number . '.pdf');
     }
 }

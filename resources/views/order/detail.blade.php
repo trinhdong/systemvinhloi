@@ -531,9 +531,21 @@
                             </div>
                         @endif
                         @if(in_array($order->status, [DELIVERY, DELIVERED, COMPLETE]))
-                            <button id="printButton" type="button" class="btn btn-success"><i
+                            @if($isStocker)
+                                <a href="{{route('stocker.order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
                                         class="bi bi-printer-fill"></i> In
-                            </button>
+                                </a>
+                            @endif
+                            @if($isWareHouseStaff)
+                                <a href="{{route('warehouse-staff.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
+                                        class="bi bi-printer-fill"></i> In
+                                </a>
+                            @endif
+                            @if($isAdmin || $isSale || $isAccountant)
+                                <a href="{{route('order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
+                                        class="bi bi-printer-fill"></i> In
+                                </a>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -580,20 +592,8 @@
             </div>
         </div>
     </div>
-    {{--    @include('order.orderInvoice', compact('order'))--}}
 @endsection
 @section('script')
     <script src="js/order/index.js"></script>
     <script src="js/order/detail.js"></script>
-    {{--<script>--}}
-    {{--$(document).ready(function() {--}}
-    {{--$('#printButton').click(function() {--}}
-    {{--var printContents = $('#printableArea').html();--}}
-    {{--var originalContents = $('body').html();--}}
-    {{--$('body').html(printContents);--}}
-    {{--window.print();--}}
-    {{--$('body').html(originalContents);--}}
-    {{--});--}}
-    {{--});--}}
-    {{--</script>--}}
 @endsection

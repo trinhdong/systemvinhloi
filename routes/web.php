@@ -114,6 +114,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE'])->group(function 
         );
         Route::get('/getDiscountByCustomerId',  [OrderController::class, 'getDiscountByCustomerId'])->name('order.getDiscountByCustomerId');
         Route::get('/getBankAccountById/{id}',  [OrderController::class, 'getBankAccountById'])->name('order.getBankAccountById');
+        Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice'])->name('order.printInvoice');
     });
 });
 
@@ -121,6 +122,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,WAREHOUSE_STAFF'])->grou
     Route::prefix('/warehouse-staff/order')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('warehouse-staff.order.index');
         Route::get('/detail/{id}', [OrderController::class, 'detail'])->name('warehouse-staff.order.detail');
+        Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice/{id}'])->name('warehouse-staff.printInvoice');
     });
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(function () {
@@ -133,6 +135,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(functi
             'stocker.order.updateStatusOrder'
         );
     });
+    Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice/{id}'])->name('stocker.printInvoice');
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT'])->group(function () {
     Route::prefix('/payment')->group(function () {
