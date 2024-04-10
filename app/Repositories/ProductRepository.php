@@ -42,4 +42,18 @@ class ProductRepository extends BaseRepository
 
         return $this->create($productData);
     }
+    public function updateProductRepository($data)
+    {
+        $product = $this->model->find($data['id']);
+        $productData = $data->except(['image_url']);
+        if ($data->hasFile('image_url')) {
+            $file = $data->file('image_url');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('images/products', $filename, 'public');
+            $productData['image_url'] = '/storage/' . $filePath;
+        } else {
+            $productData['image_url'] = $product->image_url;
+        }
+        return $this->update($data['id'], $productData);
+    }
 }

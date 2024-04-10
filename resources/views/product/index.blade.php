@@ -19,14 +19,16 @@
                             <form class="position-relative">
                                 <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i
                                         class="bi bi-search"></i></div>
-                                <input class="form-control ps-5 rounded" type="text" placeholder="Nhập nội dung tìm kiếm"
+                                <input class="form-control ps-5 rounded" type="text"
+                                       placeholder="Nhập nội dung tìm kiếm"
                                        name="search-product" value="">
                             </form>
                         </div>
                     </div>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('product.create.show')}}" type="button" class="btn btn-primary float-end">Thêm sản phẩm</a>
+                    <a href="{{route('product.create.show')}}" type="button" class="btn btn-primary float-end">Thêm sản
+                        phẩm</a>
                 </div>
             </div>
             <div class="card">
@@ -41,6 +43,7 @@
                                 <th>Tên sản phẩm</th>
                                 <th>Màu sắc</th>
                                 <th>Dung tích</th>
+                                <th>Quy cách</th>
                                 <th>Đơn vị tính</th>
                                 <th>Đơn giá</th>
                                 <th></th>
@@ -56,13 +59,22 @@
                                 @foreach($productList as $key => $item)
                                     <tr>
                                         <td>{{++$currentItem}}</td>
-                                        <td>{{$item->category_name}}</td>
-                                        <td>{{$item->category_name}}</td>
-                                        <td>{{$item->category_name}}</td>
-                                        <td>{{$item->category_name}}</td>
-                                        <td>{{$item->category_name}}</td>
-                                        <td>{{$item->category_name}}</td>
-                                        <td>{{$item->category_name}}</td>
+                                        <td>
+                                            @if($item->image_url)
+                                                <img src="{{ asset($item->image_url) }}" alt=""
+                                                     style="width:50px; height:50px;">
+                                            @else
+                                                <img src="{{ asset("/storage/images/products/no-image.jpg") }}" alt=""
+                                                     style="width:50px; height:50px;">
+                                            @endif
+                                        </td>
+                                        <td>{{$item->product_code}}</td>
+                                        <td>{{$item->product_name}}</td>
+                                        <td>{{$item->color}}</td>
+                                        <td>{{$item->capacity}}</td>
+                                        <td>{{$item->specifications}}</td>
+                                        <td>{{$item->unit}}</td>
+                                        <td>{{number_format($item->price)}}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                                 <a href="{{route('product.detail', $item->id)}}" class="text-primary"

@@ -19,6 +19,8 @@ class Product extends Model
         'color',
         'capacity',
         'unit',
+        'specifications',
+        'quantity_per_package',
         'image_url',
         'created_by',
         'updated_by',

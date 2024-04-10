@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -52,6 +53,52 @@ class ProductController extends Controller
             return redirect()->route('product.list')->with(['flash_level' => 'success', 'flash_message' => 'Thêm sản phẩm thành công']);
         } else {
             return redirect()->back()->withInput()->with(['flash_level' => 'error', 'flash_message' => 'Thêm sản phẩm không thành công']);
+        }
+    }
+    public function detail($id)
+    {
+        $categoryList = $this->categoryService->getAll();
+        $product = $this->productService->find($id);
+        return view('product.detail', compact('product', 'categoryList'));
+    }
+    public function edit($id)
+    {
+        $categoryList = $this->categoryService->getAll();
+        $product = $this->productService->find($id);
+        return view('product.edit', compact('product', 'categoryList'));
+    }
+
+    public function update(UpdateProductRequest $request)
+    {
+         $updateProduct = $this->productService->updateProductService($request);
+        if ($updateProduct) {
+            return redirect()->route('product.list')->with(['flash_level' => 'success', 'flash_message' => 'Chỉnh sửa sản phẩm thành công']);
+        } else {
+            return redirect()->back()->withInput()->with(['flash_level' => 'error', 'flash_message' => 'Chỉnh sửa sản phẩm không thành công']);
+        }
+    }
+    public function delete($id)
+    {
+        try {
+            $product = $this->productService->find($id);
+            if (!$product) {
+                return redirect()->route('product.list')->with([
+                    'flash_level' => 'error',
+                    'flash_message' => 'Sản phẩm không tồn tại.'
+                ]);
+            }
+            $product->deleted_by = auth()->user()->id;
+            $product->delete();
+
+            return redirect()->route('product.list')->with([
+                'flash_level' => 'success',
+                'flash_message' => 'Xóa sản phẩm thành công.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('product.list')->with([
+                'flash_level' => 'error',
+                'flash_message' => 'Đã có lỗi xảy ra khi xóa sản phẩm.'
+            ]);
         }
     }
 }
