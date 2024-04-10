@@ -4,8 +4,18 @@
 @endsection
 @section('action')
     <div class="col-12">
-        <a href="{{Auth::user()->role == WAREHOUSE_STAFF ? route('warehouse-staff.order.index') : route('order.index')}}"
-           class="btn btn-sm btn-secondary">Quay lại</a>
+        @if($isStocker)
+            <a href="{{route('stocker.order.index')}}"
+               class="btn btn-sm btn-secondary">Quay lại</a>
+        @endif
+        @if($isWareHouseStaff)
+            <a href="{{route('warehouse-staff.order.index')}}"
+               class="btn btn-sm btn-secondary">Quay lại</a>
+        @endif
+        @if($isAdmin || $isSale || $isAccountant)
+            <a href="{{route('order.index')}}"
+               class="btn btn-sm btn-secondary">Quay lại</a>
+        @endif
     </div>
 @endsection
 @section('breadcrumb')
@@ -15,14 +25,19 @@
     <div class="card">
         <div class="card-header py-3">
             <div class="row g-3 align-items-center">
-                <div class="col-12 col-lg-8 col-md-6 me-auto">
+                <div class="col-4 me-auto">
                     <div class="d-flex justify-content-start align-items-center">
                         <h5 class="mb-0 me-3">Mã đơn hàng: {{$order->order_number}}</h5>
                         <span class="font-14 badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4 col-6 col-md-3">
-                    <p class="mb-1" style="float:right">{{date("d/m/Y", strtotime($order->order_date))}}</p>
+                @if(!$isAccountant && $order->has_update_quantity == HAD_UPDATE_QUANTITY)
+                <div class="col-4 text-center">
+                    <span class="text-danger">Thủ kho đã cập nhật lại số lượng thùng</span>
+                </div>
+                @endif
+                <div class="col-4">
+                    <p class="mb-1" style="float:right">{{date(FORMAT_DATE_VN, strtotime($order->order_date))}}</p>
                 </div>
             </div>
         </div>
@@ -30,7 +45,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="{{$isAdmin || $isSale || $isAccountant ? 'col-12' : 'col-7'}}">
+                        <div class="{{$isAdmin || $isSale || $isAccountant || $isStocker ? 'col-12' : 'col-7'}}">
                             <div class="card border shadow-none radius-10">
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -38,19 +53,21 @@
                                             <thead class="table-light">
                                             <tr>
                                                 <th>Sản phẩm</th>
-                                                @if($isAdmin || $isSale || $isAccountant)
+                                                @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                     <th>Ghi chú</th>
                                                 @endif
-                                                    <th>Màu sắc</th>
-                                                    <th>Dung tích</th>
-                                                    <th>Đơn vị tính</th>
-                                                @if($isAdmin || $isSale || $isAccountant)
+                                                <th>Màu sắc</th>
+                                                <th>Dung tích</th>
+                                                <th>Đơn vị tính</th>
+                                                @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                     <th>Giá</th>
-                                                    <th>Chiết khấu</th>
+                                                    <th>Chiết khấu (%)</th>
+                                                    <th>Số tiền chiết khấu</th>
+                                                    <th>Ghi chú chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
                                                 @endif
-                                                <th>Số lượng</th>
-                                                @if($isAdmin || $isSale || $isAccountant)
+                                                <th>Số lượng thùng</th>
+                                                @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                     <th>Tổng tiền sau chiết khấu</th>
                                                 @endif
                                             </tr>
@@ -63,7 +80,7 @@
                                                         <div>
                                                             <div class="d-flex align-items-center gap-2">
                                                                 <div class="product-box product-image">
-                                                                    <img src="{{ $orderDetail->product->image }}"
+                                                                    <img src="{{ $orderDetail->product->image_url }}"
                                                                          alt="">
                                                                 </div>
                                                                 <div>
@@ -72,7 +89,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    @if($isAdmin || $isSale || $isAccountant)
+                                                    @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                         <td style="min-width:150px">
                                                             {{$orderDetail->note}}
                                                         </td>
@@ -86,12 +103,18 @@
                                                     <td>
                                                         {{$orderDetail->product->unit}}
                                                     </td>
-                                                    @if($isAdmin || $isSale || $isAccountant)
+                                                    @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                         <td>
                                                             {{number_format($orderDetail->product_price)}}
                                                         </td>
                                                         <td class="discount-percent">
-                                                            {{ number_format($orderDetail->discount_percent) }}%
+                                                            {{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}%
+                                                        </td>
+                                                        <td class="discount-price">
+                                                            {{ number_format($orderDetail->discount_price) }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $orderDetail->discount_note }}
                                                         </td>
                                                         <td>
                                                             {{number_format($orderDetail->unit_price)}}
@@ -100,7 +123,7 @@
                                                     <td class="quantity">
                                                         {{number_format($orderDetail->quantity)}}
                                                     </td>
-                                                    @if($isAdmin || $isSale || $isAccountant)
+                                                    @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                         <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity)}}</td>
                                                     @endif
                                                 </tr>
@@ -133,13 +156,19 @@
                                                 hàng: </label>
                                             <span>{{$order->shipping_address ?? $order->customer->address}}</span>
                                         </div>
+                                        @if (!empty($order->delivery_appointment_date))
+                                        <div class="align-items-center d-flex justify-content-between mt-3">
+                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày hẹn giao hàng: </label>
+                                            <span>{{date(FORMAT_DATE_VN, strtotime($order->delivery_appointment_date))}}</span>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            @if($isAdmin || $isSale || $isAccountant)
+                            @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                 <div class="col-12 {{!empty($order->customer->tax_code) && !empty($order->customer->email) && !empty($order->customer->company) && !empty($order->customer->company_address) ? '' : 'd-none'}}">
                                     <div id="red-bill-info"
-                                         class="{{$order->is_print_red_invoice == 1 ? '' : 'd-none'}} card border radius-10">
+                                         class="{{$order->is_print_red_invoice == PRINTED_RED_INVOICE ? '' : 'd-none'}} card border radius-10">
                                         <div class="card-body">
                                             <div class="d-flex align-items-center mb-4">
                                                 <div>
@@ -150,8 +179,10 @@
                                                 <strong>Tên
                                                     công
                                                     ty: </strong><span>{{$order->customer->company}}</span></p>
-                                            <p id="red-bill-info-company-address" class="d-flex justify-content-between">
-                                                <strong>Địa chỉ công ty: </strong><span>{{$order->customer->company_address}}</span></p>
+                                            <p id="red-bill-info-company-address"
+                                               class="d-flex justify-content-between">
+                                                <strong>Địa chỉ công
+                                                    ty: </strong><span>{{$order->customer->company_address}}</span></p>
                                             <p id="red-bill-info-tax_code" class="d-flex justify-content-between">
                                                 <strong>Mã
                                                     số
@@ -177,7 +208,7 @@
                                 </div>
                             </div>
                         </div>
-                        @if($isAdmin || $isSale || $isAccountant)
+                        @if($isAdmin || $isSale || $isAccountant || $isStocker)
                             <div class="col-5">
                                 <div class="col-12">
                                     <div class="card border shadow-none bg-light radius-10">
@@ -226,45 +257,62 @@
                                                 </div>
                                             </div>
                                             <div class="mb-3 d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Hình
-                                                    thức
-                                                    thanh toán: </label>
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Hình thức thanh toán: </label>
                                                 {{PAYMENTS_TYPE[$order->payment_type]}}
                                             </div>
                                             @if(!empty($order->payment_method))
-                                            <div class=" d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Phương
-                                                    thức
-                                                    thanh toán: </label>
-                                                {{PAYMENTS_METHOD[$order->payment_method]}}
-                                            </div>
+                                                <div class=" d-flex justify-content-between">
+                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Phương thức thanh toán: </label>
+                                                    {{PAYMENTS_METHOD[$order->payment_method]}}
+                                                </div>
                                             @endif
-                                            <div id="payment-method-info"
-                                                 class="{{$order->payment_method == TRANFER ? '' : 'd-none'}}">
-                                                <div class="align-items-center mt-3 d-flex justify-content-between">
-                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên
-                                                        chủ
-                                                        tài
-                                                        khoản: </label>
-                                                    {{$order->bank_customer_name}}
+                                            <div id="payment-method-info" class="{{$order->payment_method == TRANFER ? '' : 'd-none'}}">
+                                                <label for="" class="fw-bolder me-1 mt-3" style="white-space: nowrap">Tài khoản chuyển tiền: </label>
+                                                <div class="card border shadow-none bg-light radius-10">
+                                                    <div class="card-body">
+                                                        <div class="align-items-center d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên ngân hàng: </label>
+                                                            {{$order->bank_name}}
+                                                        </div>
+                                                        <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tài khoản: </label>
+                                                            {{$order->bank_code}}
+                                                        </div>
+                                                        <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chủ tài khoản: </label>
+                                                            {{$order->bank_customer_name}}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="align-items-center mt-3 d-flex justify-content-between">
-                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên
-                                                        ngân
-                                                        hàng: </label>
-                                                    {{$order->bank_name}}
+                                                @if(!empty($order->bankAccount))
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tài khoản nhận tiền: </label>
+                                                <div class="card border radius-10 shadow-none bg-light">
+                                                    <div class="card-body">
+                                                        <div class="align-items-center d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên ngân hàng: </label>
+                                                            {{$order->bankAccount->bank_name ?? ''}}
+                                                        </div>
+                                                        <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tài khoản: </label>
+                                                            {{$order->bankAccount->bank_code ?? ''}}
+                                                        </div>
+                                                        <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chủ tài khoản: </label>
+                                                            {{$order->bankAccount->bank_account_name ?? ''}}
+                                                        </div>
+                                                        @if($order->bankAccount->bank_branch !== null)
+                                                        <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chi nhánh: </label>
+                                                            {{$order->bankAccount->bank_branch ?? ''}}
+                                                        </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                                <div class="align-items-center mt-3 d-flex justify-content-between">
-                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số
-                                                        tài
-                                                        khoản: </label>
-                                                    {{$order->bank_code}}
-                                                </div>
+                                                @endif
                                             </div>
                                             <div id="deposit"
                                                  class="{{$order->payment_type == DEPOSIT ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền
-                                                    cọc: </label>
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền cọc: </label>
                                                 <h5 class="mb-0 text-danger">{{number_format($order->deposit)}}₫</h5>
                                             </div>
                                             @if($order->payment_status == DEPOSITED || $order->payment_status == PAID)
@@ -273,6 +321,16 @@
                                                     <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền đã thanh toán: </label>
                                                     <h5 class="mb-0 text-danger">{{number_format($order->paid)}}₫</h5>
                                                 </div>
+                                                <div id="payment_date" class="{{$order->payment_type == PAYMENT_ON_DELIVERY ? 'd-none' : ''}} align-items-center mt-3 d-flex justify-content-between">
+                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày thanh toán: </label>
+                                                    <h5 class="mb-0 text-danger">{{!empty($order->payment_date) ? date(FORMAT_DATE_VN, strtotime($order->payment_date)) : ''}}</h5>
+                                                </div>
+                                            @endif
+                                            @if(!empty($order->payment_due_day))
+                                            <div id="payment_date" class="{{$order->payment_type == PAYMENT_ON_DELIVERY ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày đến hạn thanh toán: </label>
+                                                <h5 class="mb-0 text-danger">{{$order->payment_due_day}}</h5>
+                                            </div>
                                             @endif
                                         </div>
                                     </div>
@@ -292,7 +350,7 @@
                                 <th class="col-2">Nhân viên</th>
                                 <th class="col-2">Trạng thái</th>
                                 <th class="">Ghi chú</th>
-                                <th class="col-2 text-right">Ngày cập nhật</th>
+                                <th class="col-2 text-right">Thời gian cập nhật</th>
                             </tr>
                             </thead>
                             <tbody class="bd-content-stable">
@@ -303,7 +361,7 @@
                                         <span class="badge rounded-pill bg-{{STATUS_COLOR[$comment->status]}}">{{STATUS_ORDER[$comment->status]}}</span>
                                     </td>
                                     <td>{{$comment->note}}</td>
-                                    <td class="text-right">{{date('d/m/Y', strtotime($comment->created_at))}}</td>
+                                    <td class="text-right">{{date(FORMAT_DATE_TIME_VN, strtotime($comment->created_at))}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -332,87 +390,150 @@
                             Xóa
                         </a>
                     @endif
+                    @if($isStocker && $order->status == IN_PROCESSING && ($order->payment_type === PAYMENT_ON_DELIVERY || $order->payment_type === DEPOSIT))
+                        <a href="{{route('stocker.order.edit', $order->id)}}" style="width: 80px;"
+                           class="btn btn-primary">Sửa</a>
+                    @endif
                 </div>
                 <div class="col-4">
                     <div class="d-flex justify-content-center align-items-center">
                         @if(($isAdmin || $isSale) && ($order->status == DRAFT || $order->status == REJECTED))
+                            @if($order->payment_status === DEPOSITED || $order->payment_status === PAID || $order->payment_type === PAYMENT_ON_DELIVERY)
                             <form class="d-none" id="update-status-order" method="POST"
                                   action="{{ route('order.updateStatusOrder', ['id' => $order->id]) }}">
                                 @csrf
                                 @method('PUT')
                             </form>
                             <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-bs-toggle="modal"
-                                    class="text-center btn btn-primary me-2">{{STATUS_ORDER_BUTTON[AWAITING]}}
+                                    class="text-center btn btn-primary me-2">Gửi đơn hàng
                             </button>
-                            <div class="modal fade" id="approveOrderModal" tabindex="-1" aria-labelledby="approveOrderModalLabel"
+                            <div class="modal fade" id="approveOrderModal" tabindex="-1"
+                                 aria-labelledby="approveOrderModalLabel"
                                  aria-hidden="true" style="display: none;">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="approveOrderModalLabel">Gửi đơn hàng</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            Bạn muốn gửi đơn hàng này cho <strong>{{$order->payment_type == PAYMENT_ON_DELIVERY ? ROLE_TYPE_NAME[WAREHOUSE_STAFF] : ROLE_TYPE_NAME[ACCOUNTANT]}}</strong>?
+                                            Bạn muốn gửi đơn hàng này?
                                             <div class="mb-3 mt-3">
                                                 <label for="approveNote" class="form-label">Ghi chú:</label>
-                                                <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                                                <textarea class="form-control" id="approveNote" name="note"
+                                                          rows="3"></textarea>
                                                 <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                                            <button id="approveOrder" type="button" class="btn btn-success">Đồng ý</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy
+                                                bỏ
+                                            </button>
+                                            <button id="approveOrder" type="button" class="btn btn-success">Đồng ý
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            @endif
+                            @if($order->status === DRAFT && $order->payment_status === UNPAID && ($order->payment_type === DEPOSIT || $order->payment_type === PAY_FULL))
+                                <form class="d-none" id="update-check-payment-order" method="POST"
+                                      action="{{ route('order.updateStatusPayment', ['id' => $order->id]) }}">
+                                    @csrf
+                                    @method('PUT')
+                                </form>
+                                <button id="approvePaymentOrderModalBtn" data-bs-target="#approvePaymentOrderModal" data-bs-toggle="modal"
+                                        class="text-center btn btn-success me-2">Xác nhận thanh toán
+                                </button>
+                                <div class="modal fade" id="approvePaymentOrderModal" tabindex="-1"
+                                     aria-labelledby="approvePaymentOrderModalLabel"
+                                     aria-hidden="true" style="display: none;">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="approvePaymentOrderModalLabel">Xác nhận thanh toán</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Bạn muốn xác nhận thanh toán của đơn hàng này?
+                                                <div class="mb-3 mt-3">
+                                                    <label for="approveNote" class="form-label">Ghi chú:</label>
+                                                    <textarea class="form-control" id="approveNote" name="note"
+                                                              rows="3"></textarea>
+                                                    <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy
+                                                    bỏ
+                                                </button>
+                                                <button id="approvePaymentOrder" type="button" class="btn btn-success">Đồng ý
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
-                        @if(($isAdmin || $isWareHouseStaff) && (in_array($order->status, [CONFIRMED, DELIVERY])))
-                            @if($order->status == CONFIRMED && $order->payment_status == UNPAID)
-                            <form class="d-none" id="update-status-order-reject" method="POST"
-                                  action="{{ route($isWareHouseStaff ? 'warehouse-staff.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => REJECTED]) }}">
-                                @csrf
-                                @method('PUT')
-                            </form>
-                            <button id="rejectOrderModalBtn" data-bs-target="#rejectOrderModal" data-bs-toggle="modal"
-                                    class="text-center btn btn-danger me-2">Từ chối
-                            </button>
+                        @if(($isAdmin || $isStocker) && (in_array($order->status, [IN_PROCESSING, DELIVERY])))
+                            @if($order->status == IN_PROCESSING && $order->payment_status == UNPAID)
+                                <form class="d-none" id="update-status-order-reject" method="POST"
+                                      action="{{ route($isStocker ? 'stocker.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => REJECTED]) }}">
+                                    @csrf
+                                    @method('PUT')
+                                </form>
+                                <button id="rejectOrderModalBtn" data-bs-target="#rejectOrderModal"
+                                        data-bs-toggle="modal"
+                                        class="text-center btn btn-danger me-2">Từ chối
+                                </button>
                             @endif
                             <form class="d-none" id="update-status-order" method="POST"
-                                  action="{{ route($isWareHouseStaff ? 'warehouse-staff.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id]) }}">
+                                  action="{{ route($isStocker ? 'stocker.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id]) }}">
                                 @csrf
                                 @method('PUT')
                             </form>
-                            <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-modal-body="" data-bs-toggle="modal"
-                                    class="text-center btn btn-primary me-2">{{STATUS_ORDER_BUTTON[$order->status == CONFIRMED ? DELIVERY : DELIVERED]}}
+                            <button id="approveOrderModalBtn" data-bs-target="#approveOrderModal" data-modal-body=""
+                                    data-bs-toggle="modal"
+                                    class="text-center btn btn-primary me-2">{{STATUS_ORDER_BUTTON[$order->status == IN_PROCESSING ? DELIVERY : DELIVERED]}}
                             </button>
-                            <div class="modal fade" id="approveOrderModal" tabindex="-1" aria-labelledby="approveOrderModalLabel"
+                            <div class="modal fade" id="approveOrderModal" tabindex="-1"
+                                 aria-labelledby="approveOrderModalLabel"
                                  aria-hidden="true" style="display: none;">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="approveOrderModalLabel">Cập nhật tình trạng đơn hàng</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <h5 class="modal-title" id="approveOrderModalLabel">Cập nhật tình trạng đơn
+                                                hàng</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            Bạn muốn cập nhật tình trạng đơn hàng là <strong>{{STATUS_ORDER[$order->status == CONFIRMED ? DELIVERY : DELIVERED]}}</strong>?
+                                            Bạn muốn cập nhật tình trạng đơn hàng là
+                                            <strong>{{STATUS_ORDER[$order->status == IN_PROCESSING ? DELIVERY : DELIVERED]}}</strong>?
                                             <div class="mb-3 mt-3">
                                                 <label for="approveNote" class="form-label">Ghi chú:</label>
-                                                <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                                                <textarea class="form-control" id="approveNote" name="note"
+                                                          rows="3"></textarea>
                                                 <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                                            <button id="approveOrder" type="button" class="btn btn-success">Đồng ý</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy
+                                                bỏ
+                                            </button>
+                                            <button id="approveOrder" type="button" class="btn btn-success">Đồng ý
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         @endif
-                        @if(in_array($order->status, [AWAITING, CONFIRMED, DELIVERY, DELIVERED, COMPLETE]))
-                            <button id="printButton" type="button" class="btn btn-success"><i class="bi bi-printer-fill"></i> In</button>
+                        @if(in_array($order->status, [DELIVERY, DELIVERED, COMPLETE]))
+                            <button id="printButton" type="button" class="btn btn-success"><i
+                                        class="bi bi-printer-fill"></i> In
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -459,20 +580,20 @@
             </div>
         </div>
     </div>
-{{--    @include('order.orderInvoice', compact('order'))--}}
+    {{--    @include('order.orderInvoice', compact('order'))--}}
 @endsection
 @section('script')
     <script src="js/order/index.js"></script>
     <script src="js/order/detail.js"></script>
     {{--<script>--}}
-        {{--$(document).ready(function() {--}}
-            {{--$('#printButton').click(function() {--}}
-                {{--var printContents = $('#printableArea').html();--}}
-                {{--var originalContents = $('body').html();--}}
-                {{--$('body').html(printContents);--}}
-                {{--window.print();--}}
-                {{--$('body').html(originalContents);--}}
-            {{--});--}}
-        {{--});--}}
+    {{--$(document).ready(function() {--}}
+    {{--$('#printButton').click(function() {--}}
+    {{--var printContents = $('#printableArea').html();--}}
+    {{--var originalContents = $('body').html();--}}
+    {{--$('body').html(printContents);--}}
+    {{--window.print();--}}
+    {{--$('body').html(originalContents);--}}
+    {{--});--}}
+    {{--});--}}
     {{--</script>--}}
 @endsection

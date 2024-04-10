@@ -64,7 +64,7 @@ class UserService extends BaseService
     private function processUser(array $data, $id = null)
     {
         if (isset($data['day_of_work'])) {
-            $dayOfWork = \DateTime::createFromFormat('d/m/Y', $data['day_of_work']);
+            $dayOfWork = \DateTime::createFromFormat(FORMAT_DATE_VN, $data['day_of_work']);
             if ($dayOfWork) {
                 $data['day_of_work'] = $dayOfWork->format(FORMAT_DATE);
             }

@@ -51,6 +51,32 @@ class ProductService extends BaseService
         return $this->paginate($filters, 'id');
     }
 
+    public function searchProduct($query, $request = [])
+    {
+        $filters = [
+            'product_name' => [
+                'logical_operator' => 'OR',
+                'operator' => 'LIKE',
+                'value' => $query . '%'
+            ],
+            'product_code' => [
+                'logical_operator' => 'OR',
+                'operator' => 'LIKE',
+                'value' => $query . '%'
+            ],
+        ];
+        $productIdsNotIn = $request['productIdsNotIn'] ?? [];
+        if (!empty($productIdsNotIn)) {
+            $filters['id'] = [
+                'logical_operator' => 'AND',
+                'operator' => 'NOT IN',
+                'value' => array_map('intval', $productIdsNotIn)
+            ];
+        }
+
+        return $this->paginate($filters, 'id', 'DESC', 50);
+    }
+
     /**
      * @throws \Exception
      */

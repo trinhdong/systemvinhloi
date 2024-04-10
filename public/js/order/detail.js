@@ -21,6 +21,13 @@ $(document).ready(function () {
         $(this).closest('#approveOrderModal').modal('hide');
     })
 
+    $(document).on('click', '#approvePaymentOrder', function () {
+        $('#update-check-payment-order').append($(this).closest('#approvePaymentOrderModal').find('#approveNote').clone().removeAttr('id'))
+        $('#update-check-payment-order').submit()
+        $(this).prop('disabled',true);
+        $(this).closest('#approvePaymentOrderModal').modal('hide');
+    })
+
     $(document).on('focus', '#approveNote, #rejectNote', function () {
         $(this).removeClass('is-invalid');
     })

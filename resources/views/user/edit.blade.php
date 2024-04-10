@@ -35,7 +35,7 @@
                         </div>
                         <div class="col-md-8 mt-2">
                             <label class="form-label">Ngày vào làm</label>
-                            <input name="day_of_work" type="text" id="datepicker" class="form-control" value="{{ !empty($user->day_of_work) ? date('d/m/Y', strtotime($user->day_of_work)) : '' }}" >
+                            <input name="day_of_work" type="text" id="datepicker" class="form-control" value="{{ !empty($user->day_of_work) ? date(FORMAT_DATE, strtotime($user->day_of_work)) : '' }}" >
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationPassword" class="form-label">Mật khẩu</label>

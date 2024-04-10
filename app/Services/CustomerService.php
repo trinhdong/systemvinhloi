@@ -96,11 +96,28 @@ class CustomerService extends BaseService
         $discountsProductIdMap = array_flip($discountsIdMap);
         $data['product_id'] = array_values(array_filter($data['product_id']));
         $data['discount_percent'] = array_values(array_filter($data['discount_percent'], function ($v) {
-            return floatval($v) >= 0;
+            return $v !== null && $v !== '' && floatval($v) >= 0;
         }));
+        if (count($data['note']) > count($data['product_id'])) {
+            unset($data['note'][0]);
+            $data['note'] = array_values($data['note']);
+        }
+
+        $data['discount_price'] = array_values(
+            array_filter(
+                array_map(function ($discountPrice) {
+                    return str_replace(',', '', $discountPrice);
+                }, $data['discount_price']),
+                function ($v) {
+                    return $v !== null && $v !== '' && floatval($v) >= 0;
+                }
+            )
+        );
         foreach ($data['product_id'] as $key => $productId) {
             $discounts[$key]['product_id'] = intval($productId);
             $discounts[$key]['discount_percent'] = floatval($data['discount_percent'][$key]);
+            $discounts[$key]['discount_price'] = floatval($data['discount_price'][$key]);
+            $discounts[$key]['note'] = $data['note'][$key];
             $discounts[$key]['customer_id'] = $customerId;
         }
         foreach ($discounts as $key => $discount) {

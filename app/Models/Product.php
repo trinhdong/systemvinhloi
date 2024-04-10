@@ -25,7 +25,7 @@ class Product extends Model
         'deleted_at',
     ];
 
-    public function product()
+    public function orderDetail()
     {
         return $this->hasMany(OrderDetail::class);
     }
@@ -33,5 +33,10 @@ class Product extends Model
     public function discount()
     {
         return $this->hasMany(Discount::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

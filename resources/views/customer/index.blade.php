@@ -65,11 +65,12 @@
                                         <td>{{ $customer->email }}</td>
                                         <td>{{ $areas[$customer->area_id] ?? '' }}</td>
                                         <td>
-                                            <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                            <div class="table-actions d-flex align-items-center gap-3 fs-6 justify-content-center">
                                                 <a href="{{route('customer.detail', $customer->id)}}"
                                                    class="text-primary"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
+                                                @if(Auth::user()->role === SUPER_ADMIN || Auth::user()->role === ADMIN)
                                                 <a href="{{route('customer.edit', $customer->id)}}" class="text-warning"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom"
@@ -90,6 +91,7 @@
                                                    data-customer-id="{{$customer->id}}">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

@@ -25,6 +25,7 @@
     <link href="assets/plugins/select2/css/select2.min.css" rel="stylesheet"/>
     <link href="assets/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet"/>
     <link href="assets/css/datepicker.css" rel="stylesheet"/>
+    <link href="assets/css/jquery-ui.css" rel="stylesheet"/>
 
     <!-- loader-->
     <link href="assets/css/pace.min.css" rel="stylesheet"/>
@@ -53,6 +54,7 @@
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery-ui.js"></script>
     <script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
     <script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
@@ -116,7 +118,19 @@
         });
 
         $("#datepicker").datepicker({
-            format: 'dd/mm/yyyy'
+            format: 'dd/mm/yyyy',
+            endDate: new Date()
+        });
+        $("#datepicker-delivery-appointment-date").datepicker({
+            format: 'dd/mm/yyyy',
+            startDate: new Date()
+        });
+        $("#delivered-from, #delivered-to").datepicker({
+            format: 'dd/mm/yyyy',
+            endDate: new Date()
+        });
+        $("#delivery-appointment-date").datepicker({
+            format: 'dd/mm/yyyy',
         });
     </script>
     @yield('script')

@@ -18,13 +18,9 @@
             <div class="card-body">
                 <div class="card">
                     <div class="card-header py-3">
-                        <div class="row g-5">
-                            <div class="col-3">
-                                <input name="order_number" type="text" class="form-control" placeholder="Mã đơn hàng">
-                                <div class="invalid-feedback">Vui lòng nhập mã đơn hàng</div>
-                            </div>
-                            <div class="col-3">
-                                <select id="customer" name="customer_id" class="form-select single-select">
+                            <div class="col-12 d-flex justify-content-start align-items-center">
+                                <h5 class="mb-0 me-3">Khách hàng: </h5>
+                                <select id="customer" name="customer_id" class="form-select single-select" style="width: 250px">
                                     <option selected="" disabled="" value="">Chọn khách hàng</option>
                                     @foreach($customers as $customerId => $customerName)
                                         <option value="{{ $customerId }}">{{ $customerName }}</option>
@@ -32,7 +28,6 @@
                                 </select>
                                 <div class="invalid-feedback">Vui lòng chọn khách hàng</div>
                             </div>
-                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -63,15 +58,17 @@
                                                     <th>Dung tích</th>
                                                     <th>Đơn vị tính</th>
                                                     <th>Giá</th>
-                                                    <th>Chiết khấu</th>
+                                                    <th>Chiết khấu (%)</th>
+                                                    <th>Số tiền chiết khấu</th>
+                                                    <th>Ghi chú chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
-                                                    <th>Số lượng</th>
+                                                    <th>Số lượng thùng</th>
                                                     <th>Tổng tiền sau chiết khấu</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody id="orderlist">
                                                 <tr id="empty-row">
-                                                    <td colspan="11" class="text-center">Chưa có sản phẩm nào được thêm
+                                                    <td colspan="13" class="text-center">Chưa có sản phẩm nào được thêm
                                                     </td>
                                                 </tr>
                                                 <tr class="d-none productOrder">
@@ -116,6 +113,15 @@
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </td>
+                                                    <td class="discount-price">
+                                                        <div class="input-group has-validation">
+                                                            <input disabled name="discount_price[]" type="text"
+                                                                   class="form-control"
+                                                                   placeholder="0" autocomplete="off">
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="discount-note"></td>
                                                     <td>
                                                         <div class="unit-price"></div>
                                                         <input disabled type="hidden" name="unit_price[]"/>
@@ -157,6 +163,13 @@
                                                 <div>
                                                 </div>
                                             </div>
+                                            <div class="align-items-center justify-content-between mt-2 col-4">
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày hẹn giao hàng: </label>
+                                                <input id="datepicker-delivery-appointment-date" name="delivery_appointment_date" type="text" class="form-control"
+                                                       placeholder="Nhập ngày hẹn giao hàng" autocomplete="off">
+                                                <div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -175,7 +188,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div id="red-bill" class="d-none col-2">
+                                <div id="red-bill" class="d-none col-3">
                                     <div class="form-check">
                                         <input class="form-check-input" value="1" type="checkbox" id="gridCheck1"
                                                name="is_print_red_invoice">
@@ -269,46 +282,84 @@
                                                 </div>
                                             </div>
                                             <div id="payment-method-info" class="d-none">
-                                                <div class="align-items-center mt-3">
-                                                    <label for="" class="fw-bolder me-1"
-                                                           style="white-space: nowrap">Tên chủ tài khoản: </label>
-                                                    <input name="bank_customer_name" type="text"
-                                                           class="form-control"
-                                                           placeholder="Nhập tên chủ tài khoản" autocomplete="off">
-                                                    <div class="invalid-feedback">Vui lòng nhập tên chủ tài khoản
-                                                    </div>
-                                                    <div>
-                                                    </div>
-                                                </div>
-                                                <div class="align-items-center mt-3">
-                                                    <label for="" class="fw-bolder me-1"
-                                                           style="white-space: nowrap">Tên ngân hàng: </label>
-                                                    <input name="bank_name" type="text" class="form-control"
-                                                           placeholder="Nhập tên ngân hàng" autocomplete="off">
-                                                    <div class="invalid-feedback">Vui lòng nhập tên ngân hàng</div>
-
-                                                    <div>
-                                                    </div>
-                                                </div>
-                                                <div class="align-items-center mt-3">
-                                                    <label for="" class="fw-bolder me-1"
-                                                           style="white-space: nowrap">Số tài khoản: </label>
-                                                    <input name="bank_code" type="text" class="form-control"
-                                                           placeholder="Nhập số tài khoản" autocomplete="off">
-                                                    <div class="invalid-feedback">Vui lòng nhập số tài khoản</div>
-                                                    <div>
+                                                <label for="" class="fw-bolder me-1 mt-3" style="white-space: nowrap">Tài khoản chuyển tiền: </label>
+                                                <div class="card border radius-10">
+                                                    <div class="card-body">
+                                                        <div class="align-items-center">
+                                                            <label for="" class="fw-bolder me-1"
+                                                                   style="white-space: nowrap">Tên ngân hàng: </label>
+                                                            <input name="bank_name" type="text" class="form-control"
+                                                                   placeholder="Nhập tên ngân hàng" autocomplete="off">
+                                                            <div class="invalid-feedback">Vui lòng nhập tên ngân hàng</div>
+                                                        </div>
+                                                        <div class="align-items-center mt-3">
+                                                            <label for="" class="fw-bolder me-1"
+                                                                   style="white-space: nowrap">Số tài khoản: </label>
+                                                            <input name="bank_code" type="text" class="form-control"
+                                                                   placeholder="Nhập số tài khoản" autocomplete="off">
+                                                            <div class="invalid-feedback">Vui lòng nhập số tài khoản</div>
+                                                        </div>
+                                                        <div class="align-items-center mt-3">
+                                                            <label for="" class="fw-bolder me-1"
+                                                                   style="white-space: nowrap">Tên chủ tài khoản: </label>
+                                                            <input name="bank_customer_name" type="text"
+                                                                   class="form-control"
+                                                                   placeholder="Nhập tên chủ tài khoản" autocomplete="off">
+                                                            <div class="invalid-feedback">Vui lòng nhập tên chủ tài khoản</div>
+                                                        </div>
                                                     </div>
                                                 </div>
-
+                                                <label for="" class="fw-bolder me-1"
+                                                       style="white-space: nowrap">Tài khoản nhận tiền: </label>
+                                                <div class="card border radius-10">
+                                                    <div class="card-body">
+                                                        <div class="align-items-center">
+                                                            <select id="bank-account" name="bank_account_id" class="form-select">
+                                                                <option selected="" value="">Chọn tài khoản nhận tiền</option>
+                                                                @foreach($bankAccounts as $k => $v)
+                                                                    <option value="{{ $k }}">{{ $v }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <div class="invalid-feedback">Vui lòng chọn tài khoản nhận tiền</div>
+                                                        </div>
+                                                        <div id="bank-account-info" class="d-none">
+                                                            <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên ngân hàng: </label>
+                                                                <span id="bank-name"></span>
+                                                            </div>
+                                                            <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tài khoản: </label>
+                                                                <span id="bank-code"></span>
+                                                            </div>
+                                                            <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chủ tài khoản: </label>
+                                                                <span id="bank-account-name"></span>
+                                                            </div>
+                                                            <div class="align-items-center mt-3 d-flex justify-content-between">
+                                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tên chi nhánh: </label>
+                                                                <span id="bank-branch"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div id="deposit" class="d-none align-items-center">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số
-                                                    tiền cọc: </label>
+                                            <div id="deposit" class="d-none align-items-center mt-3">
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số tiền cọc: </label>
                                                 <input name="deposit" type="text" class="form-control"
                                                        placeholder="Nhập số tiền cọc" autocomplete="off">
                                                 <div class="invalid-feedback">Vui lòng nhập số tiền cọc</div>
-                                                <div>
-                                                </div>
+                                            </div>
+                                            <div id="payment-date" class="d-none align-items-center mt-3 col-6">
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày thanh toán: </label>
+                                                <input name="payment_date" type="text" id="datepicker" class="form-control"
+                                                       placeholder="Nhập ngày thanh toán" autocomplete="off">
+                                                <div class="invalid-feedback">Vui lòng nhập ngày thanh toán</div>
+                                            </div>
+                                            <div id="payment-due-day" class="d-none align-items-center mt-3 col-6">
+                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số ngày đến hạn thanh toán: </label>
+                                                <input name="payment_due_day" type="number" class="form-control" style="width: 150px"
+                                                       placeholder="Nhập số ngày" autocomplete="off">
+                                                <div class="invalid-feedback">Vui lòng nhập số ngày đến hạn thanh toán</div>
                                             </div>
                                         </div>
                                     </div>
@@ -326,5 +377,7 @@
 @endsection
 @section('script')
     <script>const discounts = {!! json_encode($discounts) !!};</script>
+    <script>const discountsPrice = {!! json_encode($discountsPrice) !!};</script>
+    <script>const discountsNote = {!! json_encode($discountsNote) !!};</script>
     <script src="{{ asset('js/order/add.js') }}"></script>
 @endsection

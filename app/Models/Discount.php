@@ -13,6 +13,8 @@ class Discount extends Model
         'product_id',
         'customer_id',
         'discount_percent',
+        'discount_price',
+        'note',
         'created_by',
         'updated_by',
         'deleted_at',

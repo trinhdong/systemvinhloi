@@ -9,6 +9,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\CustomerRepository;
 use App\Services\CustomerService;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,6 +21,7 @@ class CustomerController extends Controller
     protected $categoryRepository;
     protected $discountRepository;
     protected $customerRepository;
+    protected $productService;
 
     public function __construct(
         CustomerService $customerService,
@@ -27,7 +29,8 @@ class CustomerController extends Controller
         ProductRepository $productRepository,
         CategoryRepository $categoryRepository,
         DiscountRepository $discountRepository,
-        CustomerRepository $customerRepository
+        CustomerRepository $customerRepository,
+        ProductService $productService
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;
@@ -35,6 +38,7 @@ class CustomerController extends Controller
         $this->categoryRepository = $categoryRepository;
         $this->discountRepository = $discountRepository;
         $this->customerRepository = $customerRepository;
+        $this->productService = $productService;
     }
 
     public function index(Request $request)
@@ -70,7 +74,7 @@ class CustomerController extends Controller
         }
 
         $data = $request->only(
-            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company', 'company_address']
+            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'discount_price', 'tax_code', 'company', 'company_address', 'note']
         );
         $customer = $this->customerService->createCustomer($data);
         if ($customer) {
@@ -106,7 +110,7 @@ class CustomerController extends Controller
         }
 
         $data = $request->only(
-            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'tax_code', 'company', 'company_address']
+            ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'discount_price', 'tax_code', 'company', 'company_address', 'note']
         );
         $updated = $this->customerService->updateCustomer($customer->id, $data);
         if ($updated) {
@@ -154,5 +158,17 @@ class CustomerController extends Controller
     {
         $customer = $this->customerRepository->getWhere(['id' => $id])->first();
         return response()->json($customer);
+    }
+    public function searchProduct(Request $request)
+    {
+        $query = $request->query('query') ?? "";
+        $products = $this->productService->searchProduct($query, $request->query());
+        foreach ($products as &$product) {
+            foreach ($product['category']['product'] ?? [] as &$p) {
+                $p = json_encode($p);
+            }
+            $product['category'] = json_encode($product['category']);
+        }
+        return response()->json($products);
     }
 }

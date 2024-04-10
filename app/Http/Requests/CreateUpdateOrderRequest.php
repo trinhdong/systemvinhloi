@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CreateUpdateOrderRequest extends FormRequest
 {
@@ -28,8 +29,6 @@ class CreateUpdateOrderRequest extends FormRequest
         }
 
         $rules = [
-            'order_number' => 'required',
-            'customer_id' => 'required',
             'product_id' => 'required|array',
             'quantity' => 'required|array',
             'unit_price' => 'required|array',
@@ -41,8 +40,8 @@ class CreateUpdateOrderRequest extends FormRequest
             'order_discount' => 'max:99999999999.99',
             'order_total' => 'max:99999999999.99',
         ];
-        if ($this->isMethod('POST')) {
-            $rules['order_number'] .= '|unique:orders,order_number';
+        if (!(Auth::user()->role === STOCKER)) {
+            $rules['customer_id'] = 'required';
         }
         if (!empty($this->input('payment_type') && $this->input('payment_type') == PAYMENT_ON_DELIVERY)) {
             unset($rules['payment_method']);
@@ -52,6 +51,8 @@ class CreateUpdateOrderRequest extends FormRequest
             $rules['bank_customer_name'] = 'required';
             $rules['bank_name'] = 'required';
             $rules['bank_code'] = 'required';
+            $rules['bank_account_id'] = 'required';
+            $rules['payment_date'] = 'required';
             if ($this->input('payment_type') == DEPOSIT) {
                 $rules['deposit'] = 'required';
             }
@@ -63,8 +64,6 @@ class CreateUpdateOrderRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'order_number.required' => 'Vui lòng nhập mã đơn hàng',
-            'order_number.unique' => 'Mã đơn hàng đã tồn tại trong hệ thống.',
             'customer_id.required' => 'Vui lòng chọn khách hàng',
             'product_id.required' => 'Vui lòng chọn sản phẩm',
             'quantity.required' => 'Vui lòng nhập số lượng',
@@ -78,6 +77,8 @@ class CreateUpdateOrderRequest extends FormRequest
             'order_total.max' => 'Số tiền quá lớn',
             'discount_percent.max' => 'Chiết khấu không được lớn hơn 100%',
             'discount_percent.required' => 'Vui lòng nhập chiết khấu',
+            'bank_account_id.required' => 'Vui lòng chọn tài khoản nhận tiền',
+            'payment_date.required' => 'Vui lòng nhập ngày thanh toán',
         ];
     }
 }
