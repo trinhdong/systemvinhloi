@@ -92,4 +92,16 @@ class ProductService extends BaseService
             throw $e;
         }
     }
+    public function updateProductService($data)
+    {
+        try {
+            return $this->productRepository->updateProductRepository($data);
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage(), [
+                'exception' => $e,
+                'data' => $data
+            ]);
+            throw $e;
+        }
+    }
 }

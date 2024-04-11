@@ -11,6 +11,7 @@ $(document).ready(function () {
         }
         reader.readAsDataURL(event.target.files[0]);
     });
+    $('#imagePreview').show();
 
     $('#image_url').on('change', function() {
         var fileInput = this;
