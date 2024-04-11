@@ -409,8 +409,8 @@ class OrderController extends Controller
             $route = 'payment.indexPayment';
         }
         if (!empty($status) && intval($status) === REJECTED) {
-            $dataUpdate['payment_status'] = $status;
-            $dataUpdate['payment_check_type'] = $status;
+            $dataUpdate['payment_status'] = REJECTED;
+            $dataUpdate['payment_check_type'] = REJECTED;
         }
         if ($request->isMethod('put')) {
             $order = $this->orderService->updateStatusPayment($order, $dataUpdate);
