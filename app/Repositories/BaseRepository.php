@@ -32,9 +32,12 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function getAll()
+    public function getAll($withTrashed = false)
     {
         try {
+            if ($withTrashed) {
+                return $this->model->withTrashed()->get();
+            }
             return $this->model->all();
         } catch (\Throwable $th) {
             Log::error($th);
@@ -49,9 +52,12 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function getWhere($conditions = false)
+    public function getWhere($conditions = false, $withTrashed = false)
     {
         if($conditions) {
+            if ($withTrashed) {
+                return $this->model->where($conditions)->withTrashed()->get();
+            }
             return $this->model->where($conditions)->get();
         }
         return $this->model->get();
@@ -171,6 +177,11 @@ abstract class BaseRepository
                                 break;
                             }
 
+                            if ($operator == 'IN') {
+                                $whereInConditions[] = [$key, $value];
+                                break;
+                            }
+
                             if ($logicalOperator === 'OR') {
                                 $orConditions[] = [$key, $operator, $value];
                             } else {
@@ -196,6 +207,11 @@ abstract class BaseRepository
                 if (!empty($whereNotInConditions)) {
                     foreach ($whereNotInConditions as $condition) {
                         $model = $model->whereNotIn(...$condition);
+                    }
+                }
+                if (!empty($whereInConditions)) {
+                    foreach ($whereInConditions as $condition) {
+                        $model = $model->whereIn(...$condition);
                     }
                 }
             }
@@ -491,6 +507,11 @@ abstract class BaseRepository
     public function destroyByWhere($p_arr)
     {
        return $this->model->where($p_arr)->delete();
+    }
+
+    public function getListCustom($name1, $name2)
+    {
+        return $this->model->selectRaw('CONCAT('.$name1.', "-", '.$name2.') AS name_custom, id')->pluck('name_custom', 'id');
     }
 
     public function getList($value = 'name')

@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title')
-    Nhân viên
+    Tài khoản ngân hàng
 @endsection
 @section('breadcrumb')
-    Danh sách nhân viên
+    Danh sách tài khoản ngân hàng
 @endsection
 @section('content')
     <div class="row">
@@ -19,22 +19,11 @@
                                        placeholder="Nhập nội dung tìm kiếm"
                                        name="query" value="{{ request('query') }}">
                             </div>
-                            <div onchange="$('#form-search').submit()" class="col-2">
-                                <select name="role" class="form-select single-select">
-                                    <option selected="" value="">Chọn chức vụ</option>
-                                    @foreach(ROLE_TYPE_LIST as $role => $roleName)
-                                        @if(Auth::user()->role != $role)
-                                            <option value="{{ $role }}"
-                                                    @if(intval(request('role')) === $role) selected @endif>{{ $roleName }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
                     </form>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('user.add')}}" class="btn btn-primary float-end">Thêm nhân viên</a>
+                    <a href="{{route('bank_account.add')}}" class="btn btn-primary float-end">Thêm tài khoản</a>
                 </div>
             </div>
             <div class="card">
@@ -44,49 +33,49 @@
                             <thead class="table-secondary">
                             <tr>
                                 <th>#</th>
-                                <th>Tên</th>
-                                <th>Email</th>
-                                <th>Chức vụ</th>
+                                <th>Tên ngân hàng</th>
+                                <th>Số tài khoản</th>
+                                <th>Tên chủ tài khoản</th>
+                                <th>Tên chi nhánh</th>
                                 <th class="col-1">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @if($users->isEmpty())
+                            @if($bankAccounts->isEmpty())
                                 <tr>
-                                    <td colspan="7" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="6" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
-                                @foreach($users as $key => $user)
+                                @foreach($bankAccounts as $key => $bankAccount)
                                     <tr>
                                         <td>{{ $key + 1 }}</td>
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>{{ ROLE_TYPE_NAME[$user->role] }}</td>
+                                        <td>{{ $bankAccount->bank_name }}</td>
+                                        <td>{{ $bankAccount->bank_code }}</td>
+                                        <td>{{ $bankAccount->bank_account_name }}</td>
+                                        <td>{{ $bankAccount->bank_branch }}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                                <a href="{{route('user.detail', $user->id)}}" class="text-primary"
+                                                <a href="{{route('bank_account.detail', $bankAccount->id)}}" class="text-primary"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
-                                                @if(Auth::User()->id !== $user->id)
-                                                <a href="{{route('user.edit', $user->id)}}" class="text-warning"
+                                                <a href="{{route('bank_account.edit', $bankAccount->id)}}" class="text-warning"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom"
                                                    title="Chỉnh sửa">
                                                     <i class="bi bi-pencil-fill"></i></a>
-                                                    <form class="d-none" id="formDeleteUser{{$user->id}}"
-                                                          action="{{ route('user.delete', $user->id) }}" method="POST">
+                                                    <form class="d-none" id="formDeleteBankAccount{{$bankAccount->id}}"
+                                                          action="{{ route('bank_account.delete', $bankAccount->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>
-                                                    <a href="javascript:;" id="deleteUserModalBtn"
+                                                    <a href="javascript:;" id="deleteBankAccountModalBtn"
                                                        class="text-danger pointer-event"
                                                        data-bs-tooltip="tooltip"
                                                        data-bs-toggle="modal"
                                                        data-bs-placement="bottom" title="Xóa"
-                                                       data-bs-target="#deleteUserModal" data-user-id="{{$user->id}}">
+                                                       data-bs-target="#deleteBankAccountModal" data-bank-account-id="{{$bankAccount->id}}">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </a>
-                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -97,30 +86,30 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            {{ $users->links('pagination::bootstrap-4') }}
+                            {{ $bankAccounts->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"
+    <div class="modal fade" id="deleteBankAccountModal" tabindex="-1" aria-labelledby="deleteBankAccountModalLabel"
          aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteUserModalLabel">Xóa nhân viên</h5>
+                    <h5 class="modal-title" id="deleteBankAccountModalLabel">Xóa nhân viên</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">Bạn có chắc muốn xóa nhân viên này?</div>
+                <div class="modal-body">Bạn có chắc muốn xóa tài khoản ngân hàng này?</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button id="deleteUser" type="button" class="btn btn-danger">Xóa</button>
+                    <button id="deleteBankAccount" type="button" class="btn btn-danger">Xóa</button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 @section('script')
-    <script src="js/user/index.js"></script>
+    <script src="js/bank_account/index.js"></script>
 @endsection

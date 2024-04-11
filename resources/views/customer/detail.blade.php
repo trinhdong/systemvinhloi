@@ -19,7 +19,6 @@
         <div class="card-body">
             <div class="row py-4">
                 <div class="col-12">
-                    <input type="text" hidden name="customer_id" value="103">
                     <div class="d-flex align-items-center">
                         <h5 class="mb-0">Thông tin khách hàng</h5>
                     </div>
@@ -52,6 +51,24 @@
                             </tr>
                             <tr>
                                 <th class="sz-col-100">
+                                    <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Tên công ty
+                                </th>
+                                <td>{{$customer->company}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Địa chỉ công ty
+                                </th>
+                                <td>{{$customer->company_address}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Mã số thuế
+                                </th>
+                                <td>{{$customer->tax_code}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
                                     <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Khu vực
                                 </th>
                                 <td>{{$areas[$customer->area_id] ?? ''}}</td>
@@ -70,9 +87,11 @@
                             <tr>
                                 <th class="col-3">Danh mục</th>
                                 <th class="col-3">Sản phẩm</th>
-                                <th>Chiết khấu</th>
                                 <th>Giá</th>
+                                <th>Chiết khấu (%)</th>
+                                <th>Số tiền chiết khấu</th>
                                 <th>Giá sau chiết khấu</th>
+                                <th class="col-2">Ghi chú</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -80,9 +99,11 @@
                                 <tr>
                                     <td>{{$categories[$categoryIds[$discount->product_id]] ?? ''}}</td>
                                     <td>{{$products[$discount->product_id]}}</td>
-                                    <td>{{$discount->discount_percent}}%</td>
                                     <td>{{number_format($productPrice[$discount->product_id] ?? 0)}}</td>
+                                    <td>{{rtrim(rtrim(number_format(floatval($discount->discount_percent), 4), '0'), '.')}}%</td>
+                                    <td>{{number_format($discount->discount_price)}}</td>
                                     <td>{{number_format(max($productPrice[$discount->product_id] - ($productPrice[$discount->product_id] * $discount->discount_percent) / 100, 0))}}</td>
+                                    <td>{{$discount->note}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -92,6 +113,7 @@
 
                 </div>
             </div>
+            @if(Auth::user()->role === SUPER_ADMIN || Auth::user()->role === ADMIN)
             <a href="{{route('customer.edit', $customer->id)}}" style="width: 80px;" class="btn btn-primary mt-3">Sửa</a>
             <form class="d-none" id="formDeleteCustomer{{$customer->id}}"
                   action="{{ route('customer.delete', $customer->id) }}"
@@ -108,6 +130,7 @@
                data-customer-id="{{$customer->id}}">
                 Xóa
             </a>
+                @endif
         </div>
     </div>
     <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel"

@@ -66,9 +66,9 @@ function formatPhoneNumber($number)
 <div style="font-family: 'DejaVu Sans',sans-serif">
     <table width="100%" style="font-family: 'DejaVu Sans',sans-serif">
         <tr>
-            <td valign="top" style="width:70%"><img src="{{public_path('assets/images/logo-icon.png')}}" alt=""
+            <td valign="top" style="width:60%"><img src="{{public_path('assets/images/logo-icon.png')}}" alt=""
                                                     height="80"/></td>
-            <td align="right" style="width: 30%">
+            <td align="right" style="width: 40%">
                 <h6 style="text-align: left; font-weight: bold">CTY TNHH NHỰA VINH LỢI</h6>
                 <div style="text-align: left; line-height: 5px; margin-top: 10px">
                     <p>G8/32 Tỉnh lộ 10, Lê Minh Xuân, </p>
@@ -84,8 +84,8 @@ function formatPhoneNumber($number)
             </td>
         </tr>
         <tr>
-            <td valign="top" style="width:70%;"></td>
-            <td align="right" style="width: 30%">
+            <td valign="top" style="width:60%;"></td>
+            <td align="right" style="width: 40%">
                 <div style="text-align: left; line-height: 5px">
                     <p style="text-align: left;">Người Nhận: <span
                             style="font-weight: bold">{{$order->customer->customer_name ?? ''}}</span></p>
@@ -105,10 +105,7 @@ function formatPhoneNumber($number)
             <th>Tên sản phẩm</th>
             <th style="text-align: center">Quy cách</th>
             <th style="text-align: center">Số lượng thùng</th>
-            <th style="text-align: center">Tổng số lượng</th>
             <th style="text-align: center">Đơn giá</th>
-            <th style="text-align: center">Chiết khấu</th>
-            <th style="text-align: center">Giá sau chiết khấu</th>
             <th style="text-align: center">Tổng cộng</th>
         </tr>
         </thead>
@@ -120,17 +117,12 @@ function formatPhoneNumber($number)
                 <td>{{$orderDetail->product->product_name}}</td>
                 <td style="text-align: center">{{$orderDetail->product->unit}}</td>
                 <td style="text-align: right">{{number_format($orderDetail->quantity)}}</td>
-                <td style="text-align: right">{{number_format($orderDetail->quantity * $orderDetail->product->quantity_per_package)}}</td>
-                <td style="text-align: right">{{number_format($orderDetail->product_price)}}</td>
-                <td style="text-align: right">{{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}
-                    %
-                </td>
                 <td style="text-align: right">{{number_format($orderDetail->unit_price)}}</td>
                 <td style="text-align: right">{{number_format($orderDetail->unit_price * $orderDetail->quantity)}}</td>
             </tr>
         @endforeach
         <tr>
-            <td colspan="8" style="border-right: none; text-align: center">
+            <td colspan="5" style="border-right: none; text-align: center">
                 <h3 style="font-weight: bold; margin-top: 1px; margin-bottom: 1px">Tổng cộng</h3>
             </td>
             <td colspan="2" style="border-left: none; margin-right: 5px">

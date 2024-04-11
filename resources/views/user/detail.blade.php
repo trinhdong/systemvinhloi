@@ -36,33 +36,47 @@
                             </tr>
                             <tr>
                                 <th class="sz-col-170">
+                                    <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Số điện thoại
+                                </th>
+                                <td>{{$user->phone}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-170">
                                     <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Chức vụ
                                 </th>
                                 <td>{{ROLE_TYPE_NAME[$user->role]}}</td>
                             </tr>
+                            @if(Auth::User()->id !== $user->id)
+                            <tr>
+                                <th class="sz-col-170">
+                                    <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Ngày vào làm
+                                </th>
+                                <td>{{date('d/m/Y', strtotime($user->day_of_work))}}</td>
+                            </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            @if(Auth::User()->id !== $user->id)
             <div class="d-flex justify-content-center align-items-center">
                 <a href="{{route('user.edit', $user->id)}}" style="width: 80px;" class="btn btn-primary mt-3 me-2">Sửa</a>
-                @if(Auth::User()->id !== $user->id)
-                    <form class="d-none" id="formDeleteUser{{$user->id}}"
-                          action="{{ route('user.delete', $user->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                    </form>
-                    <a style="width: 80px;" href="javascript:;" id="deleteUserModalBtn"
-                       class="btn btn-danger mt-3"
-                       data-bs-tooltip="tooltip"
-                       data-bs-toggle="modal"
-                       data-bs-placement="bottom" title="Xóa"
-                       data-bs-target="#deleteUserModal" data-user-id="{{$user->id}}">
-                        Xóa
-                    </a>
-                @endif
+                <form class="d-none" id="formDeleteUser{{$user->id}}"
+                      action="{{ route('user.delete', $user->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                </form>
+                <a style="width: 80px;" href="javascript:;" id="deleteUserModalBtn"
+                   class="btn btn-danger mt-3"
+                   data-bs-tooltip="tooltip"
+                   data-bs-toggle="modal"
+                   data-bs-placement="bottom" title="Xóa"
+                   data-bs-target="#deleteUserModal" data-user-id="{{$user->id}}">
+                    Xóa
+                </a>
             </div>
+            @endif
         </div>
     </div>
     <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"

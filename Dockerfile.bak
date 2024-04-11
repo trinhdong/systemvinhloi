@@ -7,7 +7,4 @@ RUN apk add --update linux-headers
 RUN pecl install xdebug-3.1.5
 RUN docker-php-ext-enable xdebug
 RUN apk del -f .build-deps
-RUN apk --no-cache add \
-    zlib-dev \
-    libpng-dev \
-    && docker-php-ext-install -j$(nproc) gd
+RUN docker-php-ext-install zlib gd

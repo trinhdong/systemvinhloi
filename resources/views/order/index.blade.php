@@ -13,13 +13,25 @@
                     <form id="form-search" class="position-relative">
                         <div class="row">
                             <div class="col-4">
-                                <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i
+                                <div class="position-absolute translate-middle-y search-icon px-3" style="top:20px"><i
                                             class="bi bi-search"></i></div>
                                 <input onchange="$('#form-search').submit()" class="form-control ps-5 rounded" type="text"
                                        placeholder="Nhập nội dung tìm kiếm"
                                        name="query" value="{{ request('query') }}">
                             </div>
-                            <div class="col-2">
+                            <div class="col-3">
+                                <input onchange="$('#form-search').submit()" name="order_date" type="text" id="datepicker"
+                                       placeholder="Ngày tạo đơn hàng" autocomplete="off"
+                                       class="form-control" value="{{ request('order_date') ?? '' }}" >
+                            </div>
+                            <div class="col-3">
+                                <input onchange="$('#form-search').submit()" name="delivery_appointment_date" type="text" id="delivery-appointment-date"
+                                       placeholder="Ngày hẹn giao hàng" autocomplete="off"
+                                       class="form-control" value="{{ request('delivery_appointment_date') ?? '' }}" >
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="customer_id" class="form-select single-select">
                                     <option selected="" value="">Chọn khách hàng</option>
                                     @foreach($customers as $customerId => $customerName)
@@ -28,7 +40,18 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-2">
+                            @if($isAdmin || $isAccountant)
+                            <div class="col-3">
+                                <select onchange="$('#form-search').submit()" name="sale_id" class="form-select single-select">
+                                    <option selected="" value="">Nhân viên bán hàng</option>
+                                    @foreach($sales as $saleId => $saleName)
+                                        <option value="{{ $saleId }}"
+                                                @if(intval(request('sale_id')) === $saleId) selected @endif>{{ $saleName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
+                            <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái đơn hàng</option>
                                     @foreach($statusList as $status => $statusName)
@@ -37,7 +60,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-2">
+                            <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="payment_status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái thanh toán</option>
                                     @foreach($paymentStatus as $status => $statusName)
@@ -46,11 +69,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                             <div class="col-2">
-                                <input onchange="$('#form-search').submit()" name="order_date" type="text" id="datepicker"
-                                 placeholder="Ngày tạo đơn hàng"
-                                 class="form-control" value="{{ !empty(request('order_date')) ? date('d/m/Y', strtotime(request('order_date'))) : '' }}" >
-                             </div>
                         </div>
                     </form>
                 </div>
@@ -69,11 +87,15 @@
                                 <th>#</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Tên khách hàng</th>
+                                @if($isAdmin || $isAccountant)
+                                    <th>Nhân viên bán hàng</th>
+                                @endif
                                 @if($isAdmin || $isSale || $isAccountant)
                                 <th>Tổng tiền</th>
                                 @endif
                                 <th>Trạng thái đơn hàng</th>
                                 <th>Trạng thái thanh toán</th>
+                                <th>Ngày hẹn giao hàng</th>
                                 <th>Ngày tạo</th>
                                 <th class="col-1">Hành động</th>
                             </tr>
@@ -81,15 +103,21 @@
                             <tbody>
                             @if($orders->isEmpty())
                                 <tr>
-                                    <td colspan="{{$isWareHouseStaff ? 7 : 9}}" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="{{$isWareHouseStaff ? 9 : ($isAdmin || $isAccountant ? 11 : 10)}}" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
-                                    <?php $enableButton = $order->enableButtonByRole(Auth::user()->role) ?>
-                                    <tr>
+                                    <?php
+                                        $isLastDayDelivered = $isStocker && $order->status === IN_PROCESSING && !empty($order->delivery_appointment_date) && date(FORMAT_DATE_VN, strtotime($order->delivery_appointment_date)) <= date(FORMAT_DATE_VN, strtotime($order->order_date));
+                                        $enableButton = $order->enableButtonByRole(Auth::user()->role);
+                                    ?>
+                                    <tr style="background-color: {{$isLastDayDelivered ? 'red' : ''}}">
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
+                                        @if($isAdmin || $isAccountant)
+                                        <td>{{ $order->user->name ?? '' }}</td>
+                                        @endif
                                         @if($isAdmin || $isSale || $isAccountant)
                                         <td>{{ number_format($order->order_total) }}</td>
                                         @endif
@@ -99,7 +127,8 @@
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_PAYMENT_COLOR[$order->payment_status]}}">{{STATUS_PAYMENT[$order->payment_status]}}</span>
                                         </td>
-                                        <td>{{ Date::parse($order->order_date)->format('d/m/Y') }}</td>
+                                        <td>{{ !empty($order->delivery_appointment_date) ? Date::parse($order->delivery_appointment_date)->format(FORMAT_DATE_VN) : '' }}</td>
+                                        <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
                                         <td>
                                             <div class="table-actions d-flex align-items-center justify-content-center gap-3 fs-6">
                                                 @if($isWareHouseStaff || $isAccountant)
@@ -108,7 +137,7 @@
                                                        data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
                                                 @else
                                                     @if($enableButton['view'])
-                                                    <a href="{{ route('order.detail', $order->id) }}" class="text-primary"
+                                                    <a href="{{ route($isStocker ? 'stocker.order.detail' : 'order.detail', $order->id) }}" class="text-primary"
                                                        data-bs-toggle="tooltip"
                                                        data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
                                                     @else
@@ -116,8 +145,8 @@
                                                            data-bs-toggle="tooltip"
                                                            data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill" style="color: #e9ecef"></i></div>
                                                     @endif
-                                                    @if($enableButton['edit'])
-                                                    <a href="{{ route('order.edit', $order->id) }}" class="text-warning"
+                                                    @if($enableButton['edit'] || ($isStocker && $order->status === IN_PROCESSING && ($order->payment_type === PAYMENT_ON_DELIVERY || $order->payment_type === DEPOSIT)))
+                                                    <a href="{{ route($isStocker ? 'stocker.order.edit' : 'order.edit', $order->id) }}" class="text-warning"
                                                        data-bs-toggle="tooltip"
                                                        data-bs-placement="bottom"
                                                        title="Chỉnh sửa">

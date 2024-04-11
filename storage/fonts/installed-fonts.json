@@ -11,5 +11,15 @@
     },
     "ibmplexsansjp": {
         "normal": "ibmplexsansjp_normal_76edf6c0ac75756b8735f26569e78fbf"
+    },
+    "roboto": {
+        "normal": "\/var\/www\/html\/web\/storage\/fonts\/roboto_normal_7bc701b343c10631f60048716b96e4f7",
+        "500": "roboto_500_5774d6fb05eba3d096525f821dbe4137"
+    },
+    "noto sans": {
+        "normal": "noto_sans_normal_696870439e69caf674e130649918e31a"
+    },
+    "amiri": {
+        "normal": "amiri_normal_348ef76746470e33e297aecee4bbb555"
     }
 }

@@ -1,6 +1,12 @@
 <div class="table-responsive mt-3">
     <div class="col-12">
-        <label>Thêm sản phẩm khuyến mãi</strong>
+        Thêm sản phẩm khuyến mãi
+        <div class="col-8">
+            <div class="col-12 position-relative">
+                <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-search"></i></div>
+                <input id="search_product" class="form-control ps-5 rounded" type="text" placeholder="Nhập sản phẩm">
+            </div>
+        </div>
     </div>
     <table class="table align-middle table-bordered mt-2">
         <thead class="table-light">
@@ -15,9 +21,11 @@
             </th>
             <th class="col-3">Danh mục</th>
             <th class="col-3">Sản phẩm</th>
-            <th>Chiết khấu</th>
             <th>Giá</th>
+            <th>Chiết khấu (%)</th>
+            <th>Số tiền chiết khấu</th>
             <th>Giá sau chiết khấu</th>
+            <th class="col-2">Ghi chú</th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +50,9 @@
                     <option selected="" disabled="" value="">Chọn...</option>
                 </select>
             </td>
+            <td class="price">
+                0
+            </td>
             <td>
                 <div class="input-group has-validation">
                     <input name="discount_percent[]" type="text" class="form-control discountPercent"
@@ -49,11 +60,18 @@
                     <div class="invalid-feedback"></div>
                 </div>
             </td>
-            <td class="price">
-                0
+            <td>
+                <div class="input-group has-validation">
+                    <input name="discount_price[]" type="text" class="form-control discountPrice"
+                           placeholder="0" autocomplete="off">
+                    <div class="invalid-feedback"></div>
+                </div>
             </td>
             <td class="priceDiscount">
                 0
+            </td>
+            <td>
+                <textarea name="note[]" cols="1" rows="1" class="form-control" placeholder="Nhập ghi chú"></textarea>
             </td>
         </tr>
         @foreach($discounts as $discount)
@@ -76,20 +94,32 @@
                     <input type="hidden" name="product_id[]" value="{{$discount->product_id}}">
                     {{$products[$discount->product_id]}}
                 </td>
+                <td class="price">
+                    {{number_format($productPrice[$discount->product_id] ?? 0)}}
+                </td>
                 <td>
                     <div class="input-group has-validation">
                         <input name="discount_percent[]"
-                               value="{{number_format(floatval($discount->discount_percent))}}" type="text"
+                               value="{{rtrim(rtrim(number_format(floatval($discount->discount_percent), 4), '0'), '.')}}" type="text"
                                class="form-control discountPercent" required=""
                                placeholder="0" autocomplete="off">
                         <div class="invalid-feedback"></div>
                     </div>
                 </td>
-                <td class="price">
-                    {{number_format($productPrice[$discount->product_id] ?? 0)}}
+                <td>
+                    <div class="input-group has-validation">
+                        <input name="discount_price[]"
+                               value="{{number_format(floatval($discount->discount_price))}}" type="text"
+                               class="form-control discountPrice" required=""
+                               placeholder="0" autocomplete="off">
+                        <div class="invalid-feedback"></div>
+                    </div>
                 </td>
                 <td class="priceDiscount">
                     {{number_format(max($productPrice[$discount->product_id] - ($productPrice[$discount->product_id] * $discount->discount_percent) / 100, 0))}}
+                </td>
+                <td>
+                    <textarea name="note[]" cols="1" rows="1" class="form-control" placeholder="Nhập ghi chú">{{$discount->note}}</textarea>
                 </td>
             </tr>
         @endforeach

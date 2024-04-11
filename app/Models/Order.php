@@ -24,12 +24,19 @@ class Order extends Model
         'paid',
         'payment_type',
         'is_print_red_invoice',
+        'has_print_red_invoice',
+        'has_update_quantity',
         'payment_method',
+        'bank_account_id',
+        'bank_account_info',
+        'payment_due_day',
         'bank_code',
         'bank_name',
         'bank_customer_name',
         'payment_date',
+        'delivery_appointment_date',
         'payment_status',
+        'payment_check_type',
         'created_by',
         'updated_by',
         'deleted_at',
@@ -43,6 +50,14 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+    public function bankAccount()
+    {
+        return $this->belongsTo(BankAccount::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     public function enableButtonByRole($role) {
         switch ($role) {
@@ -55,8 +70,8 @@ class Order extends Model
             case SALE:
                 return $this->enableButtonByStatus();
                 break;
-            case WAREHOUSE_STAFF:
-                return $this->enableButtonByStatus();
+            case STOCKER:
+                return $this->enableButtonByStatus(false, false, true);
                 break;
             case ACCOUNTANT:
                 return $this->enableButtonByStatus();
@@ -66,24 +81,23 @@ class Order extends Model
                 break;
         }
     }
-    private function enableButtonByStatus() {
+    private function enableButtonByStatus($edit = true, $delete = true, $view = true) {
         $listbutton = [
             'edit' => false,
-            'view' => false,
+            'view' => true,
             'delete' => false,
         ];
         switch($this->status) {
             case DRAFT;
             case REJECTED;
                 $listbutton = [
-                    'edit' => true,
-                    'view' => true,
-                    'delete' => true,
+                    'edit' => $edit,
+                    'view' => $view,
+                    'delete' => $delete,
                 ];
                 break;
-            case AWAITING;
             case DELIVERED;
-            case CONFIRMED;
+            case IN_PROCESSING;
             case DELIVERY;
             case COMPLETE;
                 $listbutton = [
