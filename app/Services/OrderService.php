@@ -150,7 +150,9 @@ class OrderService extends BaseService
     private function processOrder(array $data, $id = null, &$msg = '')
     {
         DB::beginTransaction();
-        $data['customer_id'] = intval($data['customer_id']);
+        if (Auth::user()->role !== STOCKER) {
+            $data['customer_id'] = intval($data['customer_id']);
+        }
         $data['order_total'] = floatval($data['order_total']);
         $data['order_discount'] = floatval($data['order_discount']);
         $data['order_total_product_price'] = floatval($data['order_total_product_price']);
