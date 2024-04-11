@@ -40,6 +40,17 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @if($isAdmin || $isAccountant)
+                            <div class="col-3">
+                                <select onchange="$('#form-search').submit()" name="sale_id" class="form-select single-select">
+                                    <option selected="" value="">Nhân viên bán hàng</option>
+                                    @foreach($sales as $saleId => $saleName)
+                                        <option value="{{ $saleId }}"
+                                                @if(intval(request('sale_id')) === $saleId) selected @endif>{{ $saleName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
                             <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái đơn hàng</option>
@@ -76,6 +87,9 @@
                                 <th>#</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Tên khách hàng</th>
+                                @if($isAdmin || $isAccountant)
+                                    <th>Nhân viên bán hàng</th>
+                                @endif
                                 @if($isAdmin || $isSale || $isAccountant)
                                 <th>Tổng tiền</th>
                                 @endif
@@ -89,7 +103,7 @@
                             <tbody>
                             @if($orders->isEmpty())
                                 <tr>
-                                    <td colspan="{{$isWareHouseStaff ? 9 : 10}}" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="{{$isWareHouseStaff ? 9 : ($isAdmin || $isAccountant ? 11 : 10)}}" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
@@ -101,6 +115,9 @@
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $customers[$order->customer_id] }}</td>
+                                        @if($isAdmin || $isAccountant)
+                                        <td>{{ $order->user->name ?? '' }}</td>
+                                        @endif
                                         @if($isAdmin || $isSale || $isAccountant)
                                         <td>{{ number_format($order->order_total) }}</td>
                                         @endif

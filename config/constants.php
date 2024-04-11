@@ -3,6 +3,7 @@ const FORMAT_DATE = 'Y-m-d';
 const FORMAT_DATE_TIME = 'Y-m-d H:i:s';
 const FORMAT_DATE_VN = 'd/m/Y';
 const FORMAT_DATE_TIME_VN = 'd/m/Y H:i:s';
+const FORMAT_DATE_TIME_VN_PATH = 'YmdHis';
 
 const SUPER_ADMIN = 0;
 const ADMIN = 1;

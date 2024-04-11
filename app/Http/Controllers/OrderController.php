@@ -76,7 +76,8 @@ class OrderController extends Controller
         }
         $orders = $this->orderService->searchQuery($query, $input);
         $customers = $this->customerRepository->getList('customer_name');
-        return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker'));
+        $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
+        return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
     }
 
     public function detail($id)
@@ -473,10 +474,41 @@ class OrderController extends Controller
         if ($id === null) {
             return abort('404', 'Page not found');
         }
-//        return view('order.orderInvoice');
         $order = $this->orderService->find($id);
+        if (!empty($order->customer_info)) {
+            $order->customer = json_decode($order->customer_info);
+        }
+        if (!empty($order->bank_account_info)) {
+            $order->bankAccount = json_decode($order->bank_account_info);
+        }
+        foreach ($order->orderDetail as $orderDetail) {
+            if (!empty($orderDetail->product_info)) {
+                $orderDetail->product = json_decode($orderDetail->product_info);
+            }
+        }
         $pdf = Pdf::loadView('order.orderInvoice', compact('order'));
-        $pdf->set_paper('letter', 'landscape');
-        return $pdf->stream($order->order_number . '.pdf');
+        $pdf->set_paper('a4', 'landscape');
+        return $pdf->stream($order->order_number . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf');
+    }
+    public function printDeliveryBill($id = null)
+    {
+        if ($id === null) {
+            return abort('404', 'Page not found');
+        }
+        $order = $this->orderService->find($id);
+        if (!empty($order->customer_info)) {
+            $order->customer = json_decode($order->customer_info);
+        }
+        if (!empty($order->bank_account_info)) {
+            $order->bankAccount = json_decode($order->bank_account_info);
+        }
+        foreach ($order->orderDetail as $orderDetail) {
+            if (!empty($orderDetail->product_info)) {
+                $orderDetail->product = json_decode($orderDetail->product_info);
+            }
+        }
+        $pdf = Pdf::loadView('order.deliveryBill', compact('order'));
+        $pdf->set_paper('a4');
+        return $pdf->stream($order->order_number . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf');
     }
 }

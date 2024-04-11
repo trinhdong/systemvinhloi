@@ -531,17 +531,15 @@
                             </div>
                         @endif
                         @if(in_array($order->status, [DELIVERY, DELIVERED, COMPLETE]))
-                            @if($isStocker)
-                                <a href="{{route('stocker.order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
-                                        class="bi bi-printer-fill"></i> In
+                            @if($isAdmin || $isStocker)
+                                <a href="{{route('stocker.order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success me-3"><i
+                                        class="bi bi-printer-fill"></i> In đơn hàng
+                                </a>
+                                <a href="{{route('order.printDeliveryBill', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-primary"><i
+                                        class="bi bi-printer-fill"></i> In phiếu kho
                                 </a>
                             @endif
-                            @if($isWareHouseStaff)
-                                <a href="{{route('warehouse-staff.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
-                                        class="bi bi-printer-fill"></i> In
-                                </a>
-                            @endif
-                            @if($isAdmin || $isSale || $isAccountant)
+                            @if($isSale)
                                 <a href="{{route('order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
                                         class="bi bi-printer-fill"></i> In
                                 </a>
