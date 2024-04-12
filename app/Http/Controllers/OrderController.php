@@ -10,6 +10,8 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\BankAccountRepository;
+use App\Repositories\InvoiceRepository;
+use App\Repositories\BillDeliveryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +26,8 @@ class OrderController extends Controller
     protected $commentRepository;
     protected $userRepository;
     protected $bankAccountRepository;
+    protected $invoiceRepository;
+    protected $billDeliveryRepository;
 
     public function __construct(
         OrderService $orderService,
@@ -32,7 +36,9 @@ class OrderController extends Controller
         OrderDetailRepository $orderDetailRepository,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
-        BankAccountRepository $bankAccountRepository
+        BankAccountRepository $bankAccountRepository,
+        InvoiceRepository $invoiceRepository,
+        BillDeliveryRepository $billDeliveryRepository
     )
     {
         $this->orderService = $orderService;
@@ -42,6 +48,8 @@ class OrderController extends Controller
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
         $this->bankAccountRepository = $bankAccountRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->billDeliveryRepository = $billDeliveryRepository;
     }
 
     public function index(Request $request)
@@ -474,7 +482,16 @@ class OrderController extends Controller
         if ($id === null) {
             return abort('404', 'Page not found');
         }
-        $order = $this->orderService->find($id);
+        $order = $this->orderService->find(intval($id));
+        if (in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
+            return abort('404', 'Page not found');
+        }
+        $invoice = $this->invoiceRepository->getWhere(['order_id' => intval($id)])->first();
+        $filePath = public_path('storage/pdf/invoices/');
+        $fileName = $order->order_number . '-' . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf';
+        if ($invoice !== null && file_exists($invoice->pdf_path)) {
+            return response()->file($filePath . $invoice->pdf_path);
+        }
         if (!empty($order->customer_info)) {
             $order->customer = json_decode($order->customer_info);
         }
@@ -486,16 +503,35 @@ class OrderController extends Controller
                 $orderDetail->product = json_decode($orderDetail->product_info);
             }
         }
-        $pdf = Pdf::loadView('order.orderInvoice', compact('order'));
+        $invoice = $this->invoiceRepository->create([
+            'order_id' => intval($id),
+            'customer_id' => $order->customer_id,
+            'sale_id' => $order->created_by,
+            'pdf_path' => $fileName,
+        ]);
+        $pdf = Pdf::loadView('order.orderInvoice', compact('order'), ['invoiceId' => $invoice->id]);
         $pdf->set_paper('a4', 'landscape');
-        return $pdf->stream($order->order_number . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf');
+        if (!is_dir($filePath)) {
+            mkdir($filePath);
+        }
+        file_put_contents($filePath . $fileName, $pdf->output());
+        return response()->file($filePath . $invoice->pdf_path);
     }
     public function printDeliveryBill($id = null)
     {
         if ($id === null) {
             return abort('404', 'Page not found');
         }
-        $order = $this->orderService->find($id);
+        $order = $this->orderService->find(intval($id));
+        if (in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
+            return abort('404', 'Page not found');
+        }
+        $billDelivery = $this->billDeliveryRepository->getWhere(['order_id' => intval($id)])->first();
+        $filePath = public_path('storage/pdf/bill-delivery/');
+        $fileName = $order->order_number . '-' . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf';
+        if ($billDelivery !== null && file_exists($billDelivery->pdf_path)) {
+            return response()->file($filePath . $billDelivery->pdf_path);
+        }
         if (!empty($order->customer_info)) {
             $order->customer = json_decode($order->customer_info);
         }
@@ -507,8 +543,18 @@ class OrderController extends Controller
                 $orderDetail->product = json_decode($orderDetail->product_info);
             }
         }
-        $pdf = Pdf::loadView('order.deliveryBill', compact('order'));
-        $pdf->set_paper('a4');
-        return $pdf->stream($order->order_number . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf');
+        $billDelivery = $this->invoiceRepository->create([
+            'order_id' => intval($id),
+            'customer_id' => $order->customer_id,
+            'sale_id' => $order->created_by,
+            'pdf_path' => $fileName,
+        ]);
+        $pdf = Pdf::loadView('order.billDelivery', compact('order'), ['billDeliveryId' => $billDelivery->id]);
+        $pdf->set_paper('a4', 'landscape');
+        if (!is_dir($filePath)) {
+            mkdir($filePath);
+        }
+        file_put_contents($filePath . $fileName, $pdf->output());
+        return response()->file($filePath . $billDelivery->pdf_path);
     }
 }

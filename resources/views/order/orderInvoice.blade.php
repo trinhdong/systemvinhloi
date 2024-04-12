@@ -120,7 +120,7 @@ function formatPhoneNumber($number)
                 <td>{{$orderDetail->product->product_name}}</td>
                 <td style="text-align: center">{{$orderDetail->product->unit}}</td>
                 <td style="text-align: right">{{number_format($orderDetail->quantity)}}</td>
-                <td style="text-align: right">{{number_format($orderDetail->quantity * $orderDetail->product->quantity_per_package)}}</td>
+                <td style="text-align: right">{{number_format($orderDetail->quantity * $orderDetail->product->quantity_per_package ?? 1)}}</td>
                 <td style="text-align: right">{{number_format($orderDetail->product_price)}}</td>
                 <td style="text-align: right">{{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}
                     %
