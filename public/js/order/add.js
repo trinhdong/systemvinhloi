@@ -25,7 +25,7 @@ $(document).ready(function () {
                 isValid = false;
             }
             if ($(this).find('input[name="quantity[]"]').val() == '') {
-                $(this).find('input[name="discount_percent[]"]').addClass('is-invalid')
+                $(this).find('input[name="quantity[]"]').addClass('is-invalid')
                 isValid = false;
             }
             const price = $(this).closest('tr').find('.product-price').text().replace(/,/g, '');
@@ -239,14 +239,19 @@ $(document).ready(function () {
         }
     })
     $(document).on('blur', '.quantity input', function (event) {
-        const quantity = $(this).val().replace(/,/g, '');
-        const priceDiscount = $(this).closest('tr').find('.unit-price').text().replace(/,/g, '');
+        const quantity = parseInt($(this).val().replace(/,/g, ''));
+        const priceDiscount = parseFloat($(this).closest('tr').find('.unit-price').text().replace(/,/g, ''));
+        const quantityPerPackage = parseInt($(this).closest('tr').find('.quantity-per-package').val());
+        $(this).closest('tr').find('.total-quantity').text(new Intl.NumberFormat("en", {
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0,
+        }).format(quantity*quantityPerPackage));
         $(this).closest('tr').find('.total').text(1);
         if (!isNaN(quantity) && !isNaN(priceDiscount)) {
             $(this).closest('tr').find('.total').text(new Intl.NumberFormat("en", {
                 maximumFractionDigits: 0,
                 minimumFractionDigits: 0,
-            }).format(priceDiscount * quantity));
+            }).format(priceDiscount * quantity * quantityPerPackage));
         }
         totalOrder()
     })
@@ -325,7 +330,9 @@ $(document).ready(function () {
         const productColor = $(this).data('product-color');
         const productCapacity = $(this).data('product-capacity');
         const productUnit = $(this).data('product-unit');
-        appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit);
+        const productSpecifications = $(this).data('product-specifications');
+        const productQuantityPerPackage = $(this).data('product-quantity-per-package');
+        appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit, productSpecifications, productQuantityPerPackage);
         $(this).remove();
         if ($('#productList .product').length == 0) {
             $('#productList').append(`
@@ -438,17 +445,19 @@ function totalOrder() {
     let totalOrder = 0;
     let totalDiscount = 0;
     let totalProductOrder = 0;
+    debugger
     $('.productOrder td.total').each(function () {
         if ($(this).closest('tr').hasClass('d-none')) {
             return;
         }
         const quantity = parseInt($(this).closest('tr').find('.quantity input').val().replace(/,/g, ''));
+        const quantityPerPackage = parseInt($(this).closest('tr').find('.quantity-per-package').val());
         const totalProductPrice = parseFloat($(this).closest('tr').find('.product-price').text().replace(/,/g, '') || 0)
         const total = parseFloat($(this).text().replace(/,/g, '') || 0)
         const discountPrice = parseFloat($(this).closest('tr').find('.discount-price input').val().replace(/,/g, '') || 0)
         totalOrder += total;
-        totalProductOrder += totalProductPrice*quantity;
-        totalDiscount += discountPrice*quantity;
+        totalProductOrder += totalProductPrice*quantity*quantityPerPackage;
+        totalDiscount += discountPrice*quantity*quantityPerPackage;
     });
     $('input[name="order_total"]').val(totalOrder);
     $('input[name="order_discount"]').val(totalDiscount);
@@ -514,7 +523,9 @@ function appendProductAjax(customerId) {
                 const productColor = product.color;
                 const productCapacity = product.capacity;
                 const productUnit = product.unit;
-                appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit)
+                const productSpecifications = product.specifications;
+                const productQuantityPerPackage = product.quantity_per_package;
+                appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit, productSpecifications, productQuantityPerPackage)
             });
             applyDiscount(customerId);
             totalOrder();
@@ -524,11 +535,15 @@ function appendProductAjax(customerId) {
         }
     })
 }
-function appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit) {
+function appendProduct(customerId, productId, productName, productPrice, productImage, productColor, productCapacity, productUnit, productSpecifications, productQuantityPerPackage) {
     const productPriceFormat = new Intl.NumberFormat("en", {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
     }).format(productPrice);
+    const unitPriceFormat = new Intl.NumberFormat("en", {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+    }).format(productPrice*productQuantityPerPackage);
     const $productOrder = $('#orderlist').find('.productOrder.d-none').clone();
     $productOrder.removeClass('d-none');
     $productOrder.attr('data-id', productId);
@@ -542,10 +557,16 @@ function appendProduct(customerId, productId, productName, productPrice, product
     $productOrder.find('.product-unit').text(productUnit);
     $productOrder.find('.discount-percent input').val(0);
     $productOrder.find('.discount-price input').val(0);
-    $productOrder.find('.unit-price').text(productPriceFormat);
-    $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
+    $productOrder.find('.unit-price').text(unitPriceFormat);
+    $productOrder.find('.product-specifications').text(productSpecifications);
+    $productOrder.find('.total-quantity').text(new Intl.NumberFormat("en", {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+    }).format(productQuantityPerPackage));
+    $productOrder.find('.quantity-per-package').val(productQuantityPerPackage);
+    $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice*productQuantityPerPackage);
     $productOrder.find('.product-price').closest('td').find('input:hidden').val(productPrice);
-    $productOrder.find('.total').text(productPriceFormat);
+    $productOrder.find('.total').text(unitPriceFormat);
     $productOrder.find('.quantity input').val(1);
     $productOrder.find('.discount-note').text('');
     if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId]) && !isNaN(discountsPrice[customerId + '_' + productId])) {
@@ -555,7 +576,7 @@ function appendProduct(customerId, productId, productName, productPrice, product
         const pricePercent = new Intl.NumberFormat("en", {
             maximumFractionDigits: 0,
             minimumFractionDigits: 0,
-        }).format(Math.max(productPrice - discountPrice, 0))
+        }).format(Math.max(productPrice*productQuantityPerPackage - discountPrice*productQuantityPerPackage, 0))
         $productOrder.find('.discount-percent input').attr('readonly', 'readonly').addClass('disabled').val(new Intl.NumberFormat("en", {
             maximumFractionDigits: 0,
             minimumFractionDigits: 0,
@@ -566,7 +587,7 @@ function appendProduct(customerId, productId, productName, productPrice, product
         }).format(discountsPrice[customerId + '_' + productId]));
         $productOrder.find('.discount-note').text(discountNote);
         $productOrder.find('.unit-price').text(pricePercent);
-        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice - discountPrice, 0))
+        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice*productQuantityPerPackage - discountPrice*productQuantityPerPackage, 0))
         $productOrder.find('.total').text(pricePercent);
     }
     $('#orderlist').prepend($productOrder);
@@ -622,7 +643,7 @@ function onSearch(e, page) {
                     }).format(product.price);
 
                     template += `
-                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}' data-product-color='${product.color}' data-product-capacity='${product.capacity}' data-product-unit='${product.unit}'>
+                                                <tr class="hover-able cursor-pointer product" data-id='${product.id}' data-product-image='${product.image_url}'  data-product-name='${product.product_name}'  data-product-price='${product.price}' data-product-color='${product.color}' data-product-capacity='${product.capacity}' data-product-unit='${product.unit}' data-product-specifications='${product.specifications}' data-product-quantity-per-package='${product.quantity_per_package}'>
                                                     <td>
                                                         <div>
                                                             <div class="d-flex align-items-center gap-2"">
@@ -637,6 +658,7 @@ function onSearch(e, page) {
                                                     </td>
                                                     <td>${product.color}</td>
                                                     <td>${product.capacity}</td>
+                                                    <td>${product.specifications}</td>
                                                     <td>${product.unit}</td>
                                                     <td>${productPrice}</td>
                                                 </tr>
@@ -645,7 +667,7 @@ function onSearch(e, page) {
                 if (!products || products.length == 0) {
                     template =  `
                             <tr>
-                                <td class="text-center" colspan='5'>
+                                <td class="text-center" colspan='6'>
                                     Không có dữ liệu
                                 </td>
                             </tr>

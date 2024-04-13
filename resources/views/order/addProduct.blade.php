@@ -40,6 +40,7 @@
                                                     <th>Sản phẩm</th>
                                                     <th>Màu sắc</th>
                                                     <th>Dung tích</th>
+                                                    <th>Quy cách</th>
                                                     <th>Đơn vị tính</th>
                                                     <th>Giá</th>
                                                 </tr>

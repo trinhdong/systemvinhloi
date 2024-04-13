@@ -66,6 +66,7 @@
                                                     <th>Ghi chú</th>
                                                     <th>Màu sắc</th>
                                                     <th>Dung tích</th>
+                                                    <th>Quy cách</th>
                                                     <th>Đơn vị tính</th>
                                                     <th>Giá</th>
                                                     <th>Chiết khấu (%)</th>
@@ -73,12 +74,13 @@
                                                     <th>Ghi chú chiết khấu</th>
                                                     <th>Giá sau chiết khấu</th>
                                                     <th>Số lượng thùng</th>
+                                                    <th>Tổng số lượng</th>
                                                     <th>Tổng tiền sau chiết khấu</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody id="orderlist">
                                                 <tr id="empty-row" class="d-none">
-                                                    <td colspan="13" class="text-center">Chưa có sản phẩm nào được thêm
+                                                    <td colspan="15" class="text-center">Chưa có sản phẩm nào được thêm
                                                     </td>
                                                 </tr>
                                                 <tr class="d-none productOrder">
@@ -110,6 +112,7 @@
                                                     </td>
                                                     <td class="product-color"></td>
                                                     <td class="product-capacity"></td>
+                                                    <td class="product-specifications"></td>
                                                     <td class="product-unit"></td>
                                                     <td>
                                                         <div class="product-price"></div>
@@ -145,7 +148,10 @@
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </td>
-                                                    <td class="total"></td>
+                                                    <input type="hidden" class="quantity-per-package">
+                                                    <td class="total-quantity text-end">
+                                                    </td>
+                                                    <td class="total text-end"></td>
                                                 </tr>
                                                 @foreach($order->orderDetail as $orderDetail)
                                                     <tr class="productOrder" data-id="{{ $orderDetail->product_id }}"
@@ -186,6 +192,9 @@
                                                         </td>
                                                         <td class="product-capacity">
                                                             {{$orderDetail->product->capacity}}
+                                                        </td>
+                                                        <td class="product-specifications">
+                                                            {{$orderDetail->product->specifications}}
                                                         </td>
                                                         <td class="product-unit">
                                                             {{$orderDetail->product->unit}}
@@ -229,7 +238,11 @@
                                                                 <div class="invalid-feedback"></div>
                                                             </div>
                                                         </td>
-                                                        <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity)}}</td>
+                                                        <input type="hidden" class="quantity-per-package" value="{{$orderDetail->product->quantity_per_package}}">
+                                                        <td class="total-quantity">
+                                                            {{$orderDetail->quantity*$orderDetail->product->quantity_per_package}}
+                                                        </td>
+                                                        <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity*$orderDetail->product->quantity_per_package)}}</td>
                                                     </tr>
                                                 @endforeach
                                                 </tbody>

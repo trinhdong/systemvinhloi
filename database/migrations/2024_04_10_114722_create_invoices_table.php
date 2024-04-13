@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('sale_id');
-            $table->string('pdf_path');
+            $table->string('pdf_invoice_path')->nullable();
+            $table->string('pdf_delivery_bill_path')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();

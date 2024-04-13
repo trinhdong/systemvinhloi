@@ -62,7 +62,7 @@
                                             {{PAYMENTS_TYPE[$order->payment_type]}}
                                         </div>
                                     </div>
-                                    @if(!empty($order->payment_method))
+                                    @if(!$isEdit && !empty($order->payment_method))
                                     <div class="form-group row mt-3">
                                         <div class="col-7 fw-bold">Phương thức thanh toán</div>
                                         <div class="col-5">{{PAYMENTS_METHOD[$order->payment_method]}}</div>

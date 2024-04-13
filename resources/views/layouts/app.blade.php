@@ -26,6 +26,7 @@
     <link href="assets/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet"/>
     <link href="assets/css/datepicker.css" rel="stylesheet"/>
     <link href="assets/css/jquery-ui.css" rel="stylesheet"/>
+    <link href="assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
     <!-- loader-->
     <link href="assets/css/pace.min.css" rel="stylesheet"/>
@@ -66,6 +67,10 @@
     <script src="assets/js/form-select2.js"></script>
     <script src="assets/js/bootstrap-datepicker.js"></script>
     <script src="assets/js/jquery.formatCurrency-1.4.0.min.js"></script>
+    <script src="assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+    <script src="assets/js/table-datatable.js"></script>
+    <script src="assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
     <!--app-->
     <script src="assets/js/app.js"></script>
     <script>
