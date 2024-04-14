@@ -81,7 +81,7 @@ function formatPhoneNumber($number)
         <tr>
             <td align="center" colspan="2">
                 <div style="line-height: 5px">
-                    <h1 style="font-weight: bold">Phiếu xuất kho</h1><br>
+                    <h1 style="font-weight: bold">ĐƠN ĐẶT HÀNG</h1><br>
                     <p>Số: <strong>{{$invoiceId}}</strong></p>
                 </div>
             </td>
@@ -130,7 +130,7 @@ function formatPhoneNumber($number)
                 <td style="text-align: right">{{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}%
                 </td>
                 <td style="text-align: right">{{number_format($orderDetail->unit_price)}}</td>
-                <td style="text-align: right">{{number_format($orderDetail->unit_price * $orderDetail->quantity)}}</td>
+                <td style="text-align: right">{{number_format($orderDetail->unit_price * $orderDetail->quantity * $orderDetail->product->quantity_per_package ?? 1)}}</td>
             </tr>
         @endforeach
         <tr>
