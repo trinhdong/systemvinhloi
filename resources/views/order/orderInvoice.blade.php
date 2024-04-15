@@ -80,7 +80,10 @@ function formatPhoneNumber($number)
         </tr>
         <tr>
             <td align="center" colspan="2">
-                <h1 style="font-weight: bold">ĐƠN ĐẶT HÀNG</h1><br>
+                <div style="line-height: 5px">
+                    <h1 style="font-weight: bold">ĐƠN ĐẶT HÀNG</h1><br>
+                    <p>Số: <strong>{{$invoiceId}}</strong></p>
+                </div>
             </td>
         </tr>
         <tr>
@@ -100,10 +103,11 @@ function formatPhoneNumber($number)
     <table width="100%" class="detail" style="font-family: 'DejaVu Sans',sans-serif">
         <thead>
         <tr>
-            <th>STT</th>
-            <th>Mã sản phẩm</th>
-            <th>Tên sản phẩm</th>
+            <th style="text-align: center">STT</th>
+            <th style="text-align: center">Mã sản phẩm</th>
+            <th style="text-align: center">Tên sản phẩm</th>
             <th style="text-align: center">Quy cách</th>
+            <th style="text-align: center">Đơn vị tính</th>
             <th style="text-align: center">Số lượng thùng</th>
             <th style="text-align: center">Tổng số lượng</th>
             <th style="text-align: center">Đơn giá</th>
@@ -118,19 +122,19 @@ function formatPhoneNumber($number)
                 <td style="text-align: right">{{$k+1}}</td>
                 <td>{{$orderDetail->product->product_code}}</td>
                 <td>{{$orderDetail->product->product_name}}</td>
+                <td style="text-align: center">{{$orderDetail->product->specifications}}</td>
                 <td style="text-align: center">{{$orderDetail->product->unit}}</td>
                 <td style="text-align: right">{{number_format($orderDetail->quantity)}}</td>
-                <td style="text-align: right">{{number_format($orderDetail->quantity * $orderDetail->product->quantity_per_package)}}</td>
+                <td style="text-align: right">{{number_format($orderDetail->quantity * $orderDetail->product->quantity_per_package ?? 1)}}</td>
                 <td style="text-align: right">{{number_format($orderDetail->product_price)}}</td>
-                <td style="text-align: right">{{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}
-                    %
+                <td style="text-align: right">{{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}%
                 </td>
                 <td style="text-align: right">{{number_format($orderDetail->unit_price)}}</td>
-                <td style="text-align: right">{{number_format($orderDetail->unit_price * $orderDetail->quantity)}}</td>
+                <td style="text-align: right">{{number_format($orderDetail->unit_price * $orderDetail->quantity * $orderDetail->product->quantity_per_package ?? 1)}}</td>
             </tr>
         @endforeach
         <tr>
-            <td colspan="8" style="border-right: none; text-align: center">
+            <td colspan="9" style="border-right: none; text-align: center">
                 <h3 style="font-weight: bold; margin-top: 1px; margin-bottom: 1px">Tổng cộng</h3>
             </td>
             <td colspan="2" style="border-left: none; margin-right: 5px">

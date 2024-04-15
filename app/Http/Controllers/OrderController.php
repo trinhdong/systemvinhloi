@@ -10,6 +10,7 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\BankAccountRepository;
+use App\Repositories\InvoiceRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class OrderController extends Controller
     protected $commentRepository;
     protected $userRepository;
     protected $bankAccountRepository;
+    protected $invoiceRepository;
 
     public function __construct(
         OrderService $orderService,
@@ -32,7 +34,8 @@ class OrderController extends Controller
         OrderDetailRepository $orderDetailRepository,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
-        BankAccountRepository $bankAccountRepository
+        BankAccountRepository $bankAccountRepository,
+        InvoiceRepository $invoiceRepository,
     )
     {
         $this->orderService = $orderService;
@@ -42,6 +45,7 @@ class OrderController extends Controller
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
         $this->bankAccountRepository = $bankAccountRepository;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function index(Request $request)
@@ -80,7 +84,7 @@ class OrderController extends Controller
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
     }
 
-    public function detail($id)
+    public function detail(int $id)
     {
         $order = $this->orderService->find($id);
         if (Auth::user()->role == STOCKER && $order->status === DRAFT) {
@@ -92,17 +96,7 @@ class OrderController extends Controller
         if (Auth::user()->role == WAREHOUSE_STAFF && in_array($order->status, [DRAFT, DELIVERY, DELIVERED, COMPLETE, REJECTED])) {
             return abort(403, 'Unauthorized');
         }
-        if (!empty($order->customer_info)) {
-            $order->customer = json_decode($order->customer_info);
-        }
-        if (!empty($order->bank_account_info)) {
-            $order->bankAccount = json_decode($order->bank_account_info);
-        }
-        foreach ($order->orderDetail as $orderDetail) {
-            if (!empty($orderDetail->product_info)) {
-                $orderDetail->product = json_decode($orderDetail->product_info);
-            }
-        }
+        $order = $this->orderService->replaceOrderDataInfo($order);
         $comments = $this->commentRepository->getWhere([
             'order_id' => $id,
             'type' => COMMENT_TYPE_ORDER
@@ -113,7 +107,8 @@ class OrderController extends Controller
         $isWareHouseStaff = Auth::user()->role == WAREHOUSE_STAFF;
         $isStocker = Auth::user()->role == STOCKER;
         $isAccountant =  Auth::user()->role == ACCOUNTANT;
-        return view('order.detail', compact('order', 'comments', 'users', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker'));
+        $dateDeliverys = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERY, 'order_id' => $id])->pluck('created_at', 'order_id');
+        return view('order.detail', compact('order', 'comments', 'users', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'dateDeliverys'));
     }
 
     public function add(CreateUpdateOrderRequest $request)
@@ -195,6 +190,9 @@ class OrderController extends Controller
             $discountsPrice = $this->orderService->mapDiscountsPrice();
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discountsNote = $this->orderService->mapDiscountsNote();
+            if (Auth::user()->role == STOCKER) {
+                $order = $this->orderService->replaceOrderDataInfo($order);
+            }
             return view('order.edit', compact('order', 'customers', 'categories', 'discounts', 'discountsPrice', 'bankAccounts', 'discountsNote'));
         }
 
@@ -238,14 +236,18 @@ class OrderController extends Controller
         );
     }
 
-    public function delete($id)
+    public function delete(int $id)
     {
         DB::beginTransaction();
         $order = $this->orderService->delete($id, true);
         if (!in_array(Auth::user()->role, [ADMIN, SUPER_ADMIN]) && in_array($order->status, [IN_PROCESSING, DELIVERY, DELIVERED, COMPLETE])) {
             return abort(403, 'Unauthorized');
         }
-        if ($order && $this->orderDetailRepository->deleteAll('order_id', $id) && $this->commentRepository->deleteAll('order_id', $id)) {
+        $hasComment = $this->commentRepository->getWhere(['order_id' => $id])->count() > 0;
+        if ($hasComment) {
+            $this->commentRepository->deleteAll('order_id', $id);
+        }
+        if ($order && $this->orderDetailRepository->deleteAll('order_id', $id)) {
             DB::commit();
             return redirect()->route('order.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Xóa thành công']
@@ -357,12 +359,7 @@ class OrderController extends Controller
         if (in_array($order->status, [DRAFT, REJECTED, DELIVERY, IN_PROCESSING])) {
             return abort(403, 'Unauthorized');
         }
-        if (!empty($order->customer_info)) {
-            $order->customer = json_decode($order->customer_info);
-        }
-        if (!empty($order->bank_account_info)) {
-            $order->bankAccount = json_decode($order->bank_account_info);
-        }
+        $order = $this->orderService->replaceOrderDataInfo($order);
         $comments = $this->commentRepository->getWhere([
             'order_id' => $id,
             'type' => COMMENT_TYPE_PAYMENT
@@ -469,46 +466,56 @@ class OrderController extends Controller
         return response()->json($this->bankAccountRepository->find($id));
     }
 
-    public function printInvoice($id = null)
+    public function printInvoice($id = null, $isDelivery = null)
     {
         if ($id === null) {
             return abort('404', 'Page not found');
         }
-        $order = $this->orderService->find($id);
-        if (!empty($order->customer_info)) {
-            $order->customer = json_decode($order->customer_info);
-        }
-        if (!empty($order->bank_account_info)) {
-            $order->bankAccount = json_decode($order->bank_account_info);
-        }
-        foreach ($order->orderDetail as $orderDetail) {
-            if (!empty($orderDetail->product_info)) {
-                $orderDetail->product = json_decode($orderDetail->product_info);
-            }
-        }
-        $pdf = Pdf::loadView('order.orderInvoice', compact('order'));
-        $pdf->set_paper('a4', 'landscape');
-        return $pdf->stream($order->order_number . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf');
-    }
-    public function printDeliveryBill($id = null)
-    {
-        if ($id === null) {
+        $order = $this->orderService->find(intval($id));
+        if (in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
             return abort('404', 'Page not found');
         }
-        $order = $this->orderService->find($id);
-        if (!empty($order->customer_info)) {
-            $order->customer = json_decode($order->customer_info);
+        $invoice = $this->invoiceRepository->getWhere(['order_id' => intval($id)])->first();
+        $fileName = $order->order_number . '-' . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf';
+        $filePath = public_path('storage/pdf/deliveries/');
+        if ($isDelivery === null) {
+            $filePath = public_path('storage/pdf/invoices/');
         }
-        if (!empty($order->bank_account_info)) {
-            $order->bankAccount = json_decode($order->bank_account_info);
+        if ($invoice !== null && file_exists($filePath . $invoice->pdf_invoice_path) && $isDelivery == null) {
+            return response()->file($filePath . $invoice->pdf_invoice_path);
         }
-        foreach ($order->orderDetail as $orderDetail) {
-            if (!empty($orderDetail->product_info)) {
-                $orderDetail->product = json_decode($orderDetail->product_info);
-            }
+        if ($invoice !== null && file_exists($filePath . $invoice->pdf_delivery_bill_path) && $isDelivery !== null) {
+            return response()->file($filePath . $invoice->pdf_delivery_bill_path);
         }
-        $pdf = Pdf::loadView('order.deliveryBill', compact('order'));
-        $pdf->set_paper('a4');
-        return $pdf->stream($order->order_number . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf');
+        $order = $this->orderService->replaceOrderDataInfo($order);
+        $dataCreate = [
+            'order_id' => intval($id),
+            'customer_id' => $order->customer_id,
+            'sale_id' => $order->created_by,
+        ];
+        $dataUpdate = [];
+        if ($isDelivery === null) {
+            $dataCreate['pdf_invoice_path'] = $fileName;
+            $dataUpdate['pdf_invoice_path'] = $fileName;
+        } else {
+            $dataCreate['pdf_delivery_bill_path'] = $fileName;
+            $dataUpdate['pdf_delivery_bill_path'] = $fileName;
+        }
+        if ($invoice === null) {
+            $invoice = $this->invoiceRepository->create($dataCreate);
+        } else {
+            $invoice = $this->invoiceRepository->update($invoice->id, $dataUpdate);
+        }
+        if ($isDelivery === null) {
+            $pdf = Pdf::loadView('order.orderInvoice', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
+            $pdf->set_paper('a4', 'landscape');
+        } else {
+            $pdf = Pdf::loadView('order.deliveryBill', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
+        }
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+        file_put_contents($filePath . $fileName, $pdf->output());
+        return response()->file($filePath . ($isDelivery === null ? $invoice->pdf_invoice_path : $invoice->pdf_delivery_bill_path));
     }
 }

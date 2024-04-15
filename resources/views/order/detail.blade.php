@@ -33,7 +33,7 @@
                 </div>
                 @if(!$isAccountant && $order->has_update_quantity == HAD_UPDATE_QUANTITY)
                 <div class="col-4 text-center">
-                    <span class="text-danger">Thủ kho đã cập nhật lại số lượng thùng</span>
+                    <span class="text-danger">Thủ kho đã cập nhật lại số lượng</span>
                 </div>
                 @endif
                 <div class="col-4">
@@ -58,6 +58,7 @@
                                                 @endif
                                                 <th>Màu sắc</th>
                                                 <th>Dung tích</th>
+                                                <th>Quy cách</th>
                                                 <th>Đơn vị tính</th>
                                                 @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                     <th>Giá</th>
@@ -67,6 +68,7 @@
                                                     <th>Giá sau chiết khấu</th>
                                                 @endif
                                                 <th>Số lượng thùng</th>
+                                                <th>Tổng số lượng</th>
                                                 @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                     <th>Tổng tiền sau chiết khấu</th>
                                                 @endif
@@ -101,30 +103,36 @@
                                                         {{$orderDetail->product->capacity}}
                                                     </td>
                                                     <td>
+                                                        {{$orderDetail->product->specifications}}
+                                                    </td>
+                                                    <td>
                                                         {{$orderDetail->product->unit}}
                                                     </td>
                                                     @if($isAdmin || $isSale || $isAccountant || $isStocker)
-                                                        <td>
+                                                        <td class="text-end">
                                                             {{number_format($orderDetail->product_price)}}
                                                         </td>
-                                                        <td class="discount-percent">
+                                                        <td class="discount-percent text-end">
                                                             {{ rtrim(rtrim(number_format($orderDetail->discount_percent, 4), '0'), '.') }}%
                                                         </td>
-                                                        <td class="discount-price">
+                                                        <td class="discount-price text-end">
                                                             {{ number_format($orderDetail->discount_price) }}
                                                         </td>
                                                         <td>
                                                             {{ $orderDetail->discount_note }}
                                                         </td>
-                                                        <td>
+                                                        <td class="text-end">
                                                             {{number_format($orderDetail->unit_price)}}
                                                         </td>
                                                     @endif
-                                                    <td class="quantity">
+                                                    <td class="quantity text-end">
                                                         {{number_format($orderDetail->quantity)}}
                                                     </td>
+                                                    <td class="text-end">
+                                                        {{number_format($orderDetail->quantity * ($orderDetail->product->quantity_per_package ?? 1))}}
+                                                    </td>
                                                     @if($isAdmin || $isSale || $isAccountant || $isStocker)
-                                                        <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity)}}</td>
+                                                        <td class="total text-end">{{number_format($orderDetail->unit_price*$orderDetail->quantity* ($orderDetail->product->quantity_per_package ?? 1))}}</td>
                                                     @endif
                                                 </tr>
                                             @endforeach
@@ -327,10 +335,17 @@
                                                 </div>
                                             @endif
                                             @if(!empty($order->payment_due_day))
-                                            <div id="payment_date" class="{{$order->payment_type == PAYMENT_ON_DELIVERY ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
-                                                <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày đến hạn thanh toán: </label>
-                                                <h5 class="mb-0 text-danger">{{$order->payment_due_day}}</h5>
-                                            </div>
+                                                @if(in_array($order->status, [DELIVERY, DELIVERED, COMPLETE]))
+                                                <div id="payment_date" class="{{$order->payment_type == PAYMENT_ON_DELIVERY ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Ngày hẹn thanh toán: </label>
+                                                    <h5 class="mb-0 text-danger">{{date(FORMAT_DATE_VN, strtotime($dateDeliverys[$order->id] . ' +' . $order->payment_due_day . ' day'))}}</h5>
+                                                </div>
+                                                @else
+                                                <div id="payment_date" class="{{$order->payment_type == PAYMENT_ON_DELIVERY ? '' : 'd-none'}} align-items-center mt-3 d-flex justify-content-between">
+                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Số ngày đến hạn thanh toán: </label>
+                                                    <h5 class="mb-0 text-danger">{{$order->payment_due_day}}</h5>
+                                                </div>
+                                                @endif
                                             @endif
                                         </div>
                                     </div>
@@ -531,16 +546,24 @@
                             </div>
                         @endif
                         @if(in_array($order->status, [DELIVERY, DELIVERED, COMPLETE]))
-                            @if($isAdmin || $isStocker)
-                                <a href="{{route('stocker.order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success me-3"><i
+                            @if($isAdmin)
+                                <a href="{{route('order.printInvoice', $order->id)}}" target="_blank" id="printInvoice" type="button" class="btn btn-success me-2"><i
                                         class="bi bi-printer-fill"></i> In đơn hàng
                                 </a>
-                                <a href="{{route('order.printDeliveryBill', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-primary"><i
+                                <a href="{{route('order.printDeliveryBill', [$order->id, true])}}" target="_blank" id="printDeliveryBill" type="button" class="btn btn-primary"><i
+                                        class="bi bi-printer-fill"></i> In phiếu kho
+                                </a>
+                            @endif
+                            @if($isStocker)
+                                <a href="{{route('stocker.order.printInvoice', $order->id)}}" target="_blank" id="printInvoice" type="button" class="btn btn-success me-2"><i
+                                        class="bi bi-printer-fill"></i> In đơn hàng
+                                </a>
+                                <a href="{{route('stocker.order.printDeliveryBill', [$order->id, true])}}" target="_blank" id="printDeliveryBill" type="button" class="btn btn-primary"><i
                                         class="bi bi-printer-fill"></i> In phiếu kho
                                 </a>
                             @endif
                             @if($isSale)
-                                <a href="{{route('order.printInvoice', $order->id)}}" target="_blank" id="printButton" type="button" class="btn btn-success"><i
+                                <a href="{{route('order.printInvoice', $order->id)}}" target="_blank" id="printInvoice" type="button" class="btn btn-success"><i
                                         class="bi bi-printer-fill"></i> In
                                 </a>
                             @endif

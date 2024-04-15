@@ -91,7 +91,7 @@
         @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === ACCOUNTANT)
             <li class="<?= (request()->is('payment*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('payment.indexPayment')}}">
-                    <div class="parent-icon"><i class="bi bi-credit-card"></i></i>
+                    <div class="parent-icon"><i class="bi bi-credit-card"></i>
                     </div>
                     <div class="menu-title">Quản lý thanh toán</div>
                 </a>

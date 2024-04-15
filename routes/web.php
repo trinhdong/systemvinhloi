@@ -8,6 +8,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
@@ -42,9 +43,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
     });
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,WAREHOUSE_STAFF,STOCKER'])->group(function () {
-    Route::get('/', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(function () {
     Route::controller(CategoryController::class)->prefix('category')->group(function () {
@@ -115,7 +114,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE'])->group(function 
         Route::get('/getDiscountByCustomerId',  [OrderController::class, 'getDiscountByCustomerId'])->name('order.getDiscountByCustomerId');
         Route::get('/getBankAccountById/{id}',  [OrderController::class, 'getBankAccountById'])->name('order.getBankAccountById');
         Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice'])->name('order.printInvoice');
-        Route::get('/print-delivery-bill/{id}',  [OrderController::class, 'printDeliveryBill'])->name('order.printDeliveryBill');
+        Route::get('/print-delivery-bill/{id}/{isDelivery}',  [OrderController::class, 'printInvoice'])->name('order.printDeliveryBill');
     });
 });
 
@@ -123,8 +122,6 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,WAREHOUSE_STAFF'])->grou
     Route::prefix('/warehouse-staff/order')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('warehouse-staff.order.index');
         Route::get('/detail/{id}', [OrderController::class, 'detail'])->name('warehouse-staff.order.detail');
-        Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice/{id}'])->name('warehouse-staff.order.printInvoice');
-        Route::get('/print-delivery-bill/{id}',  [OrderController::class, 'printDeliveryBill'])->name('warehouse-staff.order.printDeliveryBill');
     });
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(function () {
@@ -137,8 +134,8 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(functi
             'stocker.order.updateStatusOrder'
         );
     });
-    Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice/{id}'])->name('stocker.order.printInvoice');
-    Route::get('/print-delivery-bill/{id}',  [OrderController::class, 'printDeliveryBill'])->name('stocker.order.printDeliveryBill');
+    Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice'])->name('stocker.order.printInvoice');
+    Route::get('/print-delivery-bill/{id}/{isDelivery}',  [OrderController::class, 'printInvoice'])->name('stocker.order.printDeliveryBill');
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT'])->group(function () {
     Route::prefix('/payment')->group(function () {

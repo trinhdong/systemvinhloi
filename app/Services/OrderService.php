@@ -235,6 +235,8 @@ class OrderService extends BaseService
         if (Auth::user()->role === STOCKER) {
             $data = array_intersect_key($data, array_flip($this->listFieldstokerUpdateOrder()));
             $data['has_update_quantity'] = HAD_UPDATE_QUANTITY;
+        } else {
+            $data['has_update_quantity'] = null;
         }
         if (!$this->processOrderDetail($data, $id)) {
             DB::rollBack();
@@ -495,5 +497,21 @@ class OrderService extends BaseService
     {
         $order = $this->find($orderId);
         return $order->customer_id !== $customerId;
+    }
+
+    public function replaceOrderDataInfo($order)
+    {
+        if (!empty($order->customer_info)) {
+            $order->customer = json_decode($order->customer_info);
+        }
+        if (!empty($order->bank_account_info)) {
+            $order->bankAccount = json_decode($order->bank_account_info);
+        }
+        foreach ($order->orderDetail as &$orderDetail) {
+            if (!empty($orderDetail->product_info)) {
+                $orderDetail->product = json_decode($orderDetail->product_info);
+            }
+        }
+        return $order;
     }
 }
