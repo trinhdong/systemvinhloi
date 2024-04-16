@@ -536,4 +536,12 @@ abstract class BaseRepository
             return false;
         }
     }
+    public function whereYear($key, $value)
+    {
+        return $this->model->whereYear($key, $value);
+    }
+    public function whereMonth($key, $value)
+    {
+        return $this->model->whereMonth($key, $value);
+    }
 }

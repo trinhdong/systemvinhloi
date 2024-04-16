@@ -1,6 +1,5 @@
 $(document).ready(function () {
     $('#approvePaymentModal').on('show.bs.modal', function (event) {
-        debugger
         const button = $(event.relatedTarget);
         const orderId = button.data('order-id');
         $('#approvePayment').attr('data-order-id', orderId);

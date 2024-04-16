@@ -13,7 +13,7 @@ table.last-child-right tr td:last-child {
     }
     .col-left{
         min-width: 450px;
-        margin-right:10px; 
+        margin-right:10px;
     }
     .col-right{
         width: 640px;
