@@ -2,54 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\BankAccountRepository;
-use App\Repositories\CommentRepository;
 use App\Repositories\CustomerRepository;
-use App\Repositories\InvoiceRepository;
-use App\Repositories\OrderDetailRepository;
 use App\Repositories\ProductRepository;
-use App\Repositories\UserRepository;
+use App\Services\DashboardService;
 use App\Services\OrderService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function __construct(
-        OrderService $orderService,
-        CustomerRepository $customerRepository,
-        ProductRepository $productRepository,
-        OrderDetailRepository $orderDetailRepository,
-        CommentRepository $commentRepository,
-        UserRepository $userRepository,
-        BankAccountRepository $bankAccountRepository,
-        InvoiceRepository $invoiceRepository,
+        OrderService          $orderService,
+        CustomerRepository    $customerRepository,
+        ProductRepository     $productRepository,
+        DashboardService      $dashboardService
     )
     {
         $this->orderService = $orderService;
         $this->customerRepository = $customerRepository;
         $this->productRepository = $productRepository;
-        $this->orderDetailRepository = $orderDetailRepository;
-        $this->commentRepository = $commentRepository;
-        $this->userRepository = $userRepository;
-        $this->bankAccountRepository = $bankAccountRepository;
-        $this->invoiceRepository = $invoiceRepository;
+        $this->dashboardService = $dashboardService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-//        $orders = $this->orderService->getAll();
-//        $products = $this->productRepository->getAll();
-//        $comments = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERED])->pluck('created_at', 'order_id');
-//        $orderDetails = $this->orderDetailRepository->pluck('order_id', 'product_id');
-//        foreach ($products as $product) {
-//            if ($comments[$product->order]) {
-//
-//            }
-//        }
-//        $customers = $this->customerRepository->getAll();
-//        $totalOrder = count($orders);
-//        $totalProduct = count($products);
-//        $totalCustomer = count($customers);
-//        $totalPayment = $orders->where('status', COMPLETE)->sum('paid');
-        return view('dashboard');
+        $isAdmin = Auth::user()->role == ADMIN || Auth::user()->role == SUPER_ADMIN;
+        $isStocker = Auth::user()->role == STOCKER;
+        $formatDate = $this->dashboardService->getFormatDate($request->input());
+        $day = !empty($request->input('day')) ? '-' . $request->input('day') : '';
+        $month = !empty($request->input('month')) ? '-' . $request->input('month') : '-1';
+        $year = $request->input('year') ?? date('Y');
+        $yearPayment = $request->input('year_payment') ?? date('Y');
+        $customerId = $request->input('customer_id') ?? '';
+        $payment = $this->dashboardService->getPaymentData($customerId, $yearPayment);
+        $products = $this->productRepository->getAll();
+        $products = $this->dashboardService->addFieldQuantityDelivered($products, $formatDate, $year, $month,  $day);
+        $products = $this->dashboardService->addFieldQuantityInProcessing($products, $formatDate, $year, $month,  $day);
+        $customers = $this->customerRepository->getList('customer_name');
+        return view('dashboard', compact('products', 'isAdmin', 'isStocker', 'customers', 'payment'));
     }
 }

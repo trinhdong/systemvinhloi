@@ -247,6 +247,10 @@ class OrderController extends Controller
         if ($hasComment) {
             $this->commentRepository->deleteAll('order_id', $id);
         }
+        $invoice = $this->invoiceRepository->getWhere(['order_id' => intval($id)])->first();
+        if ($invoice !== null) {
+            $this->invoiceRepository->delete($invoice->id);
+        }
         if ($order && $this->orderDetailRepository->deleteAll('order_id', $id)) {
             DB::commit();
             return redirect()->route('order.index')->with(
@@ -472,7 +476,7 @@ class OrderController extends Controller
             return abort('404', 'Page not found');
         }
         $order = $this->orderService->find(intval($id));
-        if (in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
+        if (empty($order) || in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
             return abort('404', 'Page not found');
         }
         $invoice = $this->invoiceRepository->getWhere(['order_id' => intval($id)])->first();

@@ -58,6 +58,14 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function delivered()
+    {
+        return $this->hasOne(Comment::class)->where('order_id', $this->id)->where('status', DELIVERED);
+    }
+    public function inProcessing()
+    {
+        return $this->hasOne(Comment::class)->where('order_id', $this->id)->where('status', IN_PROCESSING);
+    }
 
     public function enableButtonByRole($role) {
         switch ($role) {

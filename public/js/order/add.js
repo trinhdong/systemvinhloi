@@ -445,7 +445,6 @@ function totalOrder() {
     let totalOrder = 0;
     let totalDiscount = 0;
     let totalProductOrder = 0;
-    debugger
     $('.productOrder td.total').each(function () {
         if ($(this).closest('tr').hasClass('d-none')) {
             return;

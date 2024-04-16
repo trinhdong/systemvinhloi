@@ -12,7 +12,7 @@
     <!--navigation-->
     <ul class="metismenu" id="menu">
         @if (Auth::user()->role === STOCKER || Auth::user()->role === WAREHOUSE_STAFF)
-            <li class="<?= (request()->is('dashboard*')) ? 'mm-active' : '' ?>">
+            <li class="<?= (request()->is('/*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('dashboard')}}">
                     <div class="parent-icon"><i class="lni lni-dashboard"></i>
                     </div>
@@ -21,7 +21,7 @@
             </li>
         @endif
         @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
-            <li class="<?= (request()->is('dashboard*')) ? 'mm-active' : '' ?>">
+            <li class="<?= (request()->is('/*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('dashboard')}}">
                     <div class="parent-icon"><i class="lni lni-dashboard"></i>
                     </div>
