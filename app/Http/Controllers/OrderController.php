@@ -313,6 +313,10 @@ class OrderController extends Controller
             if (($isAdmin || $isStocker) && isset($status) && $status == REJECTED) {
                 $dataUpdate = ['status' => REJECTED];
             }
+            if ($isAdmin && $dataUpdate['status'] === DELIVERED && $order->payment_status === PAID && $order->payment_check_type === ADMIN_CHECK_PAYMENT) {
+                $dataUpdate['payment_status'] = COMPLETE;
+                $dataUpdate['status'] = COMPLETE;
+            }
             if (!empty($dataUpdate['status']) && $this->orderService->update(intval($id), $dataUpdate)) {
 //                if (!empty($request->input('note'))) {
                     $this->commentRepository->create([

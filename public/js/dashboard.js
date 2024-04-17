@@ -63,7 +63,7 @@ $(function () {
     function getYears() {
         var currentYear = new Date().getFullYear();
         var years = [];
-        for (var i = currentYear; i >= currentYear - 20; i--) {
+        for (var i = currentYear; i >= currentYear - 5; i--) {
             years.push(i);
         }
         return years;
