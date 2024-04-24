@@ -7,6 +7,9 @@ use App\Repositories\OrderRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OrderDetailRepository;
 use App\Repositories\BankAccountRepository;
+use App\Repositories\InvoiceRepository;
+use App\Repositories\ProductRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +22,8 @@ class OrderService extends BaseService
     protected $customerService;
     protected $commentRepository;
     protected $bankAccountRepository;
+    protected $invoiceRepository;
+    protected $productRepository;
 
     public function __construct(
         OrderRepository $orderRepository,
@@ -26,7 +31,9 @@ class OrderService extends BaseService
         OrderDetailRepository $orderDetailRepository,
         CommentRepository $commentRepository,
         CustomerService $customerService,
-        BankAccountRepository $bankAccountRepository
+        BankAccountRepository $bankAccountRepository,
+        InvoiceRepository $invoiceRepository,
+        ProductRepository $productRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->discountRepository = $discountRepository;
@@ -34,6 +41,8 @@ class OrderService extends BaseService
         $this->customerService = $customerService;
         $this->commentRepository = $commentRepository;
         $this->bankAccountRepository = $bankAccountRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->productRepository = $productRepository;
         $this->setRepository();
     }
 
@@ -150,6 +159,57 @@ class OrderService extends BaseService
     private function processOrder(array $data, $id = null, &$msg = '')
     {
         DB::beginTransaction();
+        $data = $this->formatDataTypeOrder($data);
+        if (!$this->validateDataOrder($data, $msg)) {
+            return false;
+        }
+        $data['payment_status'] = UNPAID;
+        $data['status'] = DRAFT;
+        if ($id === null) {
+            $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
+            $data['order_number'] = $this->generateOrderNumber($data['customer_id']);
+            $order = $this->orderRepository->create($data, true);
+            if (!$order || !$this->processOrderDetail($data, $order->id)) {
+                DB::rollBack();
+                return false;
+            }
+            DB::commit();
+            return $order;
+        }
+        $isUpdateCustomer = $this->checkUpdateCustomer($data['customer_id'] ?? 0, $id);
+        $data['order_number'] = $this->generateOrderNumber($data['customer_id'] ?? 0, true, $isUpdateCustomer);
+        $data['paid'] = null;
+        $data['customer_info'] = null;
+        $data['bank_account_info'] = null;
+        $data['payment_check_type'] = UNCHECK_PAYMENT;
+        if (Auth::user()->role === STOCKER) {
+            $data = array_intersect_key($data, array_flip($this->listFieldstokerUpdateOrder()));
+            $data['has_update_quantity'] = HAD_UPDATE_QUANTITY;
+        } else {
+            $data['has_update_quantity'] = NOT_YET_UPDATE_QUANTITY;
+        }
+        if (!$this->processOrderDetail($data, $id)) {
+            DB::rollBack();
+            return false;
+        }
+
+        $order = $this->orderRepository->update($id, $data, true);
+        $comment = $this->commentRepository->getWhere(['order_id' => $order->id]);
+        if ($order->status === DRAFT && !$comment->isEmpty() && !$this->commentRepository->deleteAll('order_id', $order->id)
+        ) {
+            DB::rollBack();
+            return false;
+        }
+        if (!$order) {
+            DB::rollBack();
+            return false;
+        }
+        DB::commit();
+        return $order;
+    }
+
+    private function formatDataTypeOrder($data)
+    {
         $data['customer_id'] = intval($data['customer_id'] ?? 0);
         $data['order_total'] = floatval($data['order_total']);
         $data['order_discount'] = floatval($data['order_discount']);
@@ -188,15 +248,26 @@ class OrderService extends BaseService
                 $data['payment_date'] = $dayPaid->format(FORMAT_DATE);
             }
         }
-        if (!empty($data['deposit'])) {
-            $data['deposit'] = (float)str_replace(',', '', $data['deposit']);
+        if (isset($data['deposit'])) {
+            $data['deposit'] = $data['payment_type'] === DEPOSIT ? (float)str_replace(',', '', $data['deposit']) : null;
         }
+        $data['note'] = array_values($data['note']);
+        $data['is_print_red_invoice'] = intval($data['is_print_red_invoice'] ?? 0);
+        if (!empty($data['delivery_appointment_date'])) {
+            $deliveryAppointmentDate = \DateTime::createFromFormat(FORMAT_DATE_VN, $data['delivery_appointment_date']);
+            if ($deliveryAppointmentDate) {
+                $data['delivery_appointment_date'] = $deliveryAppointmentDate->format(FORMAT_DATE);
+            }
+        }
+        return $data;
+    }
+
+    private function validateDataOrder($data, &$msg)
+    {
         if (!empty($data['deposit']) && floatval($data['deposit']) >= floatval($data['order_total'])) {
             $msg = 'Vui lòng nhập số tiền cọc nhỏ hơn tổng tiền';
             return false;
         }
-        $data['note'] = array_values($data['note']);
-        $data['is_print_red_invoice'] = intval($data['is_print_red_invoice'] ?? 0);
         if (count($data['product_id']) !== count($data['quantity'])
             || count($data['product_id']) !== count($data['unit_price'])
             || count($data['product_id']) !== count($data['product_price'])
@@ -204,58 +275,14 @@ class OrderService extends BaseService
             || count($data['product_id']) !== count($data['discount_price'])
             || count($data['product_id']) !== count($data['note'])
         ) {
+            $msg = 'Có lỗi sảy ra, vui lòng thử lại';
             return false;
         }
-        if (!empty($data['delivery_appointment_date'])) {
-            $deliveryAppointmentDate = \DateTime::createFromFormat(FORMAT_DATE_VN, $data['delivery_appointment_date']);
-            if ($deliveryAppointmentDate) {
-                $data['delivery_appointment_date'] = $deliveryAppointmentDate->format(FORMAT_DATE);
-            }
-        }
-
-        $data['payment_status'] = UNPAID;
-        $data['status'] = DRAFT;
-        if ($id === null) {
-            $data['order_date'] = Date::now()->format(FORMAT_DATE_TIME);
-            $data['order_number'] = $this->generateOrderNumber($data['customer_id']);
-            $order = $this->orderRepository->create($data, true);
-            if (!$order || !$this->processOrderDetail($data, $order->id)) {
-                DB::rollBack();
-                return false;
-            }
-            DB::commit();
-            return $order;
-        }
-        $isUpdateCustomer = $this->checkUpdateCustomer($data['customer_id'] ?? 0, $id);
-        $data['order_number'] = $this->generateOrderNumber($data['customer_id'] ?? 0, true, $isUpdateCustomer);
-        $data['paid'] = null;
-        $data['customer_info'] = null;
-        $data['bank_account_info'] = null;
-        $data['payment_check_type'] = UNCHECK_PAYMENT;
-        if (Auth::user()->role === STOCKER) {
-            $data = array_intersect_key($data, array_flip($this->listFieldstokerUpdateOrder()));
-            $data['has_update_quantity'] = HAD_UPDATE_QUANTITY;
-        } else {
-            $data['has_update_quantity'] = null;
-        }
-        if (!$this->processOrderDetail($data, $id)) {
-            DB::rollBack();
+        if (!$this->validateTotalOrder($data)) {
+            $msg = 'Có lỗi sảy ra, vui lòng thử lại';
             return false;
         }
-
-        $order = $this->orderRepository->update($id, $data, true);
-        $comment = $this->commentRepository->getWhere(['order_id' => $order->id]);
-        if ($order->status === DRAFT && !$comment->isEmpty() && !$this->commentRepository->deleteAll('order_id', $order->id)
-        ) {
-            DB::rollBack();
-            return false;
-        }
-        if (!$order) {
-            DB::rollBack();
-            return false;
-        }
-        DB::commit();
-        return $order;
+        return true;
     }
 
     public function processOrderDetail(array $data, $orderId)
@@ -280,6 +307,9 @@ class OrderService extends BaseService
                 $orderDetails[$key]['note'] = $data['note'][$key];
                 $orderDetails[$key]['product_info'] = null;
             }
+        }
+        if (!$this->checkDuplicateOrderDetai($orderDetails)) {
+            return false;
         }
         $dataDelete = $orderDetailsIdMap;
         foreach ($orderDetails as $key => $orderDetail) {
@@ -513,5 +543,95 @@ class OrderService extends BaseService
             }
         }
         return $order;
+    }
+
+    public function printInvoice($order, $isDelivery)
+    {
+        $invoice = $this->invoiceRepository->getWhere(['order_id' => $order->id])->first();
+        $fileName = $order->order_number . '-' . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf';
+        $filePath = public_path('storage/pdf/deliveries/');
+        if ($isDelivery === null) {
+            $filePath = public_path('storage/pdf/invoices/');
+        }
+        if ($invoice !== null && $invoice->pdf_invoice_path !== null && file_exists($filePath . $invoice->pdf_invoice_path) && $isDelivery == null) {
+            return response()->file($filePath . $invoice->pdf_invoice_path);
+        }
+        if ($invoice !== null && $invoice->pdf_delivery_bill_path !== null && file_exists($filePath . $invoice->pdf_delivery_bill_path) && $isDelivery !== null) {
+            return response()->file($filePath . $invoice->pdf_delivery_bill_path);
+        }
+        $order = $this->replaceOrderDataInfo($order);
+        $dataCreate = [
+            'order_id' => $order->id,
+            'customer_id' => $order->customer_id,
+            'sale_id' => $order->created_by,
+        ];
+        $dataUpdate = [];
+        if ($isDelivery === null) {
+            $dataCreate['pdf_invoice_path'] = $fileName;
+            $dataUpdate['pdf_invoice_path'] = $fileName;
+        } else {
+            $dataCreate['pdf_delivery_bill_path'] = $fileName;
+            $dataUpdate['pdf_delivery_bill_path'] = $fileName;
+        }
+        if ($invoice === null) {
+            $invoice = $this->invoiceRepository->create($dataCreate);
+        } else {
+            $invoice = $this->invoiceRepository->update($invoice->id, $dataUpdate);
+        }
+        if (!$invoice) {
+            return abort('500', 'Data not found');
+        }
+        if ($isDelivery === null) {
+            $pdf = Pdf::loadView('order.orderInvoice', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
+            $pdf->set_paper('a4', 'landscape');
+        } else {
+            $pdf = Pdf::loadView('order.deliveryBill', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
+        }
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+        file_put_contents($filePath . $fileName, $pdf->output());
+        return response()->file($filePath . ($isDelivery === null ? $invoice->pdf_invoice_path : $invoice->pdf_delivery_bill_path));
+    }
+
+    private function checkDuplicateOrderDetai(array $orderDetails)
+    {
+        $seenProductIds = [];
+        foreach ($orderDetails as $orderDetail) {
+            $productId = $orderDetail['product_id'];
+            if (in_array($productId, $seenProductIds)) {
+                return false;
+            }
+            $seenProductIds[] = $productId;
+        }
+        return true;
+    }
+
+    private function validateTotalOrder($data)
+    {
+        $totalOrder = 0;
+        $totalProductPrice = 0;
+        $totalDiscountPrice = 0;
+        foreach ($data['product_id'] as $key => $productId) {
+            $product = $this->productRepository->find(intval($productId));
+            if (!$product) {
+                return false;
+            }
+            $quantityPerPackage = $product->quantity_per_package;
+            $unitPrice = floatval($data['unit_price'][$key]);
+            $quantity = intval($data['quantity'][$key]);
+            $discountPrice = floatval($data['discount_price'][$key]);
+            $productPrice = floatval($data['product_price'][$key]);
+            $totalOrder += $quantity * $unitPrice * $quantityPerPackage;
+            $totalDiscountPrice += $quantity * $discountPrice * $quantityPerPackage;
+            $totalProductPrice += $quantity * $productPrice * $quantityPerPackage;
+        }
+        if ($data['order_total'] !== $totalOrder
+            || $data['order_discount'] !== $totalDiscountPrice
+            || $data['order_total_product_price'] !== $totalProductPrice
+        ) {
+            return false;
+        }
+        return true;
     }
 }

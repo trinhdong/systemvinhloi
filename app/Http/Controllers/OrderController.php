@@ -10,11 +10,9 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\BankAccountRepository;
-use App\Repositories\InvoiceRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -25,7 +23,6 @@ class OrderController extends Controller
     protected $commentRepository;
     protected $userRepository;
     protected $bankAccountRepository;
-    protected $invoiceRepository;
 
     public function __construct(
         OrderService $orderService,
@@ -34,8 +31,7 @@ class OrderController extends Controller
         OrderDetailRepository $orderDetailRepository,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
-        BankAccountRepository $bankAccountRepository,
-        InvoiceRepository $invoiceRepository,
+        BankAccountRepository $bankAccountRepository
     )
     {
         $this->orderService = $orderService;
@@ -45,7 +41,6 @@ class OrderController extends Controller
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
         $this->bankAccountRepository = $bankAccountRepository;
-        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function index(Request $request)
@@ -483,47 +478,6 @@ class OrderController extends Controller
         if (empty($order) || in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
             return abort('404', 'Page not found');
         }
-        $invoice = $this->invoiceRepository->getWhere(['order_id' => intval($id)])->first();
-        $fileName = $order->order_number . '-' . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf';
-        $filePath = public_path('storage/pdf/deliveries/');
-        if ($isDelivery === null) {
-            $filePath = public_path('storage/pdf/invoices/');
-        }
-        if ($invoice !== null && file_exists($filePath . $invoice->pdf_invoice_path) && $isDelivery == null) {
-            return response()->file($filePath . $invoice->pdf_invoice_path);
-        }
-        if ($invoice !== null && file_exists($filePath . $invoice->pdf_delivery_bill_path) && $isDelivery !== null) {
-            return response()->file($filePath . $invoice->pdf_delivery_bill_path);
-        }
-        $order = $this->orderService->replaceOrderDataInfo($order);
-        $dataCreate = [
-            'order_id' => intval($id),
-            'customer_id' => $order->customer_id,
-            'sale_id' => $order->created_by,
-        ];
-        $dataUpdate = [];
-        if ($isDelivery === null) {
-            $dataCreate['pdf_invoice_path'] = $fileName;
-            $dataUpdate['pdf_invoice_path'] = $fileName;
-        } else {
-            $dataCreate['pdf_delivery_bill_path'] = $fileName;
-            $dataUpdate['pdf_delivery_bill_path'] = $fileName;
-        }
-        if ($invoice === null) {
-            $invoice = $this->invoiceRepository->create($dataCreate);
-        } else {
-            $invoice = $this->invoiceRepository->update($invoice->id, $dataUpdate);
-        }
-        if ($isDelivery === null) {
-            $pdf = Pdf::loadView('order.orderInvoice', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
-            $pdf->set_paper('a4', 'landscape');
-        } else {
-            $pdf = Pdf::loadView('order.deliveryBill', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
-        }
-        if (!is_dir($filePath)) {
-            mkdir($filePath, 0777, true);
-        }
-        file_put_contents($filePath . $fileName, $pdf->output());
-        return response()->file($filePath . ($isDelivery === null ? $invoice->pdf_invoice_path : $invoice->pdf_delivery_bill_path));
+        return $this->orderService->printInvoice($order, $isDelivery);
     }
 }
