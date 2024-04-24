@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        $tables = ['users', 'categories', 'products', 'areas', 'customers', 'orders', 'order_details', 'discounts'];
+        $tables = ['users', 'categories', 'products', 'areas', 'customers', 'orders', 'order_details', 'discounts', 'employee_customers'];
 
         foreach ($tables as $table) {
             Schema::table($table, function (Blueprint $table) {

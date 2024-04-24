@@ -78,7 +78,7 @@ class OrderController extends Controller
             unset($statusList[COMPLETE]);
             unset($statusList[REJECTED]);
         }
-        $orders = $this->orderService->searchQuery($query, $input);
+        $orders = $this->orderService->searchQuery($query, $input, $isSale);
         $customers = $this->customerRepository->getList('customer_name');
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));

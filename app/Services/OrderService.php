@@ -42,7 +42,7 @@ class OrderService extends BaseService
         return OrderRepository::class;
     }
 
-    public function searchQuery($query, $request = [])
+    public function searchQuery($query, $request = [], $isSale)
     {
         $filters = [
             'order_number' => [

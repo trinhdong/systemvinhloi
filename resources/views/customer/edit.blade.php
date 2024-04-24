@@ -2,6 +2,8 @@
 @section('title')
     Khách hàng
 @endsection
+@section('css')
+@endsection
 @section('action')
     <div class="col-12">
         <a href="{{route('customer.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
@@ -60,6 +62,13 @@
                                 @endforeach
                             </select>
                             <div class="invalid-feedback">Vui lòng chọn khu vực</div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                            <label for="validationRole" class="form-label">Khu vực</label>
+                            <select class="select-customer" id="select-customer" name="customers[]" multiple="multiple">
+                                <option value="AL">Alabama</option>
+                                <option value="WY">Wyoming</option>
+                            </select>
                         </div>
                     </div>
                     @include('customer.editDiscount', compact('products', 'categories', 'customer', 'categoryIds', 'productPrice'), ['discounts' => $customer->discount])

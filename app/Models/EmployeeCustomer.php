@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeCustomer extends Model
 {
+    use HasFactory, SoftDeletes;
     protected $table = 'employee_customers';
 
     protected $fillable = [
@@ -19,6 +22,6 @@ class EmployeeCustomer extends Model
     }
 
     public function customer() {
-        return $this->belongsTo(Customer::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
 }

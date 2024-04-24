@@ -9,8 +9,10 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\CustomerRepository;
 use App\Services\CustomerService;
+use App\Services\EmployeeCustomerService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
@@ -22,6 +24,7 @@ class CustomerController extends Controller
     protected $discountRepository;
     protected $customerRepository;
     protected $productService;
+    protected $employeeCustomerService;
 
     public function __construct(
         CustomerService $customerService,
@@ -30,7 +33,8 @@ class CustomerController extends Controller
         CategoryRepository $categoryRepository,
         DiscountRepository $discountRepository,
         CustomerRepository $customerRepository,
-        ProductService $productService
+        ProductService $productService,
+        EmployeeCustomerService $employeeCustomerService
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;
@@ -39,6 +43,7 @@ class CustomerController extends Controller
         $this->discountRepository = $discountRepository;
         $this->customerRepository = $customerRepository;
         $this->productService = $productService;
+        $this->employeeCustomerService = $employeeCustomerService;
     }
 
     public function index(Request $request)
@@ -46,8 +51,10 @@ class CustomerController extends Controller
         $areas = $this->areaRepository->getList();
         $categories = $this->categoryRepository->getList('category_name');
         $query = $request->input('query');
-        $customers = $this->customerService->searchQuery($query, $request->input());
-        return view('customer.index', compact('customers', 'areas', 'categories'));
+        $isSale =  Auth::user()->role == SALE;
+        $isAdmin = Auth::user()->role == ADMIN || Auth::user()->role == SUPER_ADMIN;
+        $customers = $this->customerService->searchQuery($query, $request->input(), $isSale);
+        return view('customer.index', compact('customers', 'areas', 'categories', 'isAdmin'));
     }
 
     public function detail($id)
@@ -76,7 +83,8 @@ class CustomerController extends Controller
         $data = $request->only(
             ['customer_name', 'email', 'phone', 'address', 'area_id', 'product_id', 'discount_percent', 'discount_price', 'tax_code', 'company', 'company_address', 'note']
         );
-        $customer = $this->customerService->createCustomer($data);
+        $isSale =  Auth::user()->role == SALE;
+        $customer = $this->customerService->createCustomer($data, $isSale);
         if ($customer) {
             return redirect()->route('customer.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Thêm khách hàng thành công']
@@ -103,9 +111,10 @@ class CustomerController extends Controller
             $categories = $this->categoryRepository->getList('category_name');
             $categoryIds = $this->productRepository->getList('category_id');
             $productPrice = $this->productRepository->getList('price');
+            $customers = $this->customerRepository->getList('customer_name')->toArray();
             return view(
                 'customer.edit',
-                compact('customer', 'areas', 'products', 'categories', 'categoryIds', 'productPrice')
+                compact('customer', 'areas', 'products', 'categories', 'categoryIds', 'productPrice', 'customers')
             );
         }
 
