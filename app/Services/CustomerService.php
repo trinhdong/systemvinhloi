@@ -145,6 +145,9 @@ class CustomerService extends BaseService
             $discounts[$key]['note'] = $data['note'][$key];
             $discounts[$key]['customer_id'] = $customerId;
         }
+        if (!$this->checkDuplicateDiscount($discounts)) {
+            return false;
+        }
         foreach ($discounts as $key => $discount) {
             if (in_array($discount['product_id'], $discountsProductIdMap)) {
                 $discountId = $discountsIdMap[$discount['product_id']];
@@ -156,6 +159,19 @@ class CustomerService extends BaseService
             if (!$this->discountRepository->create($discount, true)) {
                 return false;
             }
+        }
+        return true;
+    }
+
+    private function checkDuplicateDiscount(array $discounts)
+    {
+        $seenProductIds = [];
+        foreach ($discounts as $discount) {
+            $productId = $discount['product_id'];
+            if (in_array($productId, $seenProductIds)) {
+                return false;
+            }
+            $seenProductIds[] = $productId;
         }
         return true;
     }

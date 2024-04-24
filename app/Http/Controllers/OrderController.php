@@ -4,17 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUpdateOrderRequest;
 use App\Repositories\CategoryRepository;
+use App\Repositories\InvoiceRepository;
 use App\Repositories\UserRepository;
 use App\Services\OrderService;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\BankAccountRepository;
-use App\Repositories\InvoiceRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -35,7 +34,7 @@ class OrderController extends Controller
         CommentRepository $commentRepository,
         UserRepository $userRepository,
         BankAccountRepository $bankAccountRepository,
-        InvoiceRepository $invoiceRepository,
+        InvoiceRepository $invoiceRepository
     )
     {
         $this->orderService = $orderService;
@@ -78,7 +77,10 @@ class OrderController extends Controller
             unset($statusList[COMPLETE]);
             unset($statusList[REJECTED]);
         }
-        $orders = $this->orderService->searchQuery($query, $input, $isSale);
+        $orders = $this->orderService->searchQuery($query, $input);
+        foreach ($orders as &$order) {
+            $order = $this->orderService->replaceOrderDataInfo($order);
+        }
         $customers = $this->customerRepository->getList('customer_name');
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
@@ -190,9 +192,7 @@ class OrderController extends Controller
             $discountsPrice = $this->orderService->mapDiscountsPrice();
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discountsNote = $this->orderService->mapDiscountsNote();
-            if (Auth::user()->role == STOCKER) {
-                $order = $this->orderService->replaceOrderDataInfo($order);
-            }
+            $order = $this->orderService->replaceOrderDataInfo($order);
             return view('order.edit', compact('order', 'customers', 'categories', 'discounts', 'discountsPrice', 'bankAccounts', 'discountsNote'));
         }
 
@@ -239,7 +239,7 @@ class OrderController extends Controller
     public function delete(int $id)
     {
         DB::beginTransaction();
-        $order = $this->orderService->delete($id, true);
+        $order = $this->orderDetailRepository->delete($id, true);
         if (!in_array(Auth::user()->role, [ADMIN, SUPER_ADMIN]) && in_array($order->status, [IN_PROCESSING, DELIVERY, DELIVERED, COMPLETE])) {
             return abort(403, 'Unauthorized');
         }
@@ -294,15 +294,6 @@ class OrderController extends Controller
                 if ($order->payment_type === DEPOSIT) {
                     $dataUpdate['payment_status'] = DEPOSITED;
                 }
-                $dataUpdate['customer_info'] = json_encode($order->customer);
-                if (!empty($order->bankAccount)) {
-                    $dataUpdate['bank_account_info'] = json_encode($order->bankAccount);
-                }
-                if (!$this->orderService->updateProductInfo($order)) {
-                    return redirect()->route($isStocker ? 'stocker.order.detail' : 'order.detail', $id)->with(
-                        ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái đơn hàng thất bại']
-                    );
-                }
             }
             if (($isAdmin || $isStocker) && $order->status == IN_PROCESSING) {
                 $dataUpdate['status'] = DELIVERY;
@@ -312,6 +303,10 @@ class OrderController extends Controller
             }
             if (($isAdmin || $isStocker) && isset($status) && $status == REJECTED) {
                 $dataUpdate = ['status' => REJECTED];
+            }
+            if ($isAdmin && $dataUpdate['status'] === DELIVERED && $order->payment_status === PAID && $order->payment_check_type === ADMIN_CHECK_PAYMENT) {
+                $dataUpdate['payment_status'] = COMPLETE;
+                $dataUpdate['status'] = COMPLETE;
             }
             if (!empty($dataUpdate['status']) && $this->orderService->update(intval($id), $dataUpdate)) {
 //                if (!empty($request->input('note'))) {
@@ -345,9 +340,7 @@ class OrderController extends Controller
         unset($statusList[IN_PROCESSING]);
         $orders = $this->orderService->searchQuery($query, $input);
         foreach ($orders as &$order) {
-            if (!empty($order->bank_account_info)) {
-                $order->bankAccount = json_decode($order->bank_account_info);
-            }
+            $order = $this->orderService->replaceOrderDataInfo($order);
         }
         $customers = $this->customerRepository->getList('customer_name');
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
@@ -479,47 +472,6 @@ class OrderController extends Controller
         if (empty($order) || in_array($order->status, [DRAFT, REJECTED, IN_PROCESSING])) {
             return abort('404', 'Page not found');
         }
-        $invoice = $this->invoiceRepository->getWhere(['order_id' => intval($id)])->first();
-        $fileName = $order->order_number . '-' . date(FORMAT_DATE_TIME_VN_PATH) . '.pdf';
-        $filePath = public_path('storage/pdf/deliveries/');
-        if ($isDelivery === null) {
-            $filePath = public_path('storage/pdf/invoices/');
-        }
-        if ($invoice !== null && file_exists($filePath . $invoice->pdf_invoice_path) && $isDelivery == null) {
-            return response()->file($filePath . $invoice->pdf_invoice_path);
-        }
-        if ($invoice !== null && file_exists($filePath . $invoice->pdf_delivery_bill_path) && $isDelivery !== null) {
-            return response()->file($filePath . $invoice->pdf_delivery_bill_path);
-        }
-        $order = $this->orderService->replaceOrderDataInfo($order);
-        $dataCreate = [
-            'order_id' => intval($id),
-            'customer_id' => $order->customer_id,
-            'sale_id' => $order->created_by,
-        ];
-        $dataUpdate = [];
-        if ($isDelivery === null) {
-            $dataCreate['pdf_invoice_path'] = $fileName;
-            $dataUpdate['pdf_invoice_path'] = $fileName;
-        } else {
-            $dataCreate['pdf_delivery_bill_path'] = $fileName;
-            $dataUpdate['pdf_delivery_bill_path'] = $fileName;
-        }
-        if ($invoice === null) {
-            $invoice = $this->invoiceRepository->create($dataCreate);
-        } else {
-            $invoice = $this->invoiceRepository->update($invoice->id, $dataUpdate);
-        }
-        if ($isDelivery === null) {
-            $pdf = Pdf::loadView('order.orderInvoice', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
-            $pdf->set_paper('a4', 'landscape');
-        } else {
-            $pdf = Pdf::loadView('order.deliveryBill', compact('order'), ['invoiceId' => str_pad($invoice->id, 6, "0", STR_PAD_LEFT)]);
-        }
-        if (!is_dir($filePath)) {
-            mkdir($filePath, 0777, true);
-        }
-        file_put_contents($filePath . $fileName, $pdf->output());
-        return response()->file($filePath . ($isDelivery === null ? $invoice->pdf_invoice_path : $invoice->pdf_delivery_bill_path));
+        return $this->orderService->printInvoice($order, $isDelivery);
     }
 }

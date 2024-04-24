@@ -71,6 +71,7 @@
 @endsection
 @if($isAdmin)
 @section('script')
+    <script src="js/dashboard.js"></script>
     <script>
         var options = {
             chart: {
@@ -92,9 +93,7 @@
                 categories: {!! json_encode(array_keys($payment)) !!}
             },
         }
-
         var chart = new ApexCharts(document.querySelector("#chart"), options);
-
         chart.render();
     </script>
 @endsection

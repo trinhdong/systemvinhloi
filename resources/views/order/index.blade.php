@@ -114,7 +114,7 @@
                                     <tr style="background-color: {{$isLastDayDelivered ? 'red' : ''}}">
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
-                                        <td>{{ $customers[$order->customer_id] }}</td>
+                                        <td>{{ $order->customer->customer_name }}</td>
                                         @if($isAdmin || $isAccountant)
                                         <td>{{ $order->user->name ?? '' }}</td>
                                         @endif

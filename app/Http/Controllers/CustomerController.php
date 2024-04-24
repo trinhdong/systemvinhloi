@@ -8,6 +8,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\CustomerRepository;
+use App\Repositories\OrderRepository;
 use App\Services\CustomerService;
 use App\Services\EmployeeCustomerService;
 use App\Services\ProductService;
@@ -25,6 +26,7 @@ class CustomerController extends Controller
     protected $customerRepository;
     protected $productService;
     protected $employeeCustomerService;
+    protected $orderRepository;
 
     public function __construct(
         CustomerService $customerService,
@@ -34,7 +36,8 @@ class CustomerController extends Controller
         DiscountRepository $discountRepository,
         CustomerRepository $customerRepository,
         ProductService $productService,
-        EmployeeCustomerService $employeeCustomerService
+        EmployeeCustomerService $employeeCustomerService,
+        OrderRepository $orderRepository
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;
@@ -44,6 +47,7 @@ class CustomerController extends Controller
         $this->customerRepository = $customerRepository;
         $this->productService = $productService;
         $this->employeeCustomerService = $employeeCustomerService;
+        $this->orderRepository = $orderRepository;
     }
 
     public function index(Request $request)
@@ -137,14 +141,18 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         $customer = $this->customerRepository->delete($id, true);
-        if ($customer && $this->discountRepository->deleteAll('customer_id', $id)) {
+        if ($customer) {
+            $hasDiscounts = $this->discountRepository->getWhere(['customer_id' => $id])->count() > 0;
+            if ($hasDiscounts) {
+                $this->discountRepository->deleteAll('customer_id', $id);
+            }
             DB::commit();
-            return redirect()->route('order.index')->with(
+            return redirect()->route('customer.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Xóa thành công']
             );
         }
         DB::rollBack();
-        return redirect()->route('order.index')->with(
+        return redirect()->route('customer.index')->with(
             ['flash_level' => 'error', 'flash_message' => 'Lỗi không thể xóa khách hàng']
         );
     }

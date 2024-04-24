@@ -69,7 +69,6 @@
     <script src="assets/js/jquery.formatCurrency-1.4.0.min.js"></script>
     <script src="assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
     <script src="assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
-    <script src="assets/js/table-datatable.js"></script>
     <script src="assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
     <!--app-->
     <script src="assets/js/app.js"></script>
