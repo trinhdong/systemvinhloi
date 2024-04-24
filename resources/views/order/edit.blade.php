@@ -240,7 +240,7 @@
                                                         </td>
                                                         <input type="hidden" class="quantity-per-package" value="{{$orderDetail->product->quantity_per_package}}">
                                                         <td class="total-quantity">
-                                                            {{$orderDetail->quantity*$orderDetail->product->quantity_per_package}}
+                                                            {{number_format($orderDetail->quantity*$orderDetail->product->quantity_per_package)}}
                                                         </td>
                                                         <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity*$orderDetail->product->quantity_per_package)}}</td>
                                                     </tr>

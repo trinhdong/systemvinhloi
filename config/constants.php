@@ -107,6 +107,7 @@ const STATUS_CHECK_PAYMENT = [
     ADMIN_CHECK_PAYMENT => 'Admin đã xác nhận',
     REJECTED => 'Admin đã từ chối thanh toán',
 ];
+const NOT_YET_UPDATE_QUANTITY = 0;
 const HAD_UPDATE_QUANTITY = 1;
 const PRINTED_RED_INVOICE = 1;
 const NOT_YET_RED_INVOICE = 0;
