@@ -123,7 +123,7 @@
                                     >
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $key + 1 }}</td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $order->order_number }}</td>
-                                        <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $customers[$order->customer_id] }}</td>
+                                        <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $order->customer->customer_name }}</td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $order->user->name ?? '' }}</td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ number_format($order->order_total) }}</td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ !empty($order->bankAccount) ? $order->bankAccount->bank_code . '-' . $order->bankAccount->bank_account_name : '' }}</td>

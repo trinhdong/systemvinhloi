@@ -542,6 +542,10 @@ function appendProduct(customerId, productId, productName, productPrice, product
     const unitPriceFormat = new Intl.NumberFormat("en", {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
+    }).format(productPrice);
+    const totalOrderFormat = new Intl.NumberFormat("en", {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
     }).format(productPrice*productQuantityPerPackage);
     const $productOrder = $('#orderlist').find('.productOrder.d-none').clone();
     $productOrder.removeClass('d-none');
@@ -563,16 +567,20 @@ function appendProduct(customerId, productId, productName, productPrice, product
         minimumFractionDigits: 0,
     }).format(productQuantityPerPackage));
     $productOrder.find('.quantity-per-package').val(productQuantityPerPackage);
-    $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice*productQuantityPerPackage);
+    $productOrder.find('.unit-price').closest('td').find('input:hidden').val(productPrice);
     $productOrder.find('.product-price').closest('td').find('input:hidden').val(productPrice);
-    $productOrder.find('.total').text(unitPriceFormat);
+    $productOrder.find('.total').text(totalOrderFormat);
     $productOrder.find('.quantity input').val(1);
     $productOrder.find('.discount-note').text('');
     if (!isNaN(customerId) && !isNaN(discounts[customerId + '_' + productId]) && !isNaN(discountsPrice[customerId + '_' + productId])) {
         const discountPercent = discounts[customerId + '_' + productId];
         const discountPrice = discountsPrice[customerId + '_' + productId];
         const discountNote = discountsNote[customerId + '_' + productId] || '';
-        const pricePercent = new Intl.NumberFormat("en", {
+        const unitPriceFormatP = new Intl.NumberFormat("en", {
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0,
+        }).format(Math.max(productPrice - discountPrice, 0))
+        const totalPriceFormatP = new Intl.NumberFormat("en", {
             maximumFractionDigits: 0,
             minimumFractionDigits: 0,
         }).format(Math.max(productPrice*productQuantityPerPackage - discountPrice*productQuantityPerPackage, 0))
@@ -585,9 +593,9 @@ function appendProduct(customerId, productId, productName, productPrice, product
             minimumFractionDigits: 0,
         }).format(discountsPrice[customerId + '_' + productId]));
         $productOrder.find('.discount-note').text(discountNote);
-        $productOrder.find('.unit-price').text(pricePercent);
-        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice*productQuantityPerPackage - discountPrice*productQuantityPerPackage, 0))
-        $productOrder.find('.total').text(pricePercent);
+        $productOrder.find('.unit-price').text(unitPriceFormatP);
+        $productOrder.find('.unit-price').closest('td').find('input:hidden').val(Math.max(productPrice - discountPrice, 0))
+        $productOrder.find('.total').text(totalPriceFormatP);
     }
     $('#orderlist').prepend($productOrder);
     $('#empty-row').addClass('d-none');

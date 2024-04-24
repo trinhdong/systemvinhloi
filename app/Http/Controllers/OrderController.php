@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUpdateOrderRequest;
 use App\Repositories\CategoryRepository;
+use App\Repositories\InvoiceRepository;
 use App\Repositories\UserRepository;
 use App\Services\OrderService;
 use App\Repositories\CustomerRepository;
@@ -23,6 +24,7 @@ class OrderController extends Controller
     protected $commentRepository;
     protected $userRepository;
     protected $bankAccountRepository;
+    protected $invoiceRepository;
 
     public function __construct(
         OrderService $orderService,
@@ -31,7 +33,8 @@ class OrderController extends Controller
         OrderDetailRepository $orderDetailRepository,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
-        BankAccountRepository $bankAccountRepository
+        BankAccountRepository $bankAccountRepository,
+        InvoiceRepository $invoiceRepository
     )
     {
         $this->orderService = $orderService;
@@ -41,6 +44,7 @@ class OrderController extends Controller
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
         $this->bankAccountRepository = $bankAccountRepository;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function index(Request $request)
@@ -74,6 +78,9 @@ class OrderController extends Controller
             unset($statusList[REJECTED]);
         }
         $orders = $this->orderService->searchQuery($query, $input);
+        foreach ($orders as &$order) {
+            $order = $this->orderService->replaceOrderDataInfo($order);
+        }
         $customers = $this->customerRepository->getList('customer_name');
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
@@ -185,9 +192,7 @@ class OrderController extends Controller
             $discountsPrice = $this->orderService->mapDiscountsPrice();
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discountsNote = $this->orderService->mapDiscountsNote();
-            if (Auth::user()->role == STOCKER) {
-                $order = $this->orderService->replaceOrderDataInfo($order);
-            }
+            $order = $this->orderService->replaceOrderDataInfo($order);
             return view('order.edit', compact('order', 'customers', 'categories', 'discounts', 'discountsPrice', 'bankAccounts', 'discountsNote'));
         }
 
@@ -234,7 +239,7 @@ class OrderController extends Controller
     public function delete(int $id)
     {
         DB::beginTransaction();
-        $order = $this->orderService->delete($id, true);
+        $order = $this->orderDetailRepository->delete($id, true);
         if (!in_array(Auth::user()->role, [ADMIN, SUPER_ADMIN]) && in_array($order->status, [IN_PROCESSING, DELIVERY, DELIVERED, COMPLETE])) {
             return abort(403, 'Unauthorized');
         }
@@ -289,15 +294,6 @@ class OrderController extends Controller
                 if ($order->payment_type === DEPOSIT) {
                     $dataUpdate['payment_status'] = DEPOSITED;
                 }
-                $dataUpdate['customer_info'] = json_encode($order->customer);
-                if (!empty($order->bankAccount)) {
-                    $dataUpdate['bank_account_info'] = json_encode($order->bankAccount);
-                }
-                if (!$this->orderService->updateProductInfo($order)) {
-                    return redirect()->route($isStocker ? 'stocker.order.detail' : 'order.detail', $id)->with(
-                        ['flash_level' => 'error', 'flash_message' => 'Cập nhật trạng thái đơn hàng thất bại']
-                    );
-                }
             }
             if (($isAdmin || $isStocker) && $order->status == IN_PROCESSING) {
                 $dataUpdate['status'] = DELIVERY;
@@ -344,9 +340,7 @@ class OrderController extends Controller
         unset($statusList[IN_PROCESSING]);
         $orders = $this->orderService->searchQuery($query, $input);
         foreach ($orders as &$order) {
-            if (!empty($order->bank_account_info)) {
-                $order->bankAccount = json_decode($order->bank_account_info);
-            }
+            $order = $this->orderService->replaceOrderDataInfo($order);
         }
         $customers = $this->customerRepository->getList('customer_name');
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');

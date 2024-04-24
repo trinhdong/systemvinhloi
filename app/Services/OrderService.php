@@ -156,10 +156,37 @@ class OrderService extends BaseService
         ];
     }
 
+    private function updateCustomerInfo($data) {
+        $customer = $this->customerService->find(intval($data['customer_id'] ?? 0));
+        if (!empty($customer)) {
+            $data['customer_info'] = json_encode($customer);
+        }
+        return $data;
+    }
+
+    private function updateBankAccountInfo($data) {
+        $bankAccount = $this->bankAccountRepository->find(intval($data['bank_account_id'] ?? 0));
+        $data['bank_account_info'] = null;
+        if (!empty($bankAccount)) {
+            $data['bank_account_info'] = json_encode($bankAccount);
+        }
+        return $data;
+    }
+
+    private function updateProductInfo($productId) {
+        $product = $this->productRepository->find(intval($productId ?? 0));
+        if (!empty($product)) {
+            return json_encode($product);
+        }
+        return null;
+    }
+
     private function processOrder(array $data, $id = null, &$msg = '')
     {
         DB::beginTransaction();
         $data = $this->formatDataTypeOrder($data);
+        $data = $this->updateCustomerInfo($data);
+        $data = $this->updateBankAccountInfo($data);
         if (!$this->validateDataOrder($data, $msg)) {
             return false;
         }
@@ -179,8 +206,6 @@ class OrderService extends BaseService
         $isUpdateCustomer = $this->checkUpdateCustomer($data['customer_id'] ?? 0, $id);
         $data['order_number'] = $this->generateOrderNumber($data['customer_id'] ?? 0, true, $isUpdateCustomer);
         $data['paid'] = null;
-        $data['customer_info'] = null;
-        $data['bank_account_info'] = null;
         $data['payment_check_type'] = UNCHECK_PAYMENT;
         if (Auth::user()->role === STOCKER) {
             $data = array_intersect_key($data, array_flip($this->listFieldstokerUpdateOrder()));
@@ -194,13 +219,13 @@ class OrderService extends BaseService
         }
 
         $order = $this->orderRepository->update($id, $data, true);
-        $comment = $this->commentRepository->getWhere(['order_id' => $order->id]);
-        if ($order->status === DRAFT && !$comment->isEmpty() && !$this->commentRepository->deleteAll('order_id', $order->id)
-        ) {
+        if (!$order) {
             DB::rollBack();
             return false;
         }
-        if (!$order) {
+        $comment = $this->commentRepository->getWhere(['order_id' => $order->id]);
+        if ($order->status === DRAFT && !$comment->isEmpty() && !$this->commentRepository->deleteAll('order_id', $order->id)
+        ) {
             DB::rollBack();
             return false;
         }
@@ -305,7 +330,7 @@ class OrderService extends BaseService
                 $orderDetails[$key]['discount_price'] = floatval($data['discount_price'][$key]);
                 $orderDetails[$key]['discount_note'] = $discountNote[$data['customer_id'] . '_' . intval($productId)] ?? null;
                 $orderDetails[$key]['note'] = $data['note'][$key];
-                $orderDetails[$key]['product_info'] = null;
+                $orderDetails[$key]['product_info'] = $this->updateProductInfo($productId);
             }
         }
         if (!$this->checkDuplicateOrderDetai($orderDetails)) {
@@ -480,19 +505,6 @@ class OrderService extends BaseService
     public function getDiscountByCustomerId(int $customerId, array $productIdsNotIn = [])
     {
         return $this->discountRepository->getDiscountByCustomerId($customerId, $productIdsNotIn);
-    }
-
-    public function updateProductInfo($order)
-    {
-        foreach ($order->orderDetail as $orderDetail) {
-            DB::beginTransaction();
-            if (!$this->orderDetailRepository->update($orderDetail->id, ['product_info' => json_encode($orderDetail->product)], true)) {
-                DB::rollBack();
-                return false;
-            }
-            DB::commit();
-        }
-        return true;
     }
 
     public function updateComment($id, $order, $data, $type)

@@ -8,6 +8,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\CustomerRepository;
+use App\Repositories\OrderRepository;
 use App\Services\CustomerService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class CustomerController extends Controller
     protected $discountRepository;
     protected $customerRepository;
     protected $productService;
+    protected $orderRepository;
 
     public function __construct(
         CustomerService $customerService,
@@ -30,7 +32,8 @@ class CustomerController extends Controller
         CategoryRepository $categoryRepository,
         DiscountRepository $discountRepository,
         CustomerRepository $customerRepository,
-        ProductService $productService
+        ProductService $productService,
+        OrderRepository $orderRepository
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;
@@ -39,6 +42,7 @@ class CustomerController extends Controller
         $this->discountRepository = $discountRepository;
         $this->customerRepository = $customerRepository;
         $this->productService = $productService;
+        $this->orderRepository = $orderRepository;
     }
 
     public function index(Request $request)
@@ -128,14 +132,18 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         $customer = $this->customerRepository->delete($id, true);
-        if ($customer && $this->discountRepository->deleteAll('customer_id', $id)) {
+        if ($customer) {
+            $hasDiscounts = $this->discountRepository->getWhere(['customer_id' => $id])->count() > 0;
+            if ($hasDiscounts) {
+                $this->discountRepository->deleteAll('customer_id', $id);
+            }
             DB::commit();
-            return redirect()->route('order.index')->with(
+            return redirect()->route('customer.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Xóa thành công']
             );
         }
         DB::rollBack();
-        return redirect()->route('order.index')->with(
+        return redirect()->route('customer.index')->with(
             ['flash_level' => 'error', 'flash_message' => 'Lỗi không thể xóa khách hàng']
         );
     }
