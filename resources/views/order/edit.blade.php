@@ -28,7 +28,7 @@
                             </div>
                             <div class="col-5 d-flex justify-content-start align-items-center">
                                 <h5 class="mb-0 me-3">Khách hàng: </h5>
-                                <select id="customer" name="customer_id" class="form-select single-select" style="width: 250px">
+                                <select id="customer" name="customer_id" class="form-select single-select" style="width: 250px" @if(!empty($order->customer)) data-customer="{{json_encode($order->customer)}}" @endif>
                                     <option selected="" disabled="" value="">Chọn khách hàng</option>
                                     @foreach($customers as $customerId => $customerName)
                                         <option value="{{ $customerId }}"

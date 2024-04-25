@@ -81,7 +81,7 @@ class OrderController extends Controller
         foreach ($orders as &$order) {
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
-        $customers = $this->customerRepository->getList('customer_name');
+        $customers = $this->orderService->mapCustomers();
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
     }
@@ -193,6 +193,10 @@ class OrderController extends Controller
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discountsNote = $this->orderService->mapDiscountsNote();
             $order = $this->orderService->replaceOrderDataInfo($order);
+            if (!empty($order->customer) && !array_key_exists($order->customer->id, $customers->toArray())) {
+                $customers[$order->customer->id] = $order->customer->customer_name;
+            }
+
             return view('order.edit', compact('order', 'customers', 'categories', 'discounts', 'discountsPrice', 'bankAccounts', 'discountsNote'));
         }
 
@@ -342,7 +346,7 @@ class OrderController extends Controller
         foreach ($orders as &$order) {
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
-        $customers = $this->customerRepository->getList('customer_name');
+        $customers = $this->orderService->mapCustomers();
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
         $deliveredDates = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERED])->pluck('created_at', 'order_id');
         $dateDeliverys = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERY])->pluck('created_at', 'order_id');

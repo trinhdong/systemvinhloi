@@ -646,4 +646,14 @@ class OrderService extends BaseService
         }
         return true;
     }
+    public function mapCustomers()
+    {
+        $customerInfos = $this->orderRepository->getList('customer_info');
+        $customers = [];
+        foreach ($customerInfos as $customer) {
+            $customer = json_decode($customer);
+            $customers[$customer->id] = $customer->customer_name;
+        }
+        return $customers;
+    }
 }
