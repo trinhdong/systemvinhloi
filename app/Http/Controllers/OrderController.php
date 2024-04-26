@@ -198,13 +198,13 @@ class OrderController extends Controller
             }
             foreach($order->orderDetail as $orderDetail) {
                 $key = $order->customer->id . '_' . $orderDetail->product_id;
-                if (!array_key_exists($key, $discounts)) {
+                if (!empty($orderDetail->discount_customer_info) && !array_key_exists($key, $discounts)) {
                     $discounts[$key] = $orderDetail->discount_percent;
                 }
-                if (!array_key_exists($key, $discountsPrice)) {
+                if (!empty($orderDetail->discount_customer_info) && !array_key_exists($key, $discountsPrice)) {
                     $discountsPrice[$key] = $orderDetail->discount_price;
                 }
-                if (!array_key_exists($key, $discountsNote)) {
+                if (!empty($orderDetail->discount_customer_info) && !array_key_exists($key, $discountsNote)) {
                     $discountsNote[$key] = $orderDetail->discount_note;
                 }
             }
