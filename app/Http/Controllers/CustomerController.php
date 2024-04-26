@@ -133,6 +133,10 @@ class CustomerController extends Controller
         DB::beginTransaction();
         $customer = $this->customerRepository->delete($id, true);
         if ($customer) {
+            $hasDiscounts = $this->discountRepository->getWhere(['customer_id' => $id])->count() > 0;
+            if ($hasDiscounts) {
+                $this->discountRepository->deleteAll('customer_id', $id);
+            }
             DB::commit();
             return redirect()->route('customer.index')->with(
                 ['flash_level' => 'success', 'flash_message' => 'Xóa thành công']

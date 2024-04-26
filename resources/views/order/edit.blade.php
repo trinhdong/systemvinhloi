@@ -66,16 +66,16 @@
                                                     <th>Ghi chú</th>
                                                     <th>Màu sắc</th>
                                                     <th>Dung tích</th>
-                                                    <th>Quy cách</th>
+                                                    <th class="text-center">Quy cách</th>
                                                     <th>Đơn vị tính</th>
-                                                    <th>Giá</th>
+                                                    <th class="text-center">Giá</th>
                                                     <th>Chiết khấu (%)</th>
-                                                    <th>Số tiền chiết khấu</th>
+                                                    <th class="text-center">Số tiền chiết khấu</th>
                                                     <th>Ghi chú chiết khấu</th>
-                                                    <th>Giá sau chiết khấu</th>
-                                                    <th>Số lượng thùng</th>
-                                                    <th>Tổng số lượng</th>
-                                                    <th>Tổng tiền sau chiết khấu</th>
+                                                    <th class="text-center">Giá sau chiết khấu</th>
+                                                    <th class="text-center">Số lượng thùng</th>
+                                                    <th class="text-center">Tổng số lượng</th>
+                                                    <th class="text-center">Tổng tiền sau chiết khấu</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody id="orderlist">
@@ -115,7 +115,7 @@
                                                     <td class="product-specifications"></td>
                                                     <td class="product-unit"></td>
                                                     <td>
-                                                        <div class="product-price"></div>
+                                                        <div class="product-price text-end"></div>
                                                         <input disabled type="hidden" name="product_price[]"/>
                                                     </td>
                                                     <td class="discount-percent">
@@ -200,7 +200,7 @@
                                                             {{$orderDetail->product->unit}}
                                                         </td>
                                                         <td>
-                                                            <div class="product-price">{{number_format($orderDetail->product_price)}}</div>
+                                                            <div class="product-price text-end">{{number_format($orderDetail->product_price)}}</div>
                                                             <input type="hidden" name="product_price[]"
                                                                    value="{{$orderDetail->product_price}}"/>
                                                         </td>
@@ -213,7 +213,7 @@
                                                                 <div class="invalid-feedback"></div>
                                                             </div>
                                                         </td>
-                                                        <td class="discount-price">
+                                                        <td class="discount-price text-end">
                                                             <div class="input-group has-validation">
                                                                 <input name="discount_price[]" type="text" {{isset($discountsPrice[$order->customer_id . '_' . $orderDetail->product_id]) ? 'readonly=""' : ''}}
                                                                 class="{{isset($discountsPrice[$order->customer_id . '_' . $orderDetail->product_id]) ? 'disabled' : ''}} form-control"
@@ -224,7 +224,7 @@
                                                         </td>
                                                         <td class="discount-note">{{$orderDetail->discount_note}}</td>
                                                         <td>
-                                                            <div class="unit-price">{{number_format($orderDetail->unit_price)}}</div>
+                                                            <div class="unit-price text-end">{{number_format($orderDetail->unit_price)}}</div>
                                                             <input type="hidden" name="unit_price[]"
                                                                    value="{{$orderDetail->unit_price}}"/>
                                                         </td>
@@ -239,10 +239,10 @@
                                                             </div>
                                                         </td>
                                                         <input type="hidden" class="quantity-per-package" value="{{$orderDetail->product->quantity_per_package}}">
-                                                        <td class="total-quantity">
+                                                        <td class="total-quantity text-end">
                                                             {{number_format($orderDetail->quantity*$orderDetail->product->quantity_per_package)}}
                                                         </td>
-                                                        <td class="total">{{number_format($orderDetail->unit_price*$orderDetail->quantity*$orderDetail->product->quantity_per_package)}}</td>
+                                                        <td class="total text-end">{{number_format($orderDetail->unit_price*$orderDetail->quantity*$orderDetail->product->quantity_per_package)}}</td>
                                                     </tr>
                                                 @endforeach
                                                 </tbody>

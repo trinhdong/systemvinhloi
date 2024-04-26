@@ -58,17 +58,17 @@
                                                 @endif
                                                 <th>Màu sắc</th>
                                                 <th>Dung tích</th>
-                                                <th>Quy cách</th>
+                                                <th class="text-center">Quy cách</th>
                                                 <th>Đơn vị tính</th>
                                                 @if($isAdmin || $isSale || $isAccountant || $isStocker)
-                                                    <th>Giá</th>
-                                                    <th>Chiết khấu (%)</th>
-                                                    <th>Số tiền chiết khấu</th>
+                                                    <th class="text-center">Giá</th>
+                                                    <th class="text-center">Chiết khấu (%)</th>
+                                                    <th class="text-center">Số tiền chiết khấu</th>
                                                     <th>Ghi chú chiết khấu</th>
-                                                    <th>Giá sau chiết khấu</th>
+                                                    <th class="text-center">Giá sau chiết khấu</th>
                                                 @endif
-                                                <th>Số lượng thùng</th>
-                                                <th>Tổng số lượng</th>
+                                                <th class="text-center">Số lượng thùng</th>
+                                                <th class="text-center">Tổng số lượng</th>
                                                 @if($isAdmin || $isSale || $isAccountant || $isStocker)
                                                     <th>Tổng tiền sau chiết khấu</th>
                                                 @endif

@@ -119,7 +119,7 @@ class OrderController extends Controller
             $customers = $this->customerRepository->getList('customer_name');
             $categories = $this->categoryRepository->getList('category_name');
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
-            $discounts = $this->orderService->mapDiscounts();
+            $discounts = $this->orderService->mapDiscountsPercent();
             $discountsPrice = $this->orderService->mapDiscountsPrice();
             $discountsNote = $this->orderService->mapDiscountsNote();
             return view('order.add', compact('customers', 'categories', 'discounts', 'discountsPrice', 'discountsNote', 'bankAccounts'));
@@ -188,13 +188,25 @@ class OrderController extends Controller
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
             $customers = $this->customerRepository->getList('customer_name');
             $categories = $this->categoryRepository->getList('category_name');
-            $discounts = $this->orderService->mapDiscounts();
+            $discounts = $this->orderService->mapDiscountsPercent();
             $discountsPrice = $this->orderService->mapDiscountsPrice();
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discountsNote = $this->orderService->mapDiscountsNote();
             $order = $this->orderService->replaceOrderDataInfo($order);
             if (!empty($order->customer) && !array_key_exists($order->customer->id, $customers->toArray())) {
                 $customers[$order->customer->id] = $order->customer->customer_name;
+            }
+            foreach($order->orderDetail as $orderDetail) {
+                $key = $order->customer->id . '_' . $orderDetail->product_id;
+                if (!array_key_exists($key, $discounts)) {
+                    $discounts[$key] = $orderDetail->discount_percent;
+                }
+                if (!array_key_exists($key, $discountsPrice)) {
+                    $discountsPrice[$key] = $orderDetail->discount_price;
+                }
+                if (!array_key_exists($key, $discountsNote)) {
+                    $discountsNote[$key] = $orderDetail->discount_note;
+                }
             }
 
             return view('order.edit', compact('order', 'customers', 'categories', 'discounts', 'discountsPrice', 'bankAccounts', 'discountsNote'));
@@ -243,7 +255,7 @@ class OrderController extends Controller
     public function delete(int $id)
     {
         DB::beginTransaction();
-        $order = $this->orderDetailRepository->delete($id, true);
+        $order = $this->orderService->delete($id);
         if (!in_array(Auth::user()->role, [ADMIN, SUPER_ADMIN]) && in_array($order->status, [IN_PROCESSING, DELIVERY, DELIVERED, COMPLETE])) {
             return abort(403, 'Unauthorized');
         }

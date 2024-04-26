@@ -80,6 +80,9 @@
                     show: false,
                 }
             },
+            dataLabels: {
+                enabled: false
+            },
             series: [{
                 name: 'Doanh thu',
                 data: {!! json_encode(array_values($payment)) !!}
@@ -91,6 +94,15 @@
                     }
                 },
                 categories: {!! json_encode(array_keys($payment)) !!}
+            },
+            yaxis: {
+                labels: {
+                    formatter: function(value) {
+                        return Intl.NumberFormat("en", {
+                            maximumFractionDigits: 0, minimumFractionDigits: 0,
+                        }).format(value);
+                    }
+                }
             },
         }
         var chart = new ApexCharts(document.querySelector("#chart"), options);
