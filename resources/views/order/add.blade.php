@@ -56,16 +56,16 @@
                                                     <th>Ghi chú</th>
                                                     <th>Màu sắc</th>
                                                     <th>Dung tích</th>
-                                                    <th>Quy cách</th>
+                                                    <th class="text-center">Quy cách</th>
                                                     <th>Đơn vị tính</th>
-                                                    <th>Giá</th>
+                                                    <th class="text-center">Giá</th>
                                                     <th>Chiết khấu (%)</th>
-                                                    <th>Số tiền chiết khấu</th>
+                                                    <th class="text-center">Số tiền chiết khấu</th>
                                                     <th>Ghi chú chiết khấu</th>
-                                                    <th>Giá sau chiết khấu</th>
-                                                    <th>Số lượng thùng</th>
-                                                    <th>Tổng số lượng</th>
-                                                    <th>Tổng tiền sau chiết khấu</th>
+                                                    <th class="text-center">Giá sau chiết khấu</th>
+                                                    <th class="text-center">Số lượng thùng</th>
+                                                    <th class="text-center">Tổng số lượng</th>
+                                                    <th class="text-center">Tổng tiền sau chiết khấu</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody id="orderlist">
@@ -105,7 +105,7 @@
                                                     <td class="product-specifications"></td>
                                                     <td class="product-unit"></td>
                                                     <td>
-                                                        <div class="product-price"></div>
+                                                        <div class="product-price text-end"></div>
                                                         <input disabled type="hidden" name="product_price[]"/>
                                                     </td>
                                                     <td class="discount-percent">

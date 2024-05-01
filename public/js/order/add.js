@@ -349,6 +349,7 @@ $(document).ready(function () {
 
     $(document).on('change', '#customer', function () {
         const customerId = $(this).val();
+        const customer = $(this).data('customer');
         $('#delivery-info').find('span').text('');
         $('#red-bill-info').find('span').text('');
         $('#red-bill-info').addClass('d-none');
@@ -357,7 +358,12 @@ $(document).ready(function () {
         $('#payment-info').find('input').removeClass('is-invalid').val('');
         $('#payment-type').removeClass('is-invalid');
         if (customerId && customerId !== '') {
-            appendCustomerInfo(customerId);
+            if (customer && customer.id == customerId) {
+                appendDeliveryInfo(customer);
+                appendRedBillInfo(customer);
+            } else {
+                appendCustomerInfo(customerId);
+            }
             appendProductAjax(customerId);
         } else {
             if (!$('#delivery-info').hasClass('d-none')) {
@@ -480,29 +486,35 @@ function appendCustomerInfo(customerId) {
         method: 'GET',
         success: function (customer) {
             $('#payment-info').removeClass('d-none');
-            $('#delivery-info').removeClass('d-none');
-            $('#delivery-info').find('#delivery-info-name').append(`<span>${customer.customer_name || ''}</span>`);
-            $('#delivery-info').find('#delivery-info-address').append(`<span>${customer.address || ''}</span>`);
-            $('#delivery-info').find('#delivery-info-phone').append(`<span>${customer.phone || ''}</span>`);
-            if (customer.company != null && customer.company_address != null && customer.tax_code != null && customer.email != null) {
-                $('#red-bill').removeClass('d-none');
-                $('#red-bill-info').find('#red-bill-info-company').append(`<span>${customer.company || ''}</span>`);
-                $('#red-bill-info').find('#red-bill-info-company-address').append(`<span>${customer.company_address || ''}</span>`);
-                $('#red-bill-info').find('#red-bill-info-tax_code').append(`<span>${customer.tax_code || ''}</span>`);
-                $('#red-bill-info').find('#red-bill-info-email').append(`<span>${customer.email || ''}</span>`);
-            } else {
-                if (!$('#red-bill').hasClass('d-none')) {
-                    $('#red-bill').addClass('d-none');
-                }
-                if (!$('#red-bill-info').hasClass('d-none')) {
-                    $('#red-bill-info').addClass('d-none');
-                }
-            }
+            appendDeliveryInfo(customer);
+            appendRedBillInfo(customer);
         },
         error: function (xhr, status, error) {
             console.error(xhr.responseText);
         }
     });
+}
+function appendDeliveryInfo(customer) {
+    $('#delivery-info').removeClass('d-none');
+    $('#delivery-info').find('#delivery-info-name').append(`<span>${customer.customer_name || ''}</span>`);
+    $('#delivery-info').find('#delivery-info-address').append(`<span>${customer.address || ''}</span>`);
+    $('#delivery-info').find('#delivery-info-phone').append(`<span>${customer.phone || ''}</span>`);
+}
+function appendRedBillInfo(customer) {
+    if (customer.company != null && customer.company_address != null && customer.tax_code != null && customer.email != null) {
+        $('#red-bill').removeClass('d-none');
+        $('#red-bill-info').find('#red-bill-info-company').append(`<span>${customer.company || ''}</span>`);
+        $('#red-bill-info').find('#red-bill-info-company-address').append(`<span>${customer.company_address || ''}</span>`);
+        $('#red-bill-info').find('#red-bill-info-tax_code').append(`<span>${customer.tax_code || ''}</span>`);
+        $('#red-bill-info').find('#red-bill-info-email').append(`<span>${customer.email || ''}</span>`);
+    } else {
+        if (!$('#red-bill').hasClass('d-none')) {
+            $('#red-bill').addClass('d-none');
+        }
+        if (!$('#red-bill-info').hasClass('d-none')) {
+            $('#red-bill-info').addClass('d-none');
+        }
+    }
 }
 function appendProductAjax(customerId) {
     const productIdsNotIn = $('#orderlist .productOrder').map(function () {
