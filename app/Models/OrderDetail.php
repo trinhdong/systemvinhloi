@@ -19,6 +19,7 @@ class OrderDetail extends Model
         'discount_percent',
         'discount_price',
         'discount_note',
+        'discount_customer_info',
         'note',
         'created_by',
         'updated_by',

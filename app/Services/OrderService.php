@@ -330,7 +330,14 @@ class OrderService extends BaseService
                 $orderDetails[$key]['discount_price'] = floatval($data['discount_price'][$key]);
                 $orderDetails[$key]['discount_note'] = $discountNote[$data['customer_id'] . '_' . intval($productId)] ?? null;
                 $orderDetails[$key]['note'] = $data['note'][$key];
-                $orderDetails[$key]['product_info'] = $this->updateProductInfo($productId);
+                $productInfo = $this->updateProductInfo($productId);
+                if (!empty($productInfo)) {
+                    $orderDetails[$key]['product_info'] = $productInfo;
+                }
+                $discountCustomerInfo = $this->updateDiscountCustomerInfo($data['customer_id'], intval($productId));
+                if (!empty($discountCustomerInfo)) {
+                    $orderDetails[$key]['discount_customer_info'] = $discountCustomerInfo;
+                }
             }
         }
         if (!$this->checkDuplicateOrderDetai($orderDetails)) {
@@ -361,7 +368,7 @@ class OrderService extends BaseService
         return true;
     }
 
-    public function mapDiscounts()
+    public function mapDiscountsPercent()
     {
         $discounts = $this->discountRepository->getAll();
 
@@ -553,6 +560,12 @@ class OrderService extends BaseService
             if (!empty($orderDetail->product_info)) {
                 $orderDetail->product = json_decode($orderDetail->product_info);
             }
+            if (!empty($orderDetail->discount_customer_info)) {
+                $discountCustomerInfo = json_decode($orderDetail->discount_customer_info);
+                $orderDetail->discount_percent = floatval($discountCustomerInfo->discount_percent);
+                $orderDetail->discount_price = floatval($discountCustomerInfo->discount_price);
+                $orderDetail->discount_note = $discountCustomerInfo->note;
+            }
         }
         return $order;
     }
@@ -645,5 +658,24 @@ class OrderService extends BaseService
             return false;
         }
         return true;
+    }
+    public function mapCustomers()
+    {
+        $customerInfos = $this->orderRepository->getList('customer_info');
+        $customers = [];
+        foreach ($customerInfos as $customer) {
+            $customer = json_decode($customer);
+            $customers[$customer->id] = $customer->customer_name;
+        }
+        return $customers;
+    }
+
+    private function updateDiscountCustomerInfo(int $customerId, int $productId)
+    {
+        $discount = $this->discountRepository->getWhere(['product_id' => $productId, 'customer_id' => $customerId])->first();
+        if (!empty($discount)) {
+            return json_encode($discount);
+        }
+        return null;
     }
 }

@@ -36,9 +36,9 @@ class DashboardController extends Controller
         $customerId = $request->input('customer_id') ?? '';
         $payment = $this->dashboardService->getPaymentData($customerId, $yearPayment);
         $products = $this->productRepository->getAll();
-        $products = $this->dashboardService->addFieldQuantityDelivered($products, $formatDate, $year, $month,  $day);
-        $products = $this->dashboardService->addFieldQuantityInProcessing($products, $formatDate, $year, $month,  $day);
-        $customers = $this->customerRepository->getList('customer_name');
+        $products = $this->dashboardService->addFieldQuantityDelivered($products, $formatDate, $year, $month, $day);
+        $products = $this->dashboardService->addFieldQuantityInProcessing($products, $formatDate, $year, $month, $day);
+        $customers = $this->orderService->mapCustomers();
         return view('dashboard', compact('products', 'isAdmin', 'isStocker', 'customers', 'payment'));
     }
 }

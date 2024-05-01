@@ -75,7 +75,7 @@ class DashboardService
                 $revenueOfMonth->where('customer_id', intval($customerId));
             }
             $revenueOfMonth = $revenueOfMonth->get()->sum('paid');
-            $payment[$monthPayment] = number_format(intval($revenueOfMonth ?? 0));
+            $payment[$monthPayment] = intval($revenueOfMonth ?? 0);
         }
         return $payment;
     }
