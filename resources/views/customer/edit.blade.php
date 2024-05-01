@@ -63,13 +63,17 @@
                             </select>
                             <div class="invalid-feedback">Vui lòng chọn khu vực</div>
                         </div>
+                        @if($isAdmin)
                         <div class="col-md-3 mt-2">
-                            <label for="validationRole" class="form-label">Khu vực</label>
-                            <select class="select-customer" id="select-customer" name="customers[]" multiple="multiple">
-                                <option value="AL">Alabama</option>
-                                <option value="WY">Wyoming</option>
+                            <label for="employee_customer" class="form-label">Người phụ trách</label>
+                            <select name="user_id" class="form-select" id="user_id">
+                                <option selected="" disabled="" value="">Chọn...</option>
+                                @foreach($saleList as $key => $item)
+                                    <option value="{{ $item['id'] }}" @if(($employeeCustomer['user_id'] ?? null) && $item['id'] == $employeeCustomer['user_id']) selected="selected" @endif>{{ $item['name'] }}</option>
+                                @endforeach
                             </select>
                         </div>
+                        @endif
                     </div>
                     @include('customer.editDiscount', compact('products', 'categories', 'customer', 'categoryIds', 'productPrice'), ['discounts' => $customer->discount])
             </div>

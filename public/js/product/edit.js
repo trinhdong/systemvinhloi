@@ -30,10 +30,6 @@ $(document).ready(function () {
     });
 
     $(document).on('submit', 'form', function () {
-
-        var priceValue = $('#price').val().replace(/,/g, '');
-        $('input[name="price"]').val(priceValue);
-
         let isValid = true;
         if ($('input[name="product_code"]').val() == '') {
             $('input[name="product_code"]').addClass('is-invalid')

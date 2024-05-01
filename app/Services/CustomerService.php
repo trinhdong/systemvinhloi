@@ -69,22 +69,22 @@ class CustomerService extends BaseService
 
     public function createCustomer(array $data, $isSale)
     {
-        return $this->processCustomer($data,null, $isSale);
+        return $this->processCustomer($data,null, $isSale, '');
     }
 
-    public function updateCustomer($id, array $data)
+    public function updateCustomer($id, array $data, $isAdmin)
     {
-        return $this->processCustomer($data, $id,'');
+        return $this->processCustomer($data, $id,'', $isAdmin);
     }
 
-    private function processCustomer(array $data, $id = null, $isSale)
+    private function processCustomer(array $data, $id = null, $isSale, $isAdmin)
     {
         DB::beginTransaction();
         $data['area_id'] = intval($data['area_id']);
         if ($id === null) {
             $customer = $this->customerRepository->create($data, true);
-            if ($isSale) {
-                $insertEmployeeCustomer = $this->employeeCustomerRepository->create([
+            if ($customer && $isSale) {
+                $this->employeeCustomerRepository->create([
                     'user_id' => Auth::id(),
                     'customer_id' => $customer->id,
                 ]);
@@ -101,6 +101,13 @@ class CustomerService extends BaseService
             return false;
         }
         $customer = $this->customerRepository->update($id, $data, true);
+        if($customer && $isAdmin){
+            $this->employeeCustomerRepository->updateOrInsertData([
+                'customer_id' => $customer->id,
+            ],[
+                'user_id' => $data['user_id'],
+            ]);
+        }
         if (!$customer) {
             DB::rollBack();
         }

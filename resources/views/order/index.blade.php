@@ -34,9 +34,9 @@
                             <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="customer_id" class="form-select single-select">
                                     <option selected="" value="">Chọn khách hàng</option>
-                                    @foreach($customers as $customerId => $customerName)
-                                        <option value="{{ $customerId }}"
-                                                @if(intval(request('customer_id')) === $customerId) selected @endif>{{ $customerName }}</option>
+                                    @foreach($customers as $item)
+                                        <option value="{{ $item['customer_id'] }}"
+                                                @if(intval(request('customer_id')) === $item['customer_id']) selected @endif>{{ $item['customer_name'] }}</option>
                                     @endforeach
                                 </select>
                             </div>

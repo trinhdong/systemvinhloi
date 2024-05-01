@@ -72,7 +72,7 @@
                                         @endif
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6 justify-content-center">
-                                                <a href="{{route('customer.detail', $customer->id)}}"
+                                                <a href="{{ route('customer.detail', $isSale ? $customer->customer_id : $customer->id) }}"
                                                    class="text-primary"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>
