@@ -4,17 +4,22 @@ namespace App\Services;
 
 use App\Repositories\CustomerRepository;
 use App\Repositories\DiscountRepository;
+use App\Repositories\EmployeeCustomerRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CustomerService extends BaseService
 {
     protected $customerRepository;
     protected $discountRepository;
+    protected $employeeCustomerRepository;
 
-    public function __construct(CustomerRepository $customerRepository, DiscountRepository $discountRepository)
+
+    public function __construct(CustomerRepository $customerRepository, DiscountRepository $discountRepository, EmployeeCustomerRepository $employeeCustomerRepository)
     {
         $this->discountRepository = $discountRepository;
         $this->customerRepository = $customerRepository;
+        $this->employeeCustomerRepository = $employeeCustomerRepository;
         $this->setRepository();
     }
 
@@ -23,7 +28,7 @@ class CustomerService extends BaseService
         return CustomerRepository::class;
     }
 
-    public function searchQuery($query, $request = [])
+    public function searchQuery($query, $request = [], $isSale)
     {
         $filters = [
             'customer_name' => [
@@ -45,25 +50,45 @@ class CustomerService extends BaseService
         if (!empty($request['area_id'])) {
             $filters['area_id'] = intval($request['area_id']);
         }
-        return $this->paginate($filters, 'id');
+        if ($isSale) {
+            $userId = Auth::user()->id;
+            $filters['join'] = [
+                [
+                    'table' => 'employee_customers',
+                    'table_id' => 'employee_customers.customer_id',
+                    'table_reference_id' => 'customers.id'
+                ]
+            ];
+            $filters['employee_customers.user_id'] = [
+                'operator' => '=',
+                'value' => $userId
+            ];
+        }
+        return $this->paginate($filters, 'customers.id');
     }
 
-    public function createCustomer(array $data)
+    public function createCustomer(array $data, $isSale)
     {
-        return $this->processCustomer($data);
+        return $this->processCustomer($data,null, $isSale, '');
     }
 
-    public function updateCustomer($id, array $data)
+    public function updateCustomer($id, array $data, $isAdmin)
     {
-        return $this->processCustomer($data, $id);
+        return $this->processCustomer($data, $id,'', $isAdmin);
     }
 
-    private function processCustomer(array $data, $id = null)
+    private function processCustomer(array $data, $id = null, $isSale, $isAdmin)
     {
         DB::beginTransaction();
         $data['area_id'] = intval($data['area_id']);
         if ($id === null) {
             $customer = $this->customerRepository->create($data, true);
+            if ($customer && $isSale) {
+                $this->employeeCustomerRepository->create([
+                    'user_id' => Auth::id(),
+                    'customer_id' => $customer->id,
+                ]);
+            }
             if (!$customer || !$this->processDiscount($data, $customer->id)) {
                 DB::rollBack();
                 return false;
@@ -76,6 +101,13 @@ class CustomerService extends BaseService
             return false;
         }
         $customer = $this->customerRepository->update($id, $data, true);
+        if($customer && $isAdmin){
+            $this->employeeCustomerRepository->updateOrInsertData([
+                'customer_id' => $customer->id,
+            ],[
+                'user_id' => $data['user_id'],
+            ]);
+        }
         if (!$customer) {
             DB::rollBack();
         }

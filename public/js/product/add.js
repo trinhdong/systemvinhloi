@@ -29,10 +29,6 @@ $(document).ready(function () {
     });
 
     $(document).on('submit', 'form', function () {
-
-        var priceValue = $('#price').val().replace(/,/g, '');
-        $('input[name="price"]').val(priceValue);
-
         let isValid = true;
         if ($('input[name="product_code"]').val() == '') {
             $('input[name="product_code"]').addClass('is-invalid')
@@ -75,10 +71,12 @@ $(document).ready(function () {
         }
         $(this).find('button[type="submit"]').prop('disabled', true);
         $(this).submit();
+
     });
 
     $(document).on('change', 'input[name="product_code"], input[name="product_name"], input[name="color"], input[name="capacity"], input[name="unit"], input[name="price"], select[name="category_id"], input[name="specifications"], input[name="quantity_per_package"]', function () {
         $(this).removeClass('is-invalid');
+
     });
 
     $(document).on('input', '#price', function (event) {

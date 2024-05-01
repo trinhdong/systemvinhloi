@@ -47,6 +47,9 @@
                                 <th>Địa chỉ</th>
                                 <th>Email</th>
                                 <th>Khu vực</th>
+                                @if($isAdmin)
+                                <th>Người quản lý</th>
+                                @endif
                                 <th>Hành động</th>
                             </tr>
                             </thead>
@@ -64,9 +67,12 @@
                                         <td>{{ $customer->address }}</td>
                                         <td>{{ $customer->email }}</td>
                                         <td>{{ $areas[$customer->area_id] ?? '' }}</td>
+                                        @if($isAdmin)
+                                        <td>{{ $customer->employeeCustomer->user->name ?? 'Chưa có người phụ trách' }}</td>
+                                        @endif
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6 justify-content-center">
-                                                <a href="{{route('customer.detail', $customer->id)}}"
+                                                <a href="{{ route('customer.detail', $isSale ? $customer->customer_id : $customer->id) }}"
                                                    class="text-primary"
                                                    data-bs-toggle="tooltip"
                                                    data-bs-placement="bottom" title="Xem"><i class="bi bi-eye-fill"></i></a>

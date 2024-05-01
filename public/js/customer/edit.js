@@ -1,4 +1,14 @@
 $(document).ready(function () {
+    $(function () {
+        $('.select-customer').each(function () {
+            $(this).select2({
+                theme: 'bootstrap4',
+                width: '750px',
+                placeholder: $(this).attr('placeholder'),
+                allowClear: Boolean($(this).data('allow-clear')),
+            });
+        });
+    });
     $('#deleteDiscountModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
         const discountId = button.data('discount-id');

@@ -22,8 +22,8 @@
                                 <h5 class="mb-0 me-3">Khách hàng: </h5>
                                 <select id="customer" name="customer_id" class="form-select single-select" style="width: 250px">
                                     <option selected="" disabled="" value="">Chọn khách hàng</option>
-                                    @foreach($customers as $customerId => $customerName)
-                                        <option value="{{ $customerId }}">{{ $customerName }}</option>
+                                    @foreach($customers as $item)
+                                        <option value="{{ $item['customer_id'] }}">{{ $item['customer_name'] }}</option>
                                     @endforeach
                                 </select>
                                 <div class="invalid-feedback">Vui lòng chọn khách hàng</div>

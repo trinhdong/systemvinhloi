@@ -73,6 +73,12 @@
                                 </th>
                                 <td>{{$areas[$customer->area_id] ?? ''}}</td>
                             </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Người phụ trách
+                                </th>
+                                <td>{{$customer->employeeCustomer->user->name ?? 'Chưa có người phụ trách' }}</td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

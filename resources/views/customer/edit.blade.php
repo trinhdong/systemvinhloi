@@ -2,6 +2,8 @@
 @section('title')
     Khách hàng
 @endsection
+@section('css')
+@endsection
 @section('action')
     <div class="col-12">
         <a href="{{route('customer.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
@@ -61,6 +63,17 @@
                             </select>
                             <div class="invalid-feedback">Vui lòng chọn khu vực</div>
                         </div>
+                        @if($isAdmin)
+                        <div class="col-md-3 mt-2">
+                            <label for="employee_customer" class="form-label">Người phụ trách</label>
+                            <select name="user_id" class="form-select" id="user_id">
+                                <option selected="" disabled="" value="">Chọn...</option>
+                                @foreach($saleList as $key => $item)
+                                    <option value="{{ $item['id'] }}" @if(($employeeCustomer['user_id'] ?? null) && $item['id'] == $employeeCustomer['user_id']) selected="selected" @endif>{{ $item['name'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                     </div>
                     @include('customer.editDiscount', compact('products', 'categories', 'customer', 'categoryIds', 'productPrice'), ['discounts' => $customer->discount])
             </div>

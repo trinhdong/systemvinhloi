@@ -228,7 +228,7 @@ abstract class BaseRepository
             return $model->paginate($limit);
         } catch (\Throwable $th) {
             Log::error($th);
-            return false;
+            return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $limit);
         }
     }
 
@@ -407,7 +407,7 @@ abstract class BaseRepository
      *
      * @param
      *
-     * @return Model instance
+     * @return false instance
      */
     public function update($id, $attributes = [], $hasTransaction = false)
     {
@@ -533,6 +533,7 @@ abstract class BaseRepository
             }
             return false;
         } catch (\Throwable $th) {
+            Log::error($th);
             return false;
         }
     }

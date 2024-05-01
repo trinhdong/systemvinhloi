@@ -6,6 +6,7 @@ use App\Http\Requests\CreateUpdateOrderRequest;
 use App\Repositories\CategoryRepository;
 use App\Repositories\InvoiceRepository;
 use App\Repositories\UserRepository;
+use App\Services\CustomerService;
 use App\Services\OrderService;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderDetailRepository;
@@ -25,6 +26,7 @@ class OrderController extends Controller
     protected $userRepository;
     protected $bankAccountRepository;
     protected $invoiceRepository;
+    protected $customerService;
 
     public function __construct(
         OrderService $orderService,
@@ -34,7 +36,8 @@ class OrderController extends Controller
         CommentRepository $commentRepository,
         UserRepository $userRepository,
         BankAccountRepository $bankAccountRepository,
-        InvoiceRepository $invoiceRepository
+        InvoiceRepository $invoiceRepository,
+        CustomerService $customerService
     )
     {
         $this->orderService = $orderService;
@@ -45,6 +48,7 @@ class OrderController extends Controller
         $this->userRepository = $userRepository;
         $this->bankAccountRepository = $bankAccountRepository;
         $this->invoiceRepository = $invoiceRepository;
+        $this->customerService = $customerService;
     }
 
     public function index(Request $request)
@@ -58,6 +62,7 @@ class OrderController extends Controller
         $isWareHouseStaff = Auth::user()->role == WAREHOUSE_STAFF;
         $isStocker = Auth::user()->role == STOCKER;
         $isAccountant =  Auth::user()->role == ACCOUNTANT;
+        $filters = [];
         if ($isStocker) {
             $input['status_not_in'] = [DRAFT];
             unset($statusList[DRAFT]);
@@ -81,7 +86,22 @@ class OrderController extends Controller
         foreach ($orders as &$order) {
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
-        $customers = $this->orderService->mapCustomers();
+        if ($isSale) {
+            $userId = Auth::user()->id;
+            $filters['join'] = [
+                [
+                    'table' => 'employee_customers',
+                    'table_id' => 'employee_customers.customer_id',
+                    'table_reference_id' => 'customers.id'
+                ]
+            ];
+            $filters['employee_customers.user_id'] = [
+                'operator' => '=',
+                'value' => $userId
+            ];
+        }
+        $customers = $this->customerService->filter($filters);
+        //$customers = $this->orderService->mapCustomers();
         $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
     }
@@ -116,7 +136,23 @@ class OrderController extends Controller
     public function add(CreateUpdateOrderRequest $request)
     {
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
-            $customers = $this->customerRepository->getList('customer_name');
+            $isSale =  Auth::user()->role == SALE;
+            $filters = [];
+            if ($isSale) {
+                $userId = Auth::user()->id;
+                $filters['join'] = [
+                    [
+                        'table' => 'employee_customers',
+                        'table_id' => 'employee_customers.customer_id',
+                        'table_reference_id' => 'customers.id'
+                    ]
+                ];
+                $filters['employee_customers.user_id'] = [
+                    'operator' => '=',
+                    'value' => $userId
+                ];
+            }
+            $customers = $this->customerService->filter($filters);
             $categories = $this->categoryRepository->getList('category_name');
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discounts = $this->orderService->mapDiscountsPercent();
