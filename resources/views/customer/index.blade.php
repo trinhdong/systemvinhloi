@@ -56,7 +56,7 @@
                             <tbody>
                             @if($customers->isEmpty())
                                 <tr>
-                                    <td colspan="7" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="{{$isAdmin ? '8' : '7'}}" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($customers as $key => $customer)
