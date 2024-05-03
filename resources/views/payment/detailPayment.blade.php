@@ -11,8 +11,9 @@
     {{$order->order_number}}
 @endsection
 <?php
-    $isEdit = in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED]) && $order->status === DELIVERED;
-    $isTranfer = $order->payment_method === TRANFER && ($order->payment_type === DEPOSIT || $order->payment_type === PAY_FULL);
+    $isEdit = in_array($order->payment_status, [UNPAID, IN_PROCESSING, REJECTED]) && $order->status === DELIVERED && $order->payment_type !== DEPOSIT;
+    $isTranfer = $order->payment_method === TRANFER && $order->payment_type === PAY_FULL;
+    $isEditDeposit = in_array($order->payment_status, [DEPOSITED, IN_PROCESSING]) && $order->status === DELIVERED;
 ?>
 @section('content')
     <div class="card">
@@ -62,11 +63,18 @@
                                             {{PAYMENTS_TYPE[$order->payment_type]}}
                                         </div>
                                     </div>
+                                    @if($order->payment_type === DEPOSIT)
+                                        <div class="card border radius-10 shadow-none bg-light">
+                                            <div class="card-body">
+                                        <label for="" class="fw-bolder me-1" style="white-space: nowrap">Chi tiết tiền cọc đã thanh toán </label>
+                                        <div class="card border radius-10 shadow-none bg-light">
+                                            <div class="card-body">
+                                    @endif
                                     @if(!$isEdit && !empty($order->payment_method))
-                                    <div class="form-group row mt-3">
-                                        <div class="col-7 fw-bold">Phương thức thanh toán</div>
-                                        <div class="col-5">{{PAYMENTS_METHOD[$order->payment_method]}}</div>
-                                    </div>
+                                        <div class="form-group row {{$order->payment_type === DEPOSIT ? '' : 'mt-3'}}">
+                                            <div class="col-7 fw-bold">Phương thức thanh toán</div>
+                                            <div class="col-5">{{PAYMENTS_METHOD[$order->payment_method]}}</div>
+                                        </div>
                                     @endif
                                     @if($isEdit && $order->payment_type === PAYMENT_ON_DELIVERY)
                                         <div class="form-group row mt-3 d-flex align-items-center">
@@ -87,166 +95,358 @@
                                         </div>
                                     @endif
                                     @if($order->payment_type === PAYMENT_ON_DELIVERY  || $order->payment_method == TRANFER)
-                                    <div id="payment-method-info" class="{{$order->payment_type === PAYMENT_ON_DELIVERY && $order->payment_method !== TRANFER ? 'd-none' : ''}}">
-                                        <label for="" class="fw-bolder me-1 mt-3" style="white-space: nowrap">Tài khoản chuyển tiền </label>
-                                        <div class="card border radius-10">
-                                            <div class="card-body">
-                                                @if(!$isEdit)
-                                                <div class="form-group row">
-                                                    <div class="col-7 fw-bold">Tên ngân hàng</div>
-                                                    <div class="col-5">{{$order->bank_name}}</div>
-                                                </div>
-                                                <div class="form-group row mt-3">
-                                                    <div class="col-7 fw-bold">Số tài khoản</div>
-                                                    <div class="col-5">{{$order->bank_code}}</div>
-                                                </div>
-                                                <div class="form-group row mt-3">
-                                                    <div class="col-7 fw-bold">Tên chủ tài khoản</div>
-                                                    <div class="col-5">{{$order->bank_customer_name}}</div>
-                                                </div>
-                                                @else
-                                                <div class="form-group row d-flex align-items-center">
-                                                    <div class="col-7 fw-bold">Tên ngân hàng </div>
-                                                    <div class="col-5">
-                                                        <div class="col-8">
-                                                            <input name="bank_name" type="text" class="form-control"
-                                                                   placeholder="Nhập tên ngân hàng" autocomplete="off"
-                                                                   value="{{$order->bank_name}}">
-                                                            <div class="invalid-feedback">Vui lòng nhập tên ngân hàng</div>
+                                        <div id="payment-method-info" class="{{$order->payment_type === PAYMENT_ON_DELIVERY && $order->payment_method !== TRANFER ? 'd-none' : ''}}">
+                                            <label for="" class="fw-bolder me-1 mt-3" style="white-space: nowrap">Tài khoản chuyển tiền </label>
+                                            <div class="card border radius-10 {{$order->payment_type === DEPOSIT ? 'shadow-none bg-light' : '' }}">
+                                                <div class="card-body">
+                                                    @if(!$isEdit)
+                                                        <div class="form-group row">
+                                                            <div class="col-7 fw-bold">Tên ngân hàng</div>
+                                                            <div class="col-5">{{$order->bank_name}}</div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row mt-3 d-flex align-items-center">
-                                                    <div class="col-7 fw-bold">Số tài khoản </div>
-                                                    <div class="col-5">
-                                                        <div class="col-8">
-                                                            <input name="bank_code" type="text" class="form-control"
-                                                                   placeholder="Nhập số tài khoản" autocomplete="off"
-                                                                   value="{{$order->bank_code}}">
-                                                            <div class="invalid-feedback">Vui lòng nhập số tài khoản</div>
+                                                        <div class="form-group row mt-3">
+                                                            <div class="col-7 fw-bold">Số tài khoản</div>
+                                                            <div class="col-5">{{$order->bank_code}}</div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row mt-3 d-flex align-items-center">
-                                                    <div class="col-7 fw-bold">Tên chủ tài khoản </div>
-                                                    <div class="col-5">
-                                                        <div class="col-8">
-                                                            <input name="bank_customer_name" type="text" class="form-control"
-                                                                   placeholder="Nhập tên chủ tài khoản" autocomplete="off"
-                                                                   value="{{$order->bank_customer_name}}">
-                                                            <div class="invalid-feedback">Vui lòng nhập tên chủ tài khoản</div>
+                                                        <div class="form-group row mt-3">
+                                                            <div class="col-7 fw-bold">Tên chủ tài khoản</div>
+                                                            <div class="col-5">{{$order->bank_customer_name}}</div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tài khoản nhận tiền </label>
-                                        <div class="card border radius-10">
-                                            <div class="card-body">
-                                                @if(!$isEdit)
-                                                    <div class="form-group row">
-                                                        <div class="col-7 fw-bold">Tên ngân hàng</div>
-                                                        <div class="col-5">{{$order->bankAccount->bank_name ?? ''}}</div>
-                                                    </div>
-                                                    <div class="form-group row mt-3">
-                                                        <div class="col-7 fw-bold">Số tài khoản</div>
-                                                        <div class="col-5">{{$order->bankAccount->bank_code ?? ''}}</div>
-                                                    </div>
-                                                    <div class="form-group row mt-3">
-                                                        <div class="col-7 fw-bold">Tên chủ tài khoản</div>
-                                                        <div class="col-5">{{$order->bankAccount->bank_account_name ?? ''}}</div>
-                                                    </div>
-                                                    @if(!empty($order->bankAccount->branch))
-                                                    <div class="form-group row mt-3">
-                                                        <div class="col-7 fw-bold">Tên chi nhánh</div>
-                                                        <div class="col-5">{{$order->bankAccount->branch}}</div>
-                                                    </div>
+                                                    @else
+                                                        <div class="form-group row d-flex align-items-center">
+                                                            <div class="col-7 fw-bold">Tên ngân hàng </div>
+                                                            <div class="col-5">
+                                                                <div class="col-8">
+                                                                    <input name="bank_name" type="text" class="form-control"
+                                                                           placeholder="Nhập tên ngân hàng" autocomplete="off"
+                                                                           value="{{$order->bank_name}}">
+                                                                    <div class="invalid-feedback">Vui lòng nhập tên ngân hàng</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row mt-3 d-flex align-items-center">
+                                                            <div class="col-7 fw-bold">Số tài khoản </div>
+                                                            <div class="col-5">
+                                                                <div class="col-8">
+                                                                    <input name="bank_code" type="text" class="form-control"
+                                                                           placeholder="Nhập số tài khoản" autocomplete="off"
+                                                                           value="{{$order->bank_code}}">
+                                                                    <div class="invalid-feedback">Vui lòng nhập số tài khoản</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row mt-3 d-flex align-items-center">
+                                                            <div class="col-7 fw-bold">Tên chủ tài khoản </div>
+                                                            <div class="col-5">
+                                                                <div class="col-8">
+                                                                    <input name="bank_customer_name" type="text" class="form-control"
+                                                                           placeholder="Nhập tên chủ tài khoản" autocomplete="off"
+                                                                           value="{{$order->bank_customer_name}}">
+                                                                    <div class="invalid-feedback">Vui lòng nhập tên chủ tài khoản</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     @endif
-                                                @else
-                                                <div class="form-group row d-flex align-items-center">
-                                                    <div class="col-7 fw-bold">Chọn tài khoản nhận tiền </div>
-                                                    <div class="col-5">
-                                                        <div class="col-8">
-                                                            <select id="bank-account" name="bank_account_id" class="form-select">
-                                                                <option selected="" value="">Chọn tài khoản</option>
-                                                                @foreach($bankAccounts as $k => $v)
-                                                                    <option value="{{ $k }}" @if($order->bank_account_id == $k) selected @endif>{{ $v }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                            <div class="invalid-feedback">Vui lòng chọn tài khoản nhận tiền</div>
-                                                        </div>
-                                                    </div>
                                                 </div>
-                                                <div id="bank-account-info" class="{{$order->bankAccount !== null ? '' : 'd-none'}}">
-                                                    <div class="form-group row d-flex align-items-center mt-3">
-                                                        <div class="col-7 fw-bold">Tên ngân hàng </div>
-                                                        <div class="col-5">
-                                                            <div class="col-8">
-                                                                <span id="bank-name">{{$order->bankAccount->bank_name ?? ''}}</span>
+                                            </div>
+                                            <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tài khoản nhận tiền </label>
+                                            <div class="card border radius-10 {{$order->payment_type === DEPOSIT ? 'shadow-none bg-light' : '' }}">
+                                                <div class="card-body">
+                                                    @if(!$isEdit)
+                                                        <div class="form-group row">
+                                                            <div class="col-7 fw-bold">Tên ngân hàng</div>
+                                                            <div class="col-5">{{$order->bankAccount->bank_name ?? ''}}</div>
+                                                        </div>
+                                                        <div class="form-group row mt-3">
+                                                            <div class="col-7 fw-bold">Số tài khoản</div>
+                                                            <div class="col-5">{{$order->bankAccount->bank_code ?? ''}}</div>
+                                                        </div>
+                                                        <div class="form-group row mt-3">
+                                                            <div class="col-7 fw-bold">Tên chủ tài khoản</div>
+                                                            <div class="col-5">{{$order->bankAccount->bank_account_name ?? ''}}</div>
+                                                        </div>
+                                                        @if(!empty($order->bankAccount->branch))
+                                                            <div class="form-group row mt-3">
+                                                                <div class="col-7 fw-bold">Tên chi nhánh</div>
+                                                                <div class="col-5">{{$order->bankAccount->branch}}</div>
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        <div class="form-group row d-flex align-items-center">
+                                                            <div class="col-7 fw-bold">Chọn tài khoản nhận tiền </div>
+                                                            <div class="col-5">
+                                                                <div class="col-8">
+                                                                    <select id="bank-account" name="bank_account_id" class="form-select">
+                                                                        <option selected="" value="">Chọn tài khoản</option>
+                                                                        @foreach($bankAccounts as $k => $v)
+                                                                            <option value="{{ $k }}" @if($order->bank_account_id == $k) selected @endif>{{ $v }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    <div class="invalid-feedback">Vui lòng chọn tài khoản nhận tiền</div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-group row mt-3 d-flex align-items-center">
-                                                        <div class="col-7 fw-bold">Số tài khoản </div>
-                                                        <div class="col-5">
-                                                            <div class="col-8">
-                                                                <span id="bank-code">{{$order->bankAccount->bank_code ?? ''}}</span>
+                                                        <div id="bank-account-info" class="{{$order->bankAccount !== null ? '' : 'd-none'}}">
+                                                            <div class="form-group row d-flex align-items-center mt-3">
+                                                                <div class="col-7 fw-bold">Tên ngân hàng </div>
+                                                                <div class="col-5">
+                                                                    <div class="col-8">
+                                                                        <span id="bank-name">{{$order->bankAccount->bank_name ?? ''}}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row mt-3 d-flex align-items-center">
+                                                                <div class="col-7 fw-bold">Số tài khoản </div>
+                                                                <div class="col-5">
+                                                                    <div class="col-8">
+                                                                        <span id="bank-code">{{$order->bankAccount->bank_code ?? ''}}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row mt-3 d-flex align-items-center">
+                                                                <div class="col-7 fw-bold">Tên chủ tài khoản </div>
+                                                                <div class="col-5">
+                                                                    <div class="col-8">
+                                                                        <span id="bank-account-name">{{$order->bankAccount->bank_account_name ?? ''}}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="{{$order->bankAccount->bank_branch ?? null === null ? 'd-none' : ''}} form-group row mt-3 d-flex align-items-center">
+                                                                <div class="col-7 fw-bold">Tên chi nhánh </div>
+                                                                <div class="col-5">
+                                                                    <div class="col-8">
+                                                                        <span id="bank-branch">{{$order->bankAccount->bank_branch ?? ''}}</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-group row mt-3 d-flex align-items-center">
-                                                        <div class="col-7 fw-bold">Tên chủ tài khoản </div>
-                                                        <div class="col-5">
-                                                            <div class="col-8">
-                                                                <span id="bank-account-name">{{$order->bankAccount->bank_account_name ?? ''}}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="{{$order->bankAccount->bank_branch ?? null === null ? 'd-none' : ''}} form-group row mt-3 d-flex align-items-center">
-                                                        <div class="col-7 fw-bold">Tên chi nhánh </div>
-                                                        <div class="col-5">
-                                                            <div class="col-8">
-                                                                <span id="bank-branch">{{$order->bankAccount->bank_branch ?? ''}}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    @endif
                                                 </div>
-                                                @endif
                                             </div>
                                         </div>
-                                    </div>
                                     @endif
                                     @if($isEdit)
-                                    <div class="form-group row mt-3 d-flex align-items-center">
-                                        <div class="col-7 fw-bold">Ngày thanh toán</div>
-                                        <div class="col-5">
-                                            <div class="col-8">
-                                                <input type="text" id="datepicker" name="payment_date" class="form-control col-5" value="{{!empty($order->payment_date) ? date(FORMAT_DATE_VN, strtotime($order->payment_date)) : ''}}" placeholder="Ngày thanh toán">
-                                                <div class="invalid-feedback">Vui lòng nhập ngày thanh toán</div>
+                                        <div class="form-group row mt-3 d-flex align-items-center">
+                                            <div class="col-7 fw-bold">Ngày thanh toán</div>
+                                            <div class="col-5">
+                                                <div class="col-8">
+                                                    <input type="text" id="datepicker" name="payment_date" class="form-control col-5" value="{{!empty($order->payment_date) ? date(FORMAT_DATE_VN, strtotime($order->payment_date)) : ''}}" placeholder="Ngày thanh toán">
+                                                    <div class="invalid-feedback">Vui lòng nhập ngày thanh toán</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     @elseif(!empty($order->payment_date))
-                                    <div class="form-group row mt-3 d-flex align-items-center">
-                                        <div class="col-7 fw-bold">Ngày thanh toán</div>
-                                        <div class="col-5">
-                                            <h5 class="mb-0 col-12 text-danger">{{date(FORMAT_DATE_VN, strtotime($order->payment_date))}}</h5>
+                                        <div class="form-group row mt-3 d-flex align-items-center">
+                                            <div class="col-7 fw-bold">Ngày thanh toán</div>
+                                            <div class="col-5">
+                                                <h5 class="mb-0 col-12 text-danger">{{date(FORMAT_DATE_VN, strtotime($order->payment_date))}}</h5>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
+                                    @if($order->payment_type == DEPOSIT && !empty($order->deposit))
+                                        <div class="form-group row mt-3">
+                                            <div class="col-7 fw-bold">Số tiền đã cọc</div>
+                                            <h5 class="mb-0 col-5 text-danger" id="deposit">{{number_format($order->deposit)}}₫</h5>
+                                        </div>
+                                    @endif
+                                    @if($order->payment_type === DEPOSIT)
+                                            </div>
+                                        </div>
+                                            </div>
+                                        </div>
+                                                @if(!$isEditDeposit && !empty($order->payment_method2))
+                                                    <div class="form-group row mt-3">
+                                                        <div class="col-7 fw-bold">Phương thức thanh toán</div>
+                                                        <div class="col-5">{{PAYMENTS_METHOD[$order->payment_method2]}}</div>
+                                                    </div>
+                                                @endif
+                                                @if($isEditDeposit)
+                                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                                        <div class="col-7 fw-bold">Phương thức thanh toán</div>
+                                                        <div class="col-5">
+                                                            <div class="col-8">
+                                                                <select id="payment-method2" name="payment_method"
+                                                                        class="form-select">
+                                                                    <option selected="" value="">Chọn phương thức</option>
+                                                                    @foreach(PAYMENTS_METHOD as $k => $v)
+                                                                        <option value="{{ $k }}"
+                                                                                @if($order->payment_method2 == $k) selected @endif>{{ $v }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                                <div class="invalid-feedback">Vui lòng nhập phương thức thanh toán</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                <div id="payment-method-info2" class="{{$order->payment_method2 !== TRANFER ? 'd-none' : ''}}">
+                                                    <label for="" class="fw-bolder me-1 mt-3" style="white-space: nowrap">Tài khoản chuyển tiền </label>
+                                                    <div class="card border radius-10">
+                                                        <div class="card-body">
+                                                            @if(!$isEditDeposit)
+                                                                <div class="form-group row">
+                                                                    <div class="col-7 fw-bold">Tên ngân hàng</div>
+                                                                    <div class="col-5">{{$order->bank_name2}}</div>
+                                                                </div>
+                                                                <div class="form-group row mt-3">
+                                                                    <div class="col-7 fw-bold">Số tài khoản</div>
+                                                                    <div class="col-5">{{$order->bank_code2}}</div>
+                                                                </div>
+                                                                <div class="form-group row mt-3">
+                                                                    <div class="col-7 fw-bold">Tên chủ tài khoản</div>
+                                                                    <div class="col-5">{{$order->bank_customer_name2}}</div>
+                                                                </div>
+                                                            @else
+                                                                <div class="form-group row d-flex align-items-center">
+                                                                    <div class="col-7 fw-bold">Tên ngân hàng </div>
+                                                                    <div class="col-5">
+                                                                        <div class="col-8">
+                                                                            <input name="bank_name" type="text" class="form-control"
+                                                                                   placeholder="Nhập tên ngân hàng" autocomplete="off"
+                                                                                   value="{{$order->bank_name2}}">
+                                                                            <div class="invalid-feedback">Vui lòng nhập tên ngân hàng</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row mt-3 d-flex align-items-center">
+                                                                    <div class="col-7 fw-bold">Số tài khoản </div>
+                                                                    <div class="col-5">
+                                                                        <div class="col-8">
+                                                                            <input name="bank_code" type="text" class="form-control"
+                                                                                   placeholder="Nhập số tài khoản" autocomplete="off"
+                                                                                   value="{{$order->bank_code2}}">
+                                                                            <div class="invalid-feedback">Vui lòng nhập số tài khoản</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row mt-3 d-flex align-items-center">
+                                                                    <div class="col-7 fw-bold">Tên chủ tài khoản </div>
+                                                                    <div class="col-5">
+                                                                        <div class="col-8">
+                                                                            <input name="bank_customer_name" type="text" class="form-control"
+                                                                                   placeholder="Nhập tên chủ tài khoản" autocomplete="off"
+                                                                                   value="{{$order->bank_customer_name2}}">
+                                                                            <div class="invalid-feedback">Vui lòng nhập tên chủ tài khoản</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    <label for="" class="fw-bolder me-1" style="white-space: nowrap">Tài khoản nhận tiền </label>
+                                                    <div class="card border radius-10">
+                                                        <div class="card-body">
+                                                            @if(!$isEditDeposit)
+                                                                <div class="form-group row">
+                                                                    <div class="col-7 fw-bold">Tên ngân hàng</div>
+                                                                    <div class="col-5">{{$order->bankAccount2->bank_name ?? ''}}</div>
+                                                                </div>
+                                                                <div class="form-group row mt-3">
+                                                                    <div class="col-7 fw-bold">Số tài khoản</div>
+                                                                    <div class="col-5">{{$order->bankAccount2->bank_code ?? ''}}</div>
+                                                                </div>
+                                                                <div class="form-group row mt-3">
+                                                                    <div class="col-7 fw-bold">Tên chủ tài khoản</div>
+                                                                    <div class="col-5">{{$order->bankAccount2->bank_account_name ?? ''}}</div>
+                                                                </div>
+                                                                @if(!empty($order->bankAccount2->branch))
+                                                                    <div class="form-group row mt-3">
+                                                                        <div class="col-7 fw-bold">Tên chi nhánh</div>
+                                                                        <div class="col-5">{{$order->bankAccount2->branch}}</div>
+                                                                    </div>
+                                                                @endif
+                                                            @else
+                                                                <div class="form-group row d-flex align-items-center">
+                                                                    <div class="col-7 fw-bold">Chọn tài khoản nhận tiền </div>
+                                                                    <div class="col-5">
+                                                                        <div class="col-8">
+                                                                            <select id="bank-account" name="bank_account_id" class="form-select">
+                                                                                <option selected="" value="">Chọn tài khoản</option>
+                                                                                @foreach($bankAccounts as $k => $v)
+                                                                                    <option value="{{ $k }}" @if($order->bank_account_id2 == $k) selected @endif>{{ $v }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                            <div class="invalid-feedback">Vui lòng chọn tài khoản nhận tiền</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="bank-account-info" class="{{$order->bankAccount2 !== null ? '' : 'd-none'}}">
+                                                                    <div class="form-group row d-flex align-items-center mt-3">
+                                                                        <div class="col-7 fw-bold">Tên ngân hàng </div>
+                                                                        <div class="col-5">
+                                                                            <div class="col-8">
+                                                                                <span id="bank-name">{{$order->bankAccount2->bank_name ?? ''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                                                        <div class="col-7 fw-bold">Số tài khoản </div>
+                                                                        <div class="col-5">
+                                                                            <div class="col-8">
+                                                                                <span id="bank-code">{{$order->bankAccount2->bank_code ?? ''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                                                        <div class="col-7 fw-bold">Tên chủ tài khoản </div>
+                                                                        <div class="col-5">
+                                                                            <div class="col-8">
+                                                                                <span id="bank-account-name">{{$order->bankAccount2->bank_account_name ?? ''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="{{$order->bankAccount2->bank_branch ?? null === null ? 'd-none' : ''}} form-group row mt-3 d-flex align-items-center">
+                                                                        <div class="col-7 fw-bold">Tên chi nhánh </div>
+                                                                        <div class="col-5">
+                                                                            <div class="col-8">
+                                                                                <span id="bank-branch">{{$order->bankAccount2->bank_branch ?? ''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @if($isEditDeposit)
+                                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                                        <div class="col-7 fw-bold">Ngày thanh toán</div>
+                                                        <div class="col-5">
+                                                            <div class="col-8">
+                                                                <input type="text" id="datepicker" name="payment_date" class="form-control col-5" value="{{!empty($order->payment_date2) ? date(FORMAT_DATE_VN, strtotime($order->payment_date2)) : ''}}" placeholder="Ngày thanh toán">
+                                                                <div class="invalid-feedback">Vui lòng nhập ngày thanh toán</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @elseif(!empty($order->payment_date2))
+                                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                                        <div class="col-7 fw-bold">Ngày thanh toán</div>
+                                                        <div class="col-5">
+                                                            <h5 class="mb-0 col-12 text-danger">{{date(FORMAT_DATE_VN, strtotime($order->payment_date2))}}</h5>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                     @endif
                                     <div class="form-group row mt-3">
                                         <div class="col-7 fw-bold">Tổng số tiền của đơn hàng</div>
                                         <h5 class="mb-0 col-5" id="order-total">{{number_format($order->order_total)}}₫</h5>
                                     </div>
-                                    @if($order->payment_type == DEPOSIT && !empty($order->deposit))
-                                        <div class="form-group row mt-3">
-                                            <div class="col-7 fw-bold">Số tiền cọc</div>
-                                            <h5 class="mb-0 col-5 ">{{number_format($order->deposit)}}₫</h5>
+                                    @if($order->payment_type === DEPOSIT)
+                                    <div class="form-group row mt-3 d-flex align-items-center">
+                                        <div class="col-7 fw-bold">Số tiền còn lại đã thanh toán</div>
+                                        <div class="col-5">
+                                            @if($isEditDeposit)
+                                                <div class="col-8">
+                                                    <input id="paidRemaining" type="text" name="paid_remaining" class="form-control col-5" value="{{number_format($order->paid_remaining)}}">
+                                                    <div class="invalid-feedback">Vui lòng nhập số tiền còn lại đã thanh toán</div>
+                                                </div>
+                                            @else
+                                                <h5 class="mb-0 col-12 text-danger">{{number_format($order->paid_remaining)}}₫</h5>
+                                            @endif
                                         </div>
+                                    </div>
                                     @endif
                                     <div class="form-group row mt-3 d-flex align-items-center">
-                                        <div class="col-7 fw-bold">Số tiền đã thanh toán</div>
+                                        <div class="col-7 fw-bold">Số tiền đã thanh toán <small class="text-danger">{{$order->payment_type === DEPOSIT ? '(Số tiền đã cọc + Số tiền còn lại đã thanh toán)' : ''}}</small></div>
                                         <div class="col-5">
                                             @if($isEdit)
                                                 <div class="col-8">
@@ -254,7 +454,7 @@
                                                     <div class="invalid-feedback">Vui lòng nhập số tiền đã thanh toán</div>
                                                 </div>
                                             @else
-                                                <h5 class="mb-0 col-12 ">{{number_format($order->paid)}}₫</h5>
+                                                <h5 class="mb-0 col-12 text-danger" id="paid">{{number_format($order->paid)}}₫</h5>
                                             @endif
                                         </div>
                                     </div>
@@ -364,7 +564,7 @@
                                 </div>
                                 <div class="modal-body">
                                     Bạn muốn cập nhật thanh toán của đơn hàng này?
-                                    @if($isEdit)
+                                    @if($isEdit || $isEditDeposit)
                                     <div class="mb-3 mt-3">
                                         <label for="updateNote" class="form-label">Ghi chú:</label>
                                         <textarea class="form-control" id="updateNote" name="note" rows="3"></textarea>
@@ -463,5 +663,6 @@
 @section('script')
     <script src="js/payment/detail.js"></script>
     <script>const isEdit = {!! json_encode($isEdit) !!};</script>
+    <script>const $isEditDeposit = {!! json_encode($isEditDeposit) !!};</script>
     <script>const isTranfer = {!! json_encode($isTranfer) !!};</script>
 @endsection

@@ -31,11 +31,6 @@
                         <span class="font-14 badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
                     </div>
                 </div>
-                @if(!$isAccountant && $order->has_update_quantity == HAD_UPDATE_QUANTITY)
-                <div class="col-4 text-center">
-                    <span class="text-danger">Thủ kho đã cập nhật lại số lượng</span>
-                </div>
-                @endif
                 <div class="col-4">
                     <p class="mb-1" style="float:right">{{date(FORMAT_DATE_VN, strtotime($order->order_date))}}</p>
                 </div>

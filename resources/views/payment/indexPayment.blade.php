@@ -126,7 +126,10 @@
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $order->customer->customer_name }}</td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $order->user->name ?? '' }}</td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ number_format($order->order_total) }}</td>
-                                        <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ !empty($order->bankAccount) ? $order->bankAccount->bank_code . '-' . $order->bankAccount->bank_account_name : '' }}</td>
+                                        <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">
+                                            {{ !empty($order->bankAccount) ? $order->bankAccount->bank_code . '-' . $order->bankAccount->bank_account_name : '' }} <br>
+                                            {{ !empty($order->bankAccount2) && $order->bank_account_id !== $order->bank_account_id2 ? $order->bankAccount2->bank_code . '-' . $order->bankAccount2->bank_account_name : '' }}
+                                        </td>
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">
                                             <span class="badge rounded-pill bg-{{STATUS_COLOR[$order->status]}}">{{STATUS_ORDER[$order->status]}}</span>
                                         </td>

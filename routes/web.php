@@ -14,10 +14,14 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE,ACCOUNTANT,WAREHOUSE_STAFF,STOCKER'])->group(function () {
+    Route::prefix('user')->group(function () {
+        Route::get('/detail/{id}', [UserController::class, 'detail'])->name('user.detail');
+    });
+});
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('user.index');
-        Route::get('/detail/{id}', [UserController::class, 'detail'])->name('user.detail');
         Route::delete('/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
         Route::put('/edit/{id}', [UserController::class, 'edit'])->name('user.update');

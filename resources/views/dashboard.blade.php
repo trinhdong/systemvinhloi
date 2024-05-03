@@ -69,9 +69,9 @@
         </div>
     </div>
 @endsection
-@if($isAdmin)
 @section('script')
     <script src="js/dashboard.js"></script>
+    @if($isAdmin)
     <script>
         var options = {
             chart: {
@@ -108,5 +108,5 @@
         var chart = new ApexCharts(document.querySelector("#chart"), options);
         chart.render();
     </script>
+    @endif
 @endsection
-@endif

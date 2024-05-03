@@ -66,20 +66,20 @@ function formatPhoneNumber($number)
 <div style="font-family: 'DejaVu Sans',sans-serif">
     <table width="100%" style="font-family: 'DejaVu Sans',sans-serif">
         <tr>
-            <td valign="top" style="width:70%"><img src="{{public_path('assets/images/logo-icon.png')}}" alt=""
+            <td valign="top" style="width:40%"><img src="{{public_path('assets/images/logo-icon.png')}}" alt=""
                                                     height="80"/></td>
+            <td valign="top" style="width:30%;"></td>
             <td align="right" style="width: 30%">
                 <h6 style="text-align: left; font-weight: bold">CTY TNHH NHỰA VINH LỢI</h6>
                 <div style="text-align: left; line-height: 5px; margin-top: 10px">
                     <p>G8/32 Tỉnh lộ 10, Lê Minh Xuân, </p>
                     <p>Bình Chánh - TP. Hồ Chí Minh</p>
                     <p>ĐT: 3 969 1482 - Fax: 3 960 4613</p>
-                    <p>A Diệu</p>
                 </div>
             </td>
         </tr>
         <tr>
-            <td align="center" colspan="2">
+            <td align="center" colspan="3">
                 <div style="line-height: 5px">
                     <h1 style="font-weight: bold">ĐƠN ĐẶT HÀNG</h1><br>
                     <p>Số: <strong>{{$invoiceId}}</strong></p>
@@ -87,15 +87,21 @@ function formatPhoneNumber($number)
             </td>
         </tr>
         <tr>
-            <td valign="top" style="width:70%;"></td>
+            <td valign="left" style="width:40%;">
+                <div style="text-align: left; line-height: 5px">
+                    <p style="text-align: left;">Người tạo đơn: <span
+                            style="font-weight: bold">{{$order->user->name ?? ''}}</span></p>
+                    <p>{{$order->user->phone ? 'Điện thoại: ' . formatPhoneNumber($order->user->phone ?? '') : ''}}</p>
+                </div>
+            </td>
+            <td valign="top" style="width:30%;"></td>
             <td align="right" style="width: 30%">
                 <div style="text-align: left; line-height: 5px">
                     <p style="text-align: left;">Người Nhận: <span
                             style="font-weight: bold">{{$order->customer->customer_name ?? ''}}</span></p>
-                    <p>SĐT: {{formatPhoneNumber($order->customer->phone ?? '')}}</p>
-                    <p>ĐỊA CHỈ GIAO: {{$order->shipping_address ?? $order->customer->address ?? ''}}</p>
-                    <p style="text-align: left">Ngày nhận
-                        đơn: {{'Ngày ' . date('d', strtotime($order->order_date)) . " tháng " . date('m', strtotime($order->order_date)) . " năm " . date('Y', strtotime($order->order_date))}}</p>
+                    <p>Điện thoại: {{formatPhoneNumber($order->customer->phone ?? '')}}</p>
+                    <p>Địa chỉ: {{$order->shipping_address ?? $order->customer->address ?? ''}}</p>
+                    <p style="text-align: left">Ngày nhận đơn:  {{date('d/m/Y', strtotime($order->order_date))}}</p>
                 </div>
             </td>
         </tr>
@@ -162,7 +168,7 @@ function formatPhoneNumber($number)
             <td style="width: 40%"></td>
             <td valign="top" style="width:30%;">
                 <div style="text-align: center; line-height: 5px">
-                    <p style="white-space: nowrap;">Giờ: ......, Ngày ....... Tháng ...... năm {{date('Y')}}</p>
+                    <p style="white-space: nowrap;">Ngày ....... Tháng ...... năm {{date('Y')}} (Thời gian: {{date('H:i')}}) </p>
                     <p>Thủ kho</p>
                     <p>(Ký, họ tên)</p>
                 </div>
