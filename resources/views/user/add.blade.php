@@ -33,7 +33,7 @@
                         </div>
                         <div class="col-md-8 mt-2">
                             <label class="form-label">Ngày vào làm</label>
-                            <input name="day_of_work" type="text" id="datepicker" class="form-control" value="" >
+                            <input autocomplete="off" name="day_of_work" type="text" id="datepicker" class="form-control" value="" >
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationPassword" class="form-label">Mật khẩu</label>

@@ -31,4 +31,11 @@ $(document).ready(function () {
     $(document).on('focus', '#approveNote, #rejectNote', function () {
         $(this).removeClass('is-invalid');
     })
+
+    $(document).on('click', '#printInvoice, #printDeliveryBill', function (e) {
+        $('#printInvoice, #printDeliveryBill').addClass('disabled');
+        setTimeout(function () {
+            $('#printInvoice, #printDeliveryBill').removeClass('disabled');
+        }, 5000);
+    })
 })

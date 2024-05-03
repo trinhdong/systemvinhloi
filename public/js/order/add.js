@@ -234,11 +234,11 @@ $(document).ready(function () {
             'decimalSymbol': '',
             'digitGroupSymbol': ','
         });
+    })
+    $(document).on('blur', '.quantity input', function (event) {
         if ($(this).val() == 0) {
             $(this).val(1)
         }
-    })
-    $(document).on('blur', '.quantity input', function (event) {
         const quantity = parseInt($(this).val().replace(/,/g, ''));
         const priceDiscount = parseFloat($(this).closest('tr').find('.unit-price').text().replace(/,/g, ''));
         const quantityPerPackage = parseInt($(this).closest('tr').find('.quantity-per-package').val());

@@ -34,6 +34,14 @@ class Order extends Model
         'bank_name',
         'bank_customer_name',
         'payment_date',
+        'bank_account_id2',
+        'bank_account_info2',
+        'payment_method2',
+        'bank_code2',
+        'bank_name2',
+        'bank_customer_name2',
+        'payment_date2',
+        'paid_remaining',
         'delivery_appointment_date',
         'payment_status',
         'payment_check_type',
@@ -53,6 +61,10 @@ class Order extends Model
     public function bankAccount()
     {
         return $this->belongsTo(BankAccount::class);
+    }
+    public function bankAccount2()
+    {
+        return $this->belongsTo(BankAccount::class, 'bank_account_id2');
     }
     public function user()
     {

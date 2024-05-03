@@ -3,8 +3,12 @@
     Nhân viên
 @endsection
 @section('action')
-    <div class="col-12">
-        <a href="{{route('user.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+    <div class="col-12">'
+        @if(Auth::User()->role === SUPER_ADMIN || Auth::User()->role === ADMIN)
+            <a href="{{route('user.index')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+        @else
+            <a href="{{route('dashboard')}}" class="btn btn-sm btn-secondary">Quay lại</a>
+        @endif
     </div>
 @endsection
 @section('breadcrumb')
@@ -46,12 +50,12 @@
                                 </th>
                                 <td>{{ROLE_TYPE_NAME[$user->role]}}</td>
                             </tr>
-                            @if(Auth::User()->id !== $user->id)
+                            @if($user->role !== SUPER_ADMIN || $user->role !== ADMIN)
                             <tr>
                                 <th class="sz-col-170">
                                     <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Ngày vào làm
                                 </th>
-                                <td>{{date('d/m/Y', strtotime($user->day_of_work))}}</td>
+                                <td>{{!empty($user->day_of_work) ? date('d/m/Y', strtotime($user->day_of_work)) : ''}}</td>
                             </tr>
                             @endif
                             </tbody>

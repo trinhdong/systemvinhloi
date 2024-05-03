@@ -210,6 +210,8 @@ class OrderService extends BaseService
         if (Auth::user()->role === STOCKER) {
             $data = array_intersect_key($data, array_flip($this->listFieldstokerUpdateOrder()));
             $data['has_update_quantity'] = HAD_UPDATE_QUANTITY;
+            $order = $this->orderRepository->find(intval($id));
+            $this->updateComment($id, $order, ['note' => 'Thủ kho đã cập nhật lại số lượng thùng'], COMMENT_TYPE_ORDER);
         } else {
             $data['has_update_quantity'] = NOT_YET_UPDATE_QUANTITY;
         }
@@ -448,6 +450,7 @@ class OrderService extends BaseService
     {
         $order = $this->find($id);
         $paid = str_replace(',', '', $input['paid'] ?? '');
+        $paidRemaining = str_replace(',', '', $input['paid_remaining'] ?? '');
         if (isset($input['has_print_red_invoice'])) {
             $dataUpdate['has_print_red_invoice'] = intval($input['has_print_red_invoice'] ?? 0);
         }
@@ -464,8 +467,12 @@ class OrderService extends BaseService
             return $order;
         }
         $dayPaid = \DateTime::createFromFormat(FORMAT_DATE_VN, $input['payment_date']);
-        if ($paid == '' || !$dayPaid) {
+        if ($order->payment_type !== DEPOSIT && ($paid == '' || !$dayPaid)) {
             $msg = $paid == '' ? 'Vui lòng nhập số tiền đã thanh toán' : 'Vui lòng nhập ngày thanh toán';
+            return false;
+        }
+        if ($order->payment_type === DEPOSIT && ($paidRemaining == '' || !$dayPaid)) {
+            $msg = $paid == '' ? 'Vui lòng nhập số tiền đã thanh toán' : 'Vui lòng nhập số tiền còn lại đã thanh toán';
             return false;
         }
         if (!empty($input['payment_method'])) {
@@ -476,13 +483,14 @@ class OrderService extends BaseService
             return false;
         }
         if ((($order->payment_type === PAYMENT_ON_DELIVERY  && !empty($dataUpdate['payment_method']) && $dataUpdate['payment_method'] === TRANFER)
-            || ($order->payment_type !== PAYMENT_ON_DELIVERY && $order->payment_method === TRANFER))
+                || ($order->payment_type === PAY_FULL && $order->payment_method === TRANFER)
+                || ($order->payment_type === DEPOSIT && !empty($dataUpdate['payment_method']) && $dataUpdate['payment_method'] === TRANFER))
             && !$this->checkPaymentMethodTranfer($input, $dataUpdate)
         ) {
             $msg = 'Vui lòng nhập đầy đủ thông tin tài khoản ngân hàng';
             return false;
         }
-        if ($order->payment_type === PAYMENT_ON_DELIVERY && !empty($dataUpdate['payment_method']) && $dataUpdate['payment_method'] === CASH) {
+        if (($order->payment_type === PAYMENT_ON_DELIVERY || $order->payment_type === DEPOSIT) && !empty($dataUpdate['payment_method']) && $dataUpdate['payment_method'] === CASH) {
             $dataUpdate['bank_name'] = null;
             $dataUpdate['bank_code'] = null;
             $dataUpdate['bank_customer_name'] = null;
@@ -491,6 +499,17 @@ class OrderService extends BaseService
         }
         $dataUpdate['payment_date'] = $dayPaid->format(FORMAT_DATE);
         $dataUpdate['paid'] = floatval($paid);
+        if ($order->payment_type === DEPOSIT) {
+            foreach ($dataUpdate as $key => $value) {
+                if ($key === 'has_print_red_invoice' || $key === 'note') {
+                    continue;
+                }
+                $dataUpdate[$key . '2'] = $value;
+                unset($dataUpdate[$key]);
+            }
+            $dataUpdate['paid_remaining'] = floatval($paidRemaining);
+            $dataUpdate['paid'] = $dataUpdate['paid_remaining'] + $order->deposit;
+        }
         $dataUpdate['payment_status'] = IN_PROCESSING;
         $order = $this->update(intval($id), $dataUpdate);
         return $order && $this->updateComment($id, $order, $dataUpdate, COMMENT_TYPE_PAYMENT);
@@ -555,6 +574,9 @@ class OrderService extends BaseService
         }
         if (!empty($order->bank_account_info)) {
             $order->bankAccount = json_decode($order->bank_account_info);
+        }
+        if (!empty($order->bank_account_info2)) {
+            $order->bankAccount2 = json_decode($order->bank_account_info2);
         }
         foreach ($order->orderDetail as &$orderDetail) {
             if (!empty($orderDetail->product_info)) {

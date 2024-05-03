@@ -356,7 +356,7 @@ class OrderController extends Controller
             if (($isAdmin || $isStocker) && isset($status) && $status == REJECTED) {
                 $dataUpdate = ['status' => REJECTED];
             }
-            if ($isAdmin && $dataUpdate['status'] === DELIVERED && $order->payment_status === PAID && $order->payment_check_type === ADMIN_CHECK_PAYMENT) {
+            if ($isAdmin && $dataUpdate['status'] === DELIVERED && $order->payment_status === PAID && $order->payment_check_type === ADMIN_CHECK_PAYMENT && $order->is_print_red_invoice !== PRINTED_RED_INVOICE) {
                 $dataUpdate['payment_status'] = COMPLETE;
                 $dataUpdate['status'] = COMPLETE;
             }
