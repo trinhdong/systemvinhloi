@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateUpdateAreaRequest;
 use App\Services\AreaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,7 @@ class AreaController extends Controller
         return view('area.add');
     }
 
-    public function create(Request $request)
+    public function create(CreateUpdateAreaRequest $request)
     {
         $data = $request->all();
         $user = Auth::user();
@@ -56,7 +57,7 @@ class AreaController extends Controller
         return view('area.edit', compact('area'));
     }
 
-    public function update(Request $request){
+    public function update(CreateUpdateAreaRequest $request){
         $data = $request->all();
         $user = Auth::user();
         $data['updated_by'] = $user['id'];

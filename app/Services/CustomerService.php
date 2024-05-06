@@ -28,7 +28,7 @@ class CustomerService extends BaseService
         return CustomerRepository::class;
     }
 
-    public function searchQuery($query, $request = [], $isSale)
+    public function searchQuery($query, $request = [], $isSale = false)
     {
         $filters = [
             'customer_name' => [
@@ -87,7 +87,7 @@ class CustomerService extends BaseService
                 $this->employeeCustomerRepository->create([
                     'user_id' => Auth::id(),
                     'customer_id' => $customer->id,
-                ]);
+                ], true);
             }
             if (!$customer || !$this->processDiscount($data, $customer->id)) {
                 DB::rollBack();
@@ -101,15 +101,20 @@ class CustomerService extends BaseService
             return false;
         }
         $customer = $this->customerRepository->update($id, $data, true);
-        if($customer && $isAdmin){
-            $this->employeeCustomerRepository->updateOrInsertData([
+        if($customer && $isAdmin && !empty($data['user_id'])){
+            $employeeCustomer = $this->employeeCustomerRepository->updateOrInsertData([
                 'customer_id' => $customer->id,
             ],[
                 'user_id' => $data['user_id'],
             ]);
+            if (!$employeeCustomer) {
+                DB::rollBack();
+                return false;
+            }
         }
         if (!$customer) {
             DB::rollBack();
+            return false;
         }
         DB::commit();
         return $customer;

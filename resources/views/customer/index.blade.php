@@ -48,7 +48,7 @@
                                 <th>Email</th>
                                 <th>Khu vực</th>
                                 @if($isAdmin)
-                                <th>Người quản lý</th>
+                                <th>Người phụ trách</th>
                                 @endif
                                 <th>Hành động</th>
                             </tr>
@@ -68,7 +68,7 @@
                                         <td>{{ $customer->email }}</td>
                                         <td>{{ $areas[$customer->area_id] ?? '' }}</td>
                                         @if($isAdmin)
-                                        <td>{{ $customer->employeeCustomer->user->name ?? 'Chưa có người phụ trách' }}</td>
+                                        <td>{{ $customer->user->name ?? 'Chưa có người phụ trách' }}</td>
                                         @endif
                                         <td>
                                             <div class="table-actions d-flex align-items-center gap-3 fs-6 justify-content-center">

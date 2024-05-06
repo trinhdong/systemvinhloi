@@ -43,7 +43,7 @@ class CustomerController extends Controller
         EmployeeCustomerService $employeeCustomerService,
         OrderRepository $orderRepository,
         UserService $userService,
-        EmployeeCustomerRepository $employeeCustomerRepository,
+        EmployeeCustomerRepository $employeeCustomerRepository
     ) {
         $this->customerService = $customerService;
         $this->areaRepository = $areaRepository;

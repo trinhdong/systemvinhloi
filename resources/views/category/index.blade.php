@@ -16,11 +16,11 @@
                 <div class="col-10">
                     <div class="row">
                         <div class="col-4">
-                            <form class="position-relative">
+                            <form id="form-search" class="position-relative">
                                 <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i
                                         class="bi bi-search"></i></div>
-                                <input class="form-control ps-5 rounded" type="text" placeholder="Nhập nội dung tìm kiếm"
-                                       name="search-category" value="">
+                                <input onchange="$('#form-search').submit()" class="form-control ps-5 rounded" type="text" placeholder="Nhập nội dung tìm kiếm"
+                                       name="search-category" value="{{ request('search-category') }}">
                             </form>
                         </div>
                     </div>

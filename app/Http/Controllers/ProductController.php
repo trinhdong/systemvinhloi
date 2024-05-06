@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Repositories\CategoryRepository;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -12,9 +13,11 @@ class ProductController extends Controller
 {
     protected $productService;
     protected $categoryService;
-    public function __construct (ProductService $productService, CategoryService $categoryService) {
+    protected $categoryRepository;
+    public function __construct (ProductService $productService, CategoryService $categoryService, CategoryRepository $categoryRepository) {
         $this->productService = $productService;
         $this->categoryService = $categoryService;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function getByCategoryId(Request $request)
@@ -33,13 +36,10 @@ class ProductController extends Controller
     }
     public function index(Request $request)
     {
-        $searchTerm = $request->query('search-product', '');
-        $filters = [];
-        if (!empty($searchTerm)) {
-            $filters['whereRaw'] = "product_name LIKE '%" . $searchTerm . "%'";
-        }
-        $productList = $this->productService->paginate($filters, '', 'ASC', 20, false);
-        return view('product.index', compact('productList'));
+        $query = $request->input('query');
+        $productList = $this->productService->searchQuery($query, $request->query());
+        $categories = $this->categoryRepository->getList('category_name');
+        return view('product.index', compact('productList', 'categories'));
     }
     public function show()
     {

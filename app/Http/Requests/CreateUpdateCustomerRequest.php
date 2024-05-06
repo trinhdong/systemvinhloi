@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateUpdateCustomerRequest extends FormRequest
 {
@@ -37,6 +38,13 @@ class CreateUpdateCustomerRequest extends FormRequest
             $rules['email'] = 'email|max:255';
             if ($this->isMethod('POST')) {
                 $rules['email'] .= '|unique:customers,email';
+            }
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                $rules['email'] = [
+                    'email',
+                    'max:255',
+                    Rule::unique('customers', 'email')->ignore($this->route('id'))->whereNull('deleted_at'),
+                ];
             }
         }
         if (!empty($this->input('tax_code'))) {

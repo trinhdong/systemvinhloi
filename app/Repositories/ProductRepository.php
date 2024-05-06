@@ -39,6 +39,7 @@ class ProductRepository extends BaseRepository
         }
         $productData = $data->except(['image_url']);
         $productData['image_url'] = $imagePath;
+        $productData['price'] = str_replace(',', '', $productData['price']);
 
         return $this->create($productData);
     }
@@ -46,6 +47,7 @@ class ProductRepository extends BaseRepository
     {
         $product = $this->model->find($data['id']);
         $productData = $data->except(['image_url']);
+        $productData['price'] = str_replace(',', '', $productData['price']);
         if ($data->hasFile('image_url')) {
             $file = $data->file('image_url');
             $filename = time() . '_' . $file->getClientOriginalName();

@@ -16,72 +16,82 @@
     </div>
 @endsection
 @section('content')
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="p-4 border rounded row mb-4">
-                        <div class="col-md-6">
-                            <div class="mt-2">
-                                <label for="product_code" class="form-label">Mã sản phẩm</label>
-                                <input name="product_code" type="text" class="form-control" id="product_code"
-                                       value="{{$product->product_code}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="product_name" class="form-label">Tên sản phẩm</label>
-                                <input name="product_name" type="text" class="form-control" id="product_name"
-                                       value="{{$product->product_name}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="color" class="form-label">Màu sắc</label>
-                                <input name="color" type="text" class="form-control" id="color" value="{{$product->color}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="capacity" class="form-label">Dung tích</label>
-                                <input name="capacity" type="text" class="form-control" id="capacity" value="{{$product->capacity}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="unit" class="form-label">Đơn vị tính</label>
-                                <input name="unit" type="text" class="form-control" id="unit" value="{{$product->unit}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="specifications" class="form-label">Quy cách</label>
-                                <input name="specifications" type="text" class="form-control" id="specifications"
-                                       value="{{$product->specifications}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="quantity_per_package" class="form-label">Số lượng theo quy cách</label>
-                                <input name="quantity_per_package" type="text" class="form-control"
-                                       id="quantity_per_package" value="{{$product->quantity_per_package}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="price" class="form-label">Đơn giá</label>
-                                <input name="price" type="text" class="form-control" id="price" value="{{number_format($product->price)}}" readonly>
-                            </div>
-                            <div class="mt-2">
-                                <label for="category" class="form-label">Danh mục sản phẩm</label>
-                                <select name="category_id" class="form-control" id="category" disabled>
-                                    <option value="">Chọn danh mục</option>
-                                    @foreach($categoryList as $key => $category)
-                                        <option value="{{ $category->id }}" {{$product->category_id == $category->id ? 'selected' : ''}}>{{ $category->category_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mt-2">
-                                <label for="image_url" class="form-label">Hình ảnh sản phẩm</label>
-                            </div>
-                            <div class="mt-2">
-                                @if($product->image_url)
-                                <img src="{{ asset($product->image_url) }}" alt=""  style="max-width: 50%; height: auto;">
-                                @else
-                                    <img src="{{ asset("/storage/images/products/no-image.jpg") }}" alt=""  style="max-width: 50%; height: auto;">
-                                @endif
-                            </div>
-                        </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row py-4">
+                <div class="col-12">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0">Thông tin sản phẩm</h5>
                     </div>
-                    <div class="d-flex justify-content-center align-items-center">
+                    <div class="table-responsive mt-3">
+                        <table class="table table-bordered">
+                            <tbody>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Mã sản phẩm
+                                </th>
+                                <td>{{$product->product_code}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Tên sản phẩm
+                                </th>
+                                <td>{{$product->product_name}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Màu sắc
+                                </th>
+                                <td>{{$product->color}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Dung tích
+                                </th>
+                                <td>{{$product->capacity}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Đơn vị tính
+                                </th>
+                                <td>{{$product->unit}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Quy cách
+                                </th>
+                                <td>{{$product->specifications}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Số lượng theo quy cách
+                                </th>
+                                <td>{{$product->quantity_per_package}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Đơn giá
+                                </th>
+                                <td>{{number_format($product->price)}}</td>
+                            </tr>
+                            <tr>
+                                <th class="sz-col-100">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Hình ảnh sản phẩm
+                                </th>
+                                <td>
+                                    <div class="mt-2">
+                                        @if($product->image_url)
+                                            <img src="{{ asset($product->image_url) }}" alt=""  style="max-width: 20%; height: auto;">
+                                        @else
+                                            <img src="{{ asset("/storage/images/products/no-image.jpg") }}" alt=""  style="max-width: 20%; height: auto;">
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-center">
                         <a href="{{route('product.edit', $product->id)}}" style="width: 80px;" class="btn btn-primary mt-3 me-2">Sửa</a>
                     </div>
                 </div>

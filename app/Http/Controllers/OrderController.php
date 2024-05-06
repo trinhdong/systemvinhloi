@@ -62,7 +62,6 @@ class OrderController extends Controller
         $isWareHouseStaff = Auth::user()->role == WAREHOUSE_STAFF;
         $isStocker = Auth::user()->role == STOCKER;
         $isAccountant =  Auth::user()->role == ACCOUNTANT;
-        $filters = [];
         if ($isStocker) {
             $input['status_not_in'] = [DRAFT];
             unset($statusList[DRAFT]);
@@ -87,7 +86,7 @@ class OrderController extends Controller
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
         $customers = $this->orderService->mapCustomers();
-        $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
+        $sales = $this->userRepository->getWhereIN('role', [SALE, SUPER_ADMIN, ADMIN])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
     }
 
@@ -371,7 +370,7 @@ class OrderController extends Controller
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
         $customers = $this->orderService->mapCustomers();
-        $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
+        $sales = $this->userRepository->getWhereIN('role', [SALE, SUPER_ADMIN, ADMIN])->pluck('name', 'id');
         $deliveredDates = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERED])->pluck('created_at', 'order_id');
         $dateDeliverys = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERY])->pluck('created_at', 'order_id');
         return view('payment.indexPayment', compact('orders', 'customers', 'statusPayment', 'statusList', 'sales', 'deliveredDates', 'dateDeliverys'));

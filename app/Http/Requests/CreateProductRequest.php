@@ -26,7 +26,12 @@ class CreateProductRequest extends FormRequest
         return [
             'product_code' => 'required|unique:products,product_code',
             'product_name' => 'required',
-            'price' => 'required|numeric',
+            'price' => 'required',
+            'color' => 'required',
+            'capacity' => 'required',
+            'unit' => 'required',
+            'specifications' => 'required',
+            'quantity_per_package' => 'required',
         ];
     }
     public function messages()
@@ -36,8 +41,11 @@ class CreateProductRequest extends FormRequest
             'product_code.unique' => 'Mã sản phẩm đã tồn tại trong hệ thống.',
             'product_name.required' => 'Tên sản phẩm không được để trống.',
             'price.required' => 'Giá sản phẩm không được để trống.',
-            'price.numeric' => 'Giá sản phẩm phải là một số hợp lệ.',
-            // ...
+            'color.required' => 'Màu sắc sản phẩm không được để trống.',
+            'capacity.required' => 'Dung tích sản phẩm không được để trống.',
+            'unit.required' => 'Đơn vị tính không được để trống.',
+            'specifications.required' => 'Quy cách sản phẩm không được để trống.',
+            'quantity_per_package.required' => 'Số lượng theo quy cách không được để trống.',
         ];
     }
 }
