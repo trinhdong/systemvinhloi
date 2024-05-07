@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateUpdateCategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -31,7 +31,7 @@ class CategoryController extends Controller
         return view('category.add');
     }
 
-    public function create(Request $request)
+    public function create(CreateUpdateCategoryRequest $request)
     {
         $data = $request->all();
         $user = Auth::user();
@@ -57,7 +57,7 @@ class CategoryController extends Controller
         return view('category.edit', compact('category'));
     }
 
-    public function update(Request $request){
+    public function update(CreateUpdateCategoryRequest $request){
         $data = $request->all();
         $user = Auth::user();
         $data['updated_by'] = $user['id'];

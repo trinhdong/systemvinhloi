@@ -684,6 +684,9 @@ class OrderService extends BaseService
     public function mapCustomers()
     {
         $customerInfos = $this->orderRepository->getList('customer_info');
+        if (Auth::user()->role == SALE) {
+            $customerInfos = $this->orderRepository->getWhere('created_by', Auth::user()->id)->pluck('customer_info', 'id');
+        }
         $customers = [];
         foreach ($customerInfos as $customer) {
             $customer = json_decode($customer);

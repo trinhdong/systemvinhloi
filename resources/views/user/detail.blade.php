@@ -58,6 +58,18 @@
                                 <td>{{!empty($user->day_of_work) ? date('d/m/Y', strtotime($user->day_of_work)) : ''}}</td>
                             </tr>
                             @endif
+                            @if($user->role === SALE && !$user->customer->isEmpty())
+                                <tr>
+                                    <th class="sz-col-170">
+                                        <em class="fa fa-envelope mr-1" aria-hidden="true"></em>Danh sách khách hàng phụ trách
+                                    </th>
+                                    <td>
+                                        @foreach($user->customer as $customer)
+                                            {{$customer['customer_name'] . '-' . $customer['phone']}} <br>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>

@@ -59,4 +59,13 @@ class User extends Authenticatable
     {
         return $this->role === $role;
     }
+
+    public function employeeCustomer() {
+        return $this->hasMany(EmployeeCustomer::class, 'user_id', 'id');
+    }
+
+    public function customer()
+    {
+        return $this->hasManyThrough(Customer::class, EmployeeCustomer::class, 'user_id', 'id', 'id', 'customer_id');
+    }
 }

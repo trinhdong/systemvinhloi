@@ -25,3 +25,10 @@ $(document).on('submit', 'form', function () {
 $(document).on('focus', 'input[name="name"], input[name="email"], input[name="password"], select[name="role"]', function () {
     $(this).removeClass('is-invalid');
 })
+$(document).on('change', 'select[name="role"]', function () {
+    if ($(this).val() == 2) {
+        $('#addCustomer').removeClass('d-none')
+    } else {
+        $('#addCustomer').addClass('d-none')
+    }
+})

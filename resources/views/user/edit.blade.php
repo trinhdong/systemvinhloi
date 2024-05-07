@@ -57,6 +57,19 @@
                         </div>
                         @endif
                     </div>
+                    <div id="addCustomer" class="table-responsive mt-3 {{$user->role === SALE ? '' : 'd-none'}}">
+                        <div class="col-md-3 mt-2">
+                            <label for="validationRole" class="form-label">Khách hàng phụ trách</label>
+                            <select name="customer_ids[]" class="form-select single-select" multiple>
+                                @foreach($customers as $customer)
+                                    <option value="{{ $customer['id'] }}" {{in_array($customer['id'], $customerIds) ? 'selected' : ''}}>
+                                        {{$customer['customer_name'] . '-' . $customer['phone']}}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Vui lòng chọn chức vụ</div>
+                        </div>
+                    </div>
             </div>
             <button style="width: 80px;" class="btn btn-success mt-3" type="submit">Lưu</button>
         </div>

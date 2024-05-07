@@ -62,7 +62,6 @@ class OrderController extends Controller
         $isWareHouseStaff = Auth::user()->role == WAREHOUSE_STAFF;
         $isStocker = Auth::user()->role == STOCKER;
         $isAccountant =  Auth::user()->role == ACCOUNTANT;
-        $filters = [];
         if ($isStocker) {
             $input['status_not_in'] = [DRAFT];
             unset($statusList[DRAFT]);
@@ -86,23 +85,8 @@ class OrderController extends Controller
         foreach ($orders as &$order) {
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
-        if ($isSale) {
-            $userId = Auth::user()->id;
-            $filters['join'] = [
-                [
-                    'table' => 'employee_customers',
-                    'table_id' => 'employee_customers.customer_id',
-                    'table_reference_id' => 'customers.id'
-                ]
-            ];
-            $filters['employee_customers.user_id'] = [
-                'operator' => '=',
-                'value' => $userId
-            ];
-        }
-        $customers = $this->customerService->filter($filters);
-        //$customers = $this->orderService->mapCustomers();
-        $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
+        $customers = $this->orderService->mapCustomers();
+        $sales = $this->userRepository->getWhereIN('role', [SALE, SUPER_ADMIN, ADMIN])->pluck('name', 'id');
         return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
     }
 
@@ -137,22 +121,10 @@ class OrderController extends Controller
     {
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
             $isSale =  Auth::user()->role == SALE;
-            $filters = [];
+            $customers = $this->customerRepository->getList('customer_name');
             if ($isSale) {
-                $userId = Auth::user()->id;
-                $filters['join'] = [
-                    [
-                        'table' => 'employee_customers',
-                        'table_id' => 'employee_customers.customer_id',
-                        'table_reference_id' => 'customers.id'
-                    ]
-                ];
-                $filters['employee_customers.user_id'] = [
-                    'operator' => '=',
-                    'value' => $userId
-                ];
+                $customers = Auth::user()->customer->pluck('customer_name', 'id');
             }
-            $customers = $this->customerService->filter($filters);
             $categories = $this->categoryRepository->getList('category_name');
             $bankAccounts = $this->bankAccountRepository->getListCustom('bank_code', 'bank_account_name');
             $discounts = $this->orderService->mapDiscountsPercent();
@@ -223,6 +195,9 @@ class OrderController extends Controller
 
         if (!$request->isMethod('post') && !$request->isMethod('put')) {
             $customers = $this->customerRepository->getList('customer_name');
+            if (Auth::user()->role == SALE) {
+                $customers = Auth::user()->customer->pluck('customer_name', 'id');
+            }
             $categories = $this->categoryRepository->getList('category_name');
             $discounts = $this->orderService->mapDiscountsPercent();
             $discountsPrice = $this->orderService->mapDiscountsPrice();
@@ -395,7 +370,7 @@ class OrderController extends Controller
             $order = $this->orderService->replaceOrderDataInfo($order);
         }
         $customers = $this->orderService->mapCustomers();
-        $sales = $this->userRepository->getWhere(['role' => SALE])->pluck('name', 'id');
+        $sales = $this->userRepository->getWhereIN('role', [SALE, SUPER_ADMIN, ADMIN])->pluck('name', 'id');
         $deliveredDates = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERED])->pluck('created_at', 'order_id');
         $dateDeliverys = $this->commentRepository->getWhere(['type' => COMMENT_TYPE_ORDER, 'status' => DELIVERY])->pluck('created_at', 'order_id');
         return view('payment.indexPayment', compact('orders', 'customers', 'statusPayment', 'statusList', 'sales', 'deliveredDates', 'dateDeliverys'));

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateUpdateUserRequest extends FormRequest
 {
@@ -35,6 +36,14 @@ class CreateUpdateUserRequest extends FormRequest
         if ($this->isMethod('POST')) {
             $rules['email'] .= '|unique:users,email';
             $rules['password'] = 'required|string|min:8';
+        }
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            $rules['email'] = [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($this->route('id'))->whereNull('deleted_at'),
+            ];
         }
         if (!empty($this->input('phone'))) {
             $rules['phone'] = ['string', 'max:20', 'regex:/^0\d{9,10}$/'];

@@ -27,6 +27,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN'])->group(function () {
         Route::put('/edit/{id}', [UserController::class, 'edit'])->name('user.update');
         Route::get('/add', [UserController::class, 'add'])->name('user.add');
         Route::post('/add', [UserController::class, 'add'])->name('user.create');
+        Route::get('/search-customer',  [UserController::class, 'searchCustomer'])->name('user.searchCustomer');
     });
     Route::prefix('customer')->group(function () {
         Route::delete('/delete/{id}', [CustomerController::class, 'delete'])->name('customer.delete');
@@ -56,7 +57,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(functi
         Route::post('/add', 'create')->name('category.create.post');
         Route::get('/detail/{id}', 'detail')->name('category.detail');
         Route::get('/edit/{id}', 'edit')->name('category.edit');
-        Route::post('/edit/{id}', 'update')->name('category.update');
+        Route::put('/edit/{id}', 'update')->name('category.update');
         Route::delete('/delete/{id}', 'delete')->name('category.delete');
     });
     Route::controller(ProductController::class)->prefix('product')->group(function () {
@@ -89,7 +90,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,SALE'])->group(function 
         Route::post('/add', 'create')->name('area.create.post');
         Route::get('/detail/{id}', 'detail')->name('area.detail');
         Route::get('/edit/{id}', 'edit')->name('area.edit');
-        Route::post('/edit/{id}', 'update')->name('area.update');
+        Route::put('/edit/{id}', 'update')->name('area.update');
         Route::delete('/delete/{id}', 'delete')->name('area.delete');
     });
 });

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class EmployeeCustomer extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     protected $table = 'employee_customers';
 
     protected static function boot()
@@ -31,10 +31,10 @@ class EmployeeCustomer extends Model
         'updated_by',
     ];
     public function user() {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     public function customer() {
-        return $this->belongsTo(Customer::class, 'customer_id', 'id');
+        return $this->belongsTo(Customer::class);
     }
 }

@@ -72,10 +72,7 @@ abstract class BaseRepository
      */
     public function getWherein($column, $value)
     {
-        if($conditions) {
-            return $this->model->whereIn($column, $value)->get();
-        }
-        return $this->model->get();
+        return $this->model->whereIn($column, $value)->get();
     }
 
     /**
@@ -458,9 +455,30 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function updateOrInsertData(array $attributes, array $values = [])
+    public function updateOrInsertData(array $attributes, array $values = [], $hasTransaction = false)
     {
-       return $this->model->updateOrCreate($attributes, $values);
+        if (!$hasTransaction) {
+            DB::beginTransaction();
+        }
+        try {
+            $result =  $this->model->updateOrCreate($attributes, $values);
+            if ($result) {
+                if (!$hasTransaction) {
+                    DB::commit();
+                }
+                return true;
+            }
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
+            return false;
+        } catch (\Throwable $th) {
+            Log::error($th);
+            if (!$hasTransaction) {
+                DB::rollBack();
+            }
+            return false;
+        }
     }
 
     /**

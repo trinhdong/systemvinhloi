@@ -38,6 +38,10 @@ class Customer extends Model
         return $this->hasMany(Order::class);
     }
     public function employeeCustomer() {
-        return $this->belongsTo(EmployeeCustomer::class, 'id', 'customer_id');
+        return $this->hasOne(EmployeeCustomer::class, 'customer_id', 'id');
+    }
+    public function user()
+    {
+        return $this->hasOneThrough(User::class, EmployeeCustomer::class, 'customer_id', 'id', 'id', 'user_id');
     }
 }

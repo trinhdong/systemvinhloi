@@ -15,20 +15,24 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                        <div class="p-4 rounded">
-                            <div class="row mb-2">
-                                <label for="name" class="col-sm-2 col-form-label">Tên khu vực</label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="name" class="form-control" id="area_name" placeholder="Nhập tên khu vực" value="{{$area->name}}" readonly>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label for="description" class="col-sm-2 col-form-label">Nội dung khu vực</label>
-                                <div class="col-sm-10">
-                                    <textarea name="description" class="form-control" id="description" placeholder="Nhập nội dung khu vực" readonly>{{$area->description}}</textarea>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-bordered">
+                            <tbody>
+                            <tr>
+                                <th style="width: 200px">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Tên khu vực
+                                </th>
+                                <td>{{$area->name}}</td>
+                            </tr>
+                            <tr>
+                                <th style="width: 200px">
+                                    <em class="fa fa-id-card mr-1" aria-hidden="true"></em>Nội dung khu vực
+                                </th>
+                                <td>{{$area->description}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <a href="{{route('area.edit', $area->id)}}" style="width: 80px;" class="btn btn-primary">Sửa</a>

@@ -107,7 +107,7 @@
             </li>
         @endif
         @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
-            <li class="<?= (request()->is('bank_account*')) ? 'mm-active' : '' ?>">
+            <li class="<?= (request()->is('bank-account*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('bank_account.index')}}">
                     <div class="parent-icon"><i class="bx bxs-bank"></i>
                     </div>
