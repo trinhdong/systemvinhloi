@@ -131,6 +131,9 @@ class OrderService extends BaseService
                 $filters['delivery_appointment_date'] = $deliveryAppointmentDate->format(FORMAT_DATE);
             }
         }
+        if (Auth::user()->role == SALE) {
+            $filters['created_by'] = Auth::user()->id;
+        }
 
         return $this->paginate($filters, 'id');
     }
@@ -203,14 +206,16 @@ class OrderService extends BaseService
             DB::commit();
             return $order;
         }
-        $isUpdateCustomer = $this->checkUpdateCustomer($data['customer_id'] ?? 0, $id);
-        $data['order_number'] = $this->generateOrderNumber($data['customer_id'] ?? 0, true, $isUpdateCustomer);
+        $order = $this->orderRepository->find(intval($id));
+        $isUpdateCustomer = $this->checkUpdateCustomer($data['customer_id'] ?? 0, $order);
+        if ($isUpdateCustomer) {
+            $data['order_number'] = $this->generateOrderNumber($data['customer_id'] ?? 0, $order);
+        }
         $data['paid'] = null;
         $data['payment_check_type'] = UNCHECK_PAYMENT;
         if (Auth::user()->role === STOCKER) {
             $data = array_intersect_key($data, array_flip($this->listFieldstokerUpdateOrder()));
             $data['has_update_quantity'] = HAD_UPDATE_QUANTITY;
-            $order = $this->orderRepository->find(intval($id));
             $this->updateComment($id, $order, ['note' => 'Thủ kho đã cập nhật lại số lượng thùng'], COMMENT_TYPE_ORDER);
         } else {
             $data['has_update_quantity'] = NOT_YET_UPDATE_QUANTITY;
@@ -547,23 +552,42 @@ class OrderService extends BaseService
         ]);
     }
 
-    public function generateOrderNumber($customerId, $isUpdateOrder = false, $isUpdateCustomer = false)
+    private function getTotalOrderOf($orderNumber, $isCus = false)
     {
-        $totalOrder = $this->orderRepository->getAll(true)->count() + 1;
-        $totalOrderOfCus = $this->orderRepository->getWhere([
-            'customer_id' => $customerId,
-            ['created_at' , '>=', date(FORMAT_DATE_TIME, strtotime(date('Y') . '-01-01' . '00:00:00'))]
-        ], true)->count() + 1;
-        if ($isUpdateOrder) {
-            $totalOrder = $totalOrder - 1;
-            $totalOrderOfCus = $isUpdateCustomer ? $totalOrderOfCus :  $totalOrderOfCus - 1;
+        $arrOrderNumber = explode('-', $orderNumber);
+        if ($isCus) {
+            return intval($arrOrderNumber[1] ?? 0);
+        }
+        return intval($arrOrderNumber[2] ?? 0);
+    }
+
+    public function generateOrderNumber($customerId, $order = null)
+    {
+        $totalOrder = 1;
+        $totalOrderOfCus = 1;
+        $condition = [['created_at' , '>=', date(FORMAT_DATE_TIME, strtotime(date('Y') . '-01-01' . '00:00:00'))]];
+        if (Auth::user()->role == SALE) {
+            $condition['created_by'] = Auth::user()->id;
+        }
+        $latestOrder = $this->orderRepository->getWhere($condition, true)->last();
+        if (!empty($latestOrder)) {
+            $totalOrder = $this->getTotalOrderOf($latestOrder->order_number) + 1;
+        }
+        if (!empty($order)) {
+            $totalOrder = $this->getTotalOrderOf($order);
+        }
+
+        unset($condition['created_by']);
+        $condition['customer_id'] = $customerId;
+        $latestOrder = $this->orderRepository->getWhere($condition, true, 'order_number')->last();
+        if (!empty($latestOrder)) {
+            $totalOrderOfCus = $this->getTotalOrderOf($latestOrder->order_number, true) + 1;
         }
         return $customerId . '-' . $totalOrderOfCus . '-' . $totalOrder .'-' .'VINHLOI' . '-' . date('Y');
     }
 
-    private function checkUpdateCustomer($customerId, $orderId)
+    private function checkUpdateCustomer($customerId, $order)
     {
-        $order = $this->find($orderId);
         return $order->customer_id !== $customerId;
     }
 
@@ -685,7 +709,7 @@ class OrderService extends BaseService
     {
         $customerInfos = $this->orderRepository->getList('customer_info');
         if (Auth::user()->role == SALE) {
-            $customerInfos = $this->orderRepository->getWhere('created_by', Auth::user()->id)->pluck('customer_info', 'id');
+            $customerInfos = $this->orderRepository->getWhere(['created_by' => Auth::user()->id])->pluck('customer_info', 'id');
         }
         $customers = [];
         foreach ($customerInfos as $customer) {

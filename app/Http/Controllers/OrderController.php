@@ -93,6 +93,9 @@ class OrderController extends Controller
     public function detail(int $id)
     {
         $order = $this->orderService->find($id);
+        if (Auth::user()->role == SALE && Auth::user()->id != $order->created_by) {
+            return abort(403, 'Unauthorized');
+        }
         if (Auth::user()->role == STOCKER && $order->status === DRAFT) {
             return abort(403, 'Unauthorized');
         }
@@ -175,6 +178,9 @@ class OrderController extends Controller
     public function edit(CreateUpdateOrderRequest $request, $id)
     {
         $order = $this->orderService->find($id);
+        if (Auth::user()->role == SALE && Auth::user()->id != $order->created_by) {
+            return abort(403, 'Unauthorized');
+        }
         if (in_array($order->status, [DELIVERY, DELIVERED, COMPLETE])) {
             return abort(403, 'Unauthorized');
         }

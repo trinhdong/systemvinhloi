@@ -52,9 +52,12 @@ abstract class BaseRepository
      *
      * @return Model instance
      */
-    public function getWhere($conditions = false, $withTrashed = false)
+    public function getWhere($conditions = false, $withTrashed = false, $orderBy = '')
     {
         if($conditions) {
+            if ($orderBy !== '') {
+                return $this->model->where($conditions)->orderBy($orderBy, 'ASC')->withTrashed()->get();
+            }
             if ($withTrashed) {
                 return $this->model->where($conditions)->withTrashed()->get();
             }
