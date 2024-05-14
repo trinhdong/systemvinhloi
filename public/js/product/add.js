@@ -33,10 +33,6 @@ $(document).ready(function () {
             $('input[name="product_name"]').addClass('is-invalid')
             isValid = false;
         }
-        if ($('input[name="color"]').val() == '') {
-            $('input[name="color"]').addClass('is-invalid')
-            isValid = false;
-        }
         if ($('input[name="capacity"]').val() == '') {
             $('input[name="capacity"]').addClass('is-invalid')
             isValid = false;
@@ -69,7 +65,7 @@ $(document).ready(function () {
 
     });
 
-    $(document).on('change', 'input[name="product_code"], input[name="product_name"], input[name="color"], input[name="capacity"], input[name="unit"], input[name="price"], select[name="category_id"], input[name="specifications"], input[name="quantity_per_package"]', function () {
+    $(document).on('change', 'input[name="product_code"], input[name="product_name"], input[name="capacity"], input[name="unit"], input[name="price"], select[name="category_id"], input[name="specifications"], input[name="quantity_per_package"]', function () {
         $(this).removeClass('is-invalid');
 
     });

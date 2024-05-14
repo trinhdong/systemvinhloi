@@ -19,27 +19,36 @@
                     <div class="col-12">
                         <div class="col-md-8 mt-2">
                             <label for="validationName" class="form-label">Tên</label>
-                            <input name="name" type="text" class="form-control" id="validationName" value="" >
+                            <input name="name" type="text" class="form-control" id="validationName" value="{{ old('name') }}" >
                             <div class="invalid-feedback">Vui lòng nhập tên</div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationEmail" class="form-label">Email</label>
-                            <input name="email" type="email" class="form-control" id="validationEmail" value="" >
+                            <input name="email" type="email" class="form-control" id="validationEmail" value="{{ old('email') }}" >
                             <div class="invalid-feedback">Vui lòng nhập email</div>
                         </div>
                         <div class="col-md-8 mt-2">
                             <label class="form-label">Số điện thoại</label>
-                            <input name="phone" type="text" class="form-control" value="" >
+                            <input name="phone" type="text" class="form-control" value="{{ old('phone') }}" >
                         </div>
                         <div class="col-md-8 mt-2">
                             <label class="form-label">Ngày vào làm</label>
-                            <input autocomplete="off" name="day_of_work" type="text" id="datepicker" class="form-control" value="" >
+                            <input autocomplete="off" name="day_of_work" type="text" id="datepicker" class="form-control" value="{{ old('day_of_work') }}" >
                         </div>
                         <div class="col-md-8 mt-2">
                             <label for="validationPassword" class="form-label">Mật khẩu</label>
                             <div class="input-group has-validation">
-                                <input name="password" type="password" class="form-control" id="validationPassword" >
+                                <input name="password" type="password" class="form-control" id="validationPassword">
+                                <button class="btn btn-outline-secondary toggle-password" type="button"><i class="bi bi-eye-slash"></i></button>
                                 <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <label for="password-confirm" class="form-label">Xác nhận mật khẩu</label>
+                            <div class="input-group has-validation">
+                                <input name="password_confirmation" type="password" class="form-control" id="password-confirm">
+                                <button class="btn btn-outline-secondary toggle-password" type="button"><i class="bi bi-eye-slash"></i></button>
+                                <div class="invalid-feedback">Vui lòng nhập xác nhận mật khẩu</div>
                             </div>
                         </div>
                         <div class="col-md-3 mt-2">

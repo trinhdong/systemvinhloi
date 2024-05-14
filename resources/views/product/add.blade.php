@@ -24,50 +24,49 @@
                     <div class="col-md-6">
                         <div class="mt-2">
                             <label for="product_code" class="form-label">Mã sản phẩm</label>
-                            <input name="product_code" type="text" class="form-control" id="product_code" value=""
+                            <input name="product_code" type="text" class="form-control" id="product_code" value="{{ old('product_code') }}"
                                    placeholder="Nhập mã sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập mã sản phẩm</div>
                         </div>
                         <div class="mt-2">
                             <label for="product_name" class="form-label">Tên sản phẩm</label>
-                            <input name="product_name" type="text" class="form-control" id="product_name" value=""
+                            <input name="product_name" type="text" class="form-control" id="product_name" value="{{ old('product_name') }}"
                                    placeholder="Nhập tên sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập tên sản phẩm</div>
                         </div>
                         <div class="mt-2">
                             <label for="color" class="form-label">Màu sắc</label>
-                            <input name="color" type="text" class="form-control" id="color" value=""
+                            <input name="color" type="text" class="form-control" id="color" value="{{ old('color') }}"
                                    placeholder="Nhập màu sắc sản phẩm">
-                            <div class="invalid-feedback">Vui lòng nhập màu sắc sản phẩm</div>
                         </div>
                         <div class="mt-2">
                             <label for="capacity" class="form-label">Dung tích</label>
-                            <input name="capacity" type="text" class="form-control" id="capacity" value=""
+                            <input name="capacity" type="text" class="form-control" id="capacity" value="{{ old('capacity') }}"
                                    placeholder="Nhập dung tích sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập dung tích sản phẩm</div>
                         </div>
                         <div class="mt-2">
                             <label for="unit" class="form-label">Đơn vị tính</label>
-                            <input name="unit" type="text" class="form-control" id="unit" value=""
+                            <input name="unit" type="text" class="form-control" id="unit" value="{{ old('unit') }}"
                                    placeholder="Nhập dung tích sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập dung tích sản phẩm</div>
                         </div>
                         <div class="mt-2">
                             <label for="specifications" class="form-label">Quy cách</label>
                             <input name="specifications" type="text" class="form-control" id="specifications"
-                                   value="" placeholder="Nhập quy cách sản phẩm">
+                                   value="{{ old('specifications') }}" placeholder="Nhập quy cách sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập quy cách sản phẩm</div>
                         </div>
                         <div class="mt-2">
                             <label for="quantity_per_package" class="form-label">Số lượng theo quy cách</label>
                             <input name="quantity_per_package" type="text" class="form-control"
-                                   id="quantity_per_package" value=""
+                                   id="quantity_per_package" value="{{ old('quantity_per_package') }}"
                                    placeholder="Nhập số lượng theo quy cách sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập số lượng theo quy cách</div>
                         </div>
                         <div class="mt-2">
                             <label for="price" class="form-label">Đơn giá</label>
-                            <input name="price" type="text" class="form-control" id="price" value=""
+                            <input name="price" type="text" class="form-control" id="price" value="{{ old('price') }}"
                                    placeholder="Nhập đơn giá sản phẩm">
                             <div class="invalid-feedback">Vui lòng nhập đơn giá sản phẩm</div>
                         </div>

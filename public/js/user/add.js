@@ -1,3 +1,17 @@
+$(document).ready(function () {
+    $('.toggle-password').click(function () {
+        // Tìm icon bên trong nút
+        let icon = $(this).find('i');
+        // Kiểm tra và thay đổi class của icon
+        if (icon.hasClass('bi-eye-slash')) {
+            icon.removeClass('bi-eye-slash').addClass('bi-eye'); // Chuyển sang trạng thái hiển thị mật khẩu
+            $(this).parent().find('input').attr('type', 'text');
+        } else {
+            icon.removeClass('bi-eye').addClass('bi-eye-slash'); // Chuyển sang trạng thái ẩn mật khẩu
+            $(this).parent().find('input').attr('type', 'password');
+        }
+    });
+});
 $(document).on('submit', 'form', function () {
     let isValid = true;
     if ($('input[name="name"]').val() == '') {

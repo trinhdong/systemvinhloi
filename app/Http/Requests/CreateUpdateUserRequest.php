@@ -35,7 +35,7 @@ class CreateUpdateUserRequest extends FormRequest
 
         if ($this->isMethod('POST')) {
             $rules['email'] .= '|unique:users,email';
-            $rules['password'] = 'required|string|min:8';
+            $rules['password'] = 'required|string|min:8|confirmed';
         }
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             $rules['email'] = [
@@ -63,6 +63,7 @@ class CreateUpdateUserRequest extends FormRequest
             'password.min' => 'Vui lòng nhập mật khẩu lớn hơn hoặc 8 ký tự.',
             'phone.max' => 'Số điện thoại không được vượt quá :max ký tự.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
+            'password.confirmed' => 'Xác nhận mật khẩu không chính xác.',
         ];
     }
 }
