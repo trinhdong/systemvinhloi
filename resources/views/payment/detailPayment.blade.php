@@ -11,9 +11,9 @@
     {{$order->order_number}}
 @endsection
 <?php
-    $isEdit = in_array($order->payment_status, [UNPAID, IN_PROCESSING, REJECTED]) && $order->status === DELIVERED && $order->payment_type !== DEPOSIT;
+    $isEdit = in_array($order->payment_status, [UNPAID, IN_PROCESSING, REJECTED]) && $order->status === DELIVERED && $order->payment_type !== DEPOSIT && Auth::user()->role !== SALE;
     $isTranfer = $order->payment_method === TRANFER && $order->payment_type === PAY_FULL;
-    $isEditDeposit = in_array($order->payment_status, [DEPOSITED, IN_PROCESSING]) && $order->status === DELIVERED;
+    $isEditDeposit = in_array($order->payment_status, [DEPOSITED, IN_PROCESSING]) && $order->status === DELIVERED && Auth::user()->role !== SALE;
 ?>
 @section('content')
     <div class="card">
@@ -431,6 +431,12 @@
                                         <h5 class="mb-0 col-5" id="order-total">{{number_format($order->order_total)}}₫</h5>
                                     </div>
                                     @if($order->payment_type === DEPOSIT)
+                                    @if($order->payment_status === DEPOSITED || $order->payment_status === IN_PROCESSING)
+                                    <div class="form-group row mt-3">
+                                        <div class=" col-7 fw-bold">Số tiền còn lại</div>
+                                        <h5 class="mb-0 col-5">{{number_format(max($order->order_total - $order->paid, 0))}}₫</h5>
+                                    </div>
+                                    @endif
                                     <div class="form-group row mt-3 d-flex align-items-center">
                                         <div class="col-7 fw-bold">Số tiền còn lại đã thanh toán</div>
                                         <div class="col-5">
@@ -459,7 +465,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group row mt-3">
-                                        <div class=" col-7 fw-bold">Số tiền còn lại</div>
+                                        <div class=" col-7 fw-bold">Số tiền còn lại chưa thanh toán</div>
                                         <h5 class="mb-0 col-5 text-danger" id="remaining">{{number_format(max($order->order_total - $order->paid, 0))}}₫</h5>
                                     </div>
                                     @if(!empty($order->is_print_red_invoice))
@@ -469,7 +475,7 @@
                                             <div class="col-8">
                                                 @if($order->has_print_red_invoice == PRINTED_RED_INVOICE)
                                                     Đã xuất hóa đơn
-                                                @elseif($order->status === DELIVERED)
+                                                @elseif($order->status === DELIVERED && Auth::user()->role !== SALE)
                                                     <select id="has-print-red-invoice" name="has_print_red_invoice" class="form-select">
                                                         <option value="0">Chưa xuất hóa đơn</option>
                                                         <option value="1">Đã xuất hóa đơn</option>
@@ -543,48 +549,49 @@
                     </div>
                 </div>
             @endif
-            <div class="row">
-                <div class="col-3 text-left flex justify-content-start">
-                    @if($order->status === DELIVERED && (($order->is_print_red_invoice === PRINTED_RED_INVOICE  && $order->has_print_red_invoice === NOT_YET_RED_INVOICE) || in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED])))
-                    <form class="d-none" id="update-payment" method="POST"
-                          action="{{ route('payment.updatePayment', ['id' => $order->id]) }}">
-                        @csrf
-                        @method('PUT')
-                    </form>
-                    <button id="updatePaymentModalBtn" data-bs-target="#updatePaymentModal" data-bs-toggle="modal"
-                            class="text-center btn btn-primary me-2">Cập nhật
-                    </button>
-                    <div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel"
-                         aria-hidden="true" style="display: none;">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="updatePaymentModalLabel">Cập nhật thanh toán</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Bạn muốn cập nhật thanh toán của đơn hàng này?
-                                    @if($isEdit || $isEditDeposit)
-                                    <div class="mb-3 mt-3">
-                                        <label for="updateNote" class="form-label">Ghi chú:</label>
-                                        <textarea class="form-control" id="updateNote" name="note" rows="3"></textarea>
-                                        <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+            @if(Auth::user()->role !== SALE)
+                <div class="row">
+                    <div class="col-3 text-left flex justify-content-start">
+                        @if($order->status === DELIVERED && (($order->is_print_red_invoice === PRINTED_RED_INVOICE  && $order->has_print_red_invoice === NOT_YET_RED_INVOICE) || in_array($order->payment_status, [UNPAID, DEPOSITED, IN_PROCESSING, REJECTED])))
+                            <form class="d-none" id="update-payment" method="POST"
+                                  action="{{ route('payment.updatePayment', ['id' => $order->id]) }}">
+                                @csrf
+                                @method('PUT')
+                            </form>
+                            <button id="updatePaymentModalBtn" data-bs-target="#updatePaymentModal" data-bs-toggle="modal"
+                                    class="text-center btn btn-primary me-2">Cập nhật
+                            </button>
+                            <div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel"
+                                 aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="updatePaymentModalLabel">Cập nhật thanh toán</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn muốn cập nhật thanh toán của đơn hàng này?
+                                            @if($isEdit || $isEditDeposit)
+                                                <div class="mb-3 mt-3">
+                                                    <label for="updateNote" class="form-label">Ghi chú:</label>
+                                                    <textarea class="form-control" id="updateNote" name="note" rows="3"></textarea>
+                                                    <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                                            <button id="updatePayment" type="button"
+                                                    class="btn btn-success">Đồng ý
+                                            </button>
+                                        </div>
                                     </div>
-                                    @endif
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                                    <button id="updatePayment" type="button"
-                                            class="btn btn-success">Đồng ý
-                                    </button>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
-                    @endif
-                </div>
-                <div class="col-6 d-flex justify-content-center text-left">
-                    @if($isAdmin && $order->payment_check_type === ACCOUNTANT_CHECK_PAYMENT && $order->status === DELIVERED && $order->payment_status === PAID)
+                    <div class="col-6 d-flex justify-content-center text-left">
+                        @if($isAdmin && $order->payment_check_type === ACCOUNTANT_CHECK_PAYMENT && $order->status === DELIVERED && $order->payment_status === PAID)
                             <form class="d-none" id="update-status-payment-reject" method="POST"
                                   action="{{route('payment.updateStatusPayment', ['id' => $order->id, 'status' => REJECTED])}}">
                                 @csrf
@@ -618,45 +625,46 @@
                                     </div>
                                 </div>
                             </div>
-                    @endif
-                    @if(($isAdmin || ($isAccountant && in_array($order->payment_check_type, [SALE_CHECK_PAYMENT, UNCHECK_PAYMENT, REJECTED]))) && $order->status === DELIVERED && in_array($order->payment_status, [PAID, IN_PROCESSING]))
-                    <form class="d-none" id="update-status-payment" method="POST"
-                          action="{{ route('payment.updateStatusPayment', ['id' => $order->id]) }}">
-                        @csrf
-                        @method('PUT')
-                    </form>
-                    <button id="approvePaymentModalBtn" data-bs-target="#approvePaymentModal" data-bs-toggle="modal"
-                            class="text-center btn btn-success me-2">Xác nhận
-                    </button>
-                    <div class="modal fade" id="approvePaymentModal" tabindex="-1" aria-labelledby="approvePaymentModalLabel"
-                         aria-hidden="true" style="display: none;">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="approvePaymentModalLabel">Xác nhận thanh toán</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Bạn muốn xác nhận thanh toán của đơn hàng này?
-                                    <div class="mb-3 mt-3">
-                                        <label for="approveNote" class="form-label">Ghi chú:</label>
-                                        <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
-                                        <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                        @endif
+                        @if(($isAdmin || ($isAccountant && in_array($order->payment_check_type, [SALE_CHECK_PAYMENT, UNCHECK_PAYMENT, REJECTED]))) && $order->status === DELIVERED && in_array($order->payment_status, [PAID, IN_PROCESSING]))
+                            <form class="d-none" id="update-status-payment" method="POST"
+                                  action="{{ route('payment.updateStatusPayment', ['id' => $order->id]) }}">
+                                @csrf
+                                @method('PUT')
+                            </form>
+                            <button id="approvePaymentModalBtn" data-bs-target="#approvePaymentModal" data-bs-toggle="modal"
+                                    class="text-center btn btn-success me-2">Xác nhận
+                            </button>
+                            <div class="modal fade" id="approvePaymentModal" tabindex="-1" aria-labelledby="approvePaymentModalLabel"
+                                 aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="approvePaymentModalLabel">Xác nhận thanh toán</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn muốn xác nhận thanh toán của đơn hàng này?
+                                            <div class="mb-3 mt-3">
+                                                <label for="approveNote" class="form-label">Ghi chú:</label>
+                                                <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                                                <div class="invalid-feedback">Vui lòng nhập ghi chú</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                                            <button id="approvePayment" type="button"
+                                                    class="btn btn-success">Đồng ý
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                                    <button id="approvePayment" type="button"
-                                            class="btn btn-success">Đồng ý
-                                    </button>
-                                </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
-                    @endif
+                    <div class="col-3"></div>
                 </div>
-                <div class="col-3"></div>
-            </div>
+            @endif
         </div>
     </div>
 @endsection

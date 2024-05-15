@@ -67,9 +67,8 @@ class OrderController extends Controller
             unset($statusList[DRAFT]);
         }
         if ($isAccountant) {
-            $input['status_not_in'] = [DRAFT, DELIVERY, REJECTED, IN_PROCESSING];
+            $input['status_not_in'] = [DRAFT, REJECTED, IN_PROCESSING];
             unset($statusList[DRAFT]);
-            unset($statusList[DELIVERY]);
             unset($statusList[REJECTED]);
             unset($statusList[IN_PROCESSING]);
         }
@@ -87,7 +86,8 @@ class OrderController extends Controller
         }
         $customers = $this->orderService->mapCustomers();
         $sales = $this->userRepository->getWhereIN('role', [SALE, SUPER_ADMIN, ADMIN])->pluck('name', 'id');
-        return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales'));
+        $areas = $this->orderService->mapAreas();
+        return view('order.index', compact('orders', 'customers', 'statusList', 'paymentStatus', 'isAdmin', 'isSale', 'isWareHouseStaff', 'isAccountant', 'isStocker', 'sales', 'areas'));
     }
 
     public function detail(int $id)
@@ -317,6 +317,7 @@ class OrderController extends Controller
         $isSale = Auth::user()->role == SALE;
         $isAdmin = Auth::user()->role == SUPER_ADMIN || Auth::user()->role == ADMIN;
         $isStocker = Auth::user()->role == STOCKER;
+        $isAccountant = Auth::user()->role == ACCOUNTANT;
         $dataUpdate = [];
         if ($request->isMethod('put') && $order) {
             if (($isAdmin || $isSale) && ($order->status == DRAFT || $order->status == REJECTED)) {
@@ -331,7 +332,7 @@ class OrderController extends Controller
             if (($isAdmin || $isStocker) && $order->status == IN_PROCESSING) {
                 $dataUpdate['status'] = DELIVERY;
             }
-            if (($isAdmin || $isStocker) && $order->status == DELIVERY) {
+            if (($isAdmin || $isStocker || $isAccountant) && $order->status == DELIVERY) {
                 $dataUpdate['status'] = DELIVERED;
             }
             if (($isAdmin || $isStocker) && isset($status) && $status == REJECTED) {
@@ -476,6 +477,20 @@ class OrderController extends Controller
         }
         return redirect()->route('payment.detailPayment', $id)->with(
             ['flash_level' => 'error', 'flash_message' => $msg !== '' ? $msg : 'Cập nhật thanh toán thất bại']
+        );
+    }
+
+    public function checkStockOk(Request $request, $id)
+    {
+        $order = $this->orderService->find(intval($id));
+        if ($order && $this->orderService->update(intval($id), ['check_stock_ok' => CHECK_STOCK_OK])) {
+            $this->orderService->updateComment($id, $order, ['note' => 'Đã đủ hàng để giao'], COMMENT_TYPE_ORDER);
+            return redirect()->route('warehouse-staff.order.detail', $id)->with(
+                ['flash_level' => 'success', 'flash_message' => 'Cập nhật tình trạng hàng hóa thành công']
+            );
+        }
+        return redirect()->route('warehouse-staff.order.detail', $id)->with(
+            ['flash_level' => 'error', 'flash_message' => 'Cập nhật tình trạng hàng hóa thất bại']
         );
     }
 

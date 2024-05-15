@@ -73,6 +73,12 @@ class AreaController extends Controller
     {
         try {
             $area = $this->areaService->find($id);
+            if (!$area->customer->isEmpty()) {
+                return redirect()->route('area.list')->with([
+                    'flash_level' => 'error',
+                    'flash_message' => 'Khu vực có khách hàng đang hoạt động, không thể xóa.'
+                ]);
+            }
             if (!$area) {
                 return redirect()->route('area.list')->with([
                     'flash_level' => 'error',

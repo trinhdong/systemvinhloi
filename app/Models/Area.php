@@ -23,4 +23,9 @@ class Area extends Model
     {
         return $this->belongsTo(User::class, 'deleted_by');
     }
+
+    public function customer()
+    {
+        return $this->hasMany(Customer::class);
+    }
 }

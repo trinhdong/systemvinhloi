@@ -69,6 +69,17 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @if($isAdmin || $isStocker)
+                                <div class="col-3" style="{{$isAdmin ? 'margin-top: 15px' : ''}}">
+                                    <select onchange="$('#form-search').submit()" name="area_id" class="form-select single-select">
+                                        <option selected="" value="">Chọn khu vực</option>
+                                        @foreach($areas as $areaId => $areaName)
+                                            <option value="{{ $areaId }}"
+                                                    @if(intval(request('area_id')) === $areaId) selected @endif>{{ $areaName }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
                         </div>
                     </form>
                 </div>
@@ -87,6 +98,9 @@
                                 <th>#</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Tên khách hàng</th>
+                                @if($isAdmin || $isStocker)
+                                    <th>Khu vực</th>
+                                @endif
                                 @if($isAdmin || $isAccountant)
                                     <th>Nhân viên bán hàng</th>
                                 @endif
@@ -95,6 +109,7 @@
                                 @endif
                                 <th>Trạng thái đơn hàng</th>
                                 <th>Trạng thái thanh toán</th>
+                                <th>Tình trạng hàng hóa</th>
                                 <th>Ngày hẹn giao hàng</th>
                                 <th>Ngày tạo</th>
                                 <th class="col-1">Hành động</th>
@@ -103,7 +118,7 @@
                             <tbody>
                             @if($orders->isEmpty())
                                 <tr>
-                                    <td colspan="{{$isWareHouseStaff ? 9 : ($isAdmin || $isAccountant ? 11 : 10)}}" class="text-center">Không tìm thấy dữ liệu</td>
+                                    <td colspan="{{$isWareHouseStaff ? 10 : ($isAdmin ? 13 : 12)}}" class="text-center">Không tìm thấy dữ liệu</td>
                                 </tr>
                             @else
                                 @foreach($orders as $key => $order)
@@ -115,6 +130,9 @@
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $order->order_number }}</td>
                                         <td>{{ $order->customer->customer_name }}</td>
+                                        @if($isAdmin || $isStocker)
+                                            <td>{{ $areas[$order->customer->area_id] ?? '' }}</td>
+                                        @endif
                                         @if($isAdmin || $isAccountant)
                                         <td>{{ $order->user->name ?? '' }}</td>
                                         @endif
@@ -127,6 +145,7 @@
                                         <td>
                                             <span class="badge rounded-pill bg-{{STATUS_PAYMENT_COLOR[$order->payment_status]}}">{{STATUS_PAYMENT[$order->payment_status]}}</span>
                                         </td>
+                                        <td>{{ $order->check_stock_ok === CHECK_STOCK_OK ? 'Đã đủ hàng để giao' : '' }}</td>
                                         <td>{{ !empty($order->delivery_appointment_date) ? Date::parse($order->delivery_appointment_date)->format(FORMAT_DATE_VN) : '' }}</td>
                                         <td>{{ Date::parse($order->order_date)->format(FORMAT_DATE_VN) }}</td>
                                         <td>

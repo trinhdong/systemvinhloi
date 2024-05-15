@@ -143,6 +143,9 @@ $(document).ready(function () {
         });
     })
     $(document).on('input', '#paidRemaining', function (event) {
+        if ($(this).val() === '') {
+            $(this).val('0')
+        }
         $(this).formatCurrency({
             'symbol': '',
             'decimalSymbol': '',

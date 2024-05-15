@@ -89,6 +89,13 @@ class OrderService extends BaseService
         if (!empty($request['sale_id'])) {
             $filters['created_by'] = intval($request['sale_id']);
         }
+        if (!empty($request['area_id'])) {
+            $filters['customer_info->area_id'] = [
+                'logical_operator' => 'AND',
+                'operator' => 'JsonContains',
+                'value' => intval($request['area_id'])
+            ];
+        }
         if (!empty($request['delivered_from']) || !empty($request['delivered_to'])) {
             $conditions = [
                 'type' => COMMENT_TYPE_ORDER,
@@ -162,6 +169,7 @@ class OrderService extends BaseService
     private function updateCustomerInfo($data) {
         $customer = $this->customerService->find(intval($data['customer_id'] ?? 0));
         if (!empty($customer)) {
+            $customer->area = json_encode($customer->area);
             $data['customer_info'] = json_encode($customer);
         }
         return $data;
@@ -179,6 +187,7 @@ class OrderService extends BaseService
     private function updateProductInfo($productId) {
         $product = $this->productRepository->find(intval($productId ?? 0));
         if (!empty($product)) {
+            $product->category = json_encode($product->category);
             return json_encode($product);
         }
         return null;
@@ -240,6 +249,20 @@ class OrderService extends BaseService
         return $order;
     }
 
+    private function formatArrayData($data)
+    {
+        return array_values(
+            array_filter(
+                array_map(function ($val) {
+                    return str_replace(',', '', $val);
+                }, $data),
+                function ($v) {
+                    return $v !== null && $v !== '' && floatval($v) >= 0;
+                }
+            )
+        );
+    }
+
     private function formatDataTypeOrder($data)
     {
         $data['customer_id'] = intval($data['customer_id'] ?? 0);
@@ -247,29 +270,14 @@ class OrderService extends BaseService
         $data['order_discount'] = floatval($data['order_discount']);
         $data['order_total_product_price'] = floatval($data['order_total_product_price']);
         $data['product_id'] = array_values(array_filter($data['product_id']));
-        $data['quantity'] = array_values(
-            array_filter(
-                array_map(function ($quantity) {
-                    return str_replace(',', '', $quantity);
-                }, $data['quantity'])
-            )
-        );
-        $data['unit_price'] = array_values(array_filter(str_replace(',', '', $data['unit_price'] ?? '')));
-        $data['product_price'] = array_values(array_filter(str_replace(',', '', $data['product_price'] ?? '')));
+        $data['quantity'] = $this->formatArrayData($data['quantity']);
+        $data['unit_price'] = $this->formatArrayData($data['unit_price']);
+        $data['product_price'] = $this->formatArrayData($data['product_price']);
         $data['discount_percent'] = array_values(array_filter($data['discount_percent'], function ($v) {
                 return $v !== null && $v !== '' && floatval($v) >= 0;
             })
         );
-        $data['discount_price'] = array_values(
-            array_filter(
-                array_map(function ($discountPrice) {
-                    return str_replace(',', '', $discountPrice);
-                }, $data['discount_price']),
-                function ($v) {
-                    return $v !== null && $v !== '' && floatval($v) >= 0;
-                }
-            )
-        );
+        $data['discount_price'] = $this->formatArrayData($data['discount_price']);
         $data['payment_type'] = intval($data['payment_type']);
         $data['payment_method'] = intval($data['payment_method']);
         $data['bank_account_id'] = $data['payment_method'] === TRANFER ? intval($data['bank_account_id'] ?? 0) : null;
@@ -307,11 +315,11 @@ class OrderService extends BaseService
             || count($data['product_id']) !== count($data['discount_price'])
             || count($data['product_id']) !== count($data['note'])
         ) {
-            $msg = 'Có lỗi sảy ra, vui lòng thử lại';
+            $msg = 'Có lỗi xảy ra, vui lòng thử lại';
             return false;
         }
         if (!$this->validateTotalOrder($data)) {
-            $msg = 'Có lỗi sảy ra, vui lòng thử lại';
+            $msg = 'Có lỗi xảy ra, vui lòng thử lại';
             return false;
         }
         return true;
@@ -717,6 +725,20 @@ class OrderService extends BaseService
             $customers[$customer->id] = $customer->customer_name;
         }
         return $customers;
+    }
+
+    public function mapAreas()
+    {
+        $areas = [];
+        $customerInfos = $this->orderRepository->getList('customer_info');
+        if (Auth::user()->role == SALE) {
+            $customerInfos = $this->orderRepository->getWhere(['created_by' => Auth::user()->id])->pluck('customer_info', 'id');
+        }
+        foreach ($customerInfos as $customer) {
+            $customer = json_decode($customer);
+            $areas[$customer->area_id] = $customer->area->name ?? '';
+        }
+        return $areas;
     }
 
     private function updateDiscountCustomerInfo(int $customerId, int $productId)

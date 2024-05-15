@@ -30,6 +30,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @if(Auth::user()->role !== SALE)
                             <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="sale_id" class="form-select single-select">
                                     <option selected="" value="">Nhân viên bán hàng</option>
@@ -39,6 +40,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @endif
                             <div class="col-3">
                                 <select onchange="$('#form-search').submit()" name="status" class="form-select single-select">
                                     <option selected="" value="">Chọn trạng thái đơn hàng</option>
@@ -141,7 +143,7 @@
                                         <td class="cursor-pointer" onclick="window.location = '{{route('payment.detailPayment', $order->id)}}'">{{ $deadlinePayment }}</td>
                                         @if(Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN)
                                         <td>
-                                            @if($order->status === DELIVERED && $order->payment_status === PAID)
+                                            @if($order->status === DELIVERED && ($order->payment_status === PAID || $order->payment_status === IN_PROCESSING))
                                             <form class="d-none" id="update-status-payment{{$order->id}}" method="POST"
                                                   action="{{ route('payment.updateStatusPayment', ['id' => $order->id]) }}">
                                                 @csrf
@@ -159,7 +161,7 @@
                                                     </div>
                                                 </div>
                                             @endif
-                                            @if(in_array($order->payment_status, [IN_PROCESSING, REJECTED, DEPOSITED, UNPAID]))
+                                            @if(in_array($order->payment_status, [REJECTED, DEPOSITED, UNPAID]))
                                                 <div class="d-flex align-items-center justify-content-center">
                                                     <div style="pointer-events: none;" class="text-center"><i style="color: gray" class="bx font-20 bx-checkbox"></i>
                                                     </div>

@@ -73,6 +73,12 @@ class CategoryController extends Controller
     {
         try {
             $category = $this->categoryService->find($id);
+            if (!$category->product->isEmpty()) {
+                return redirect()->route('category.list')->with([
+                    'flash_level' => 'error',
+                    'flash_message' => 'Danh mục có sản phẩm đang hoạt động, không thể xóa.'
+                ]);
+            }
             if (!$category) {
                 return redirect()->route('category.list')->with([
                     'flash_level' => 'error',

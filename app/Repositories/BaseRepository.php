@@ -182,6 +182,11 @@ abstract class BaseRepository
                                 break;
                             }
 
+                            if ($operator == 'JsonContains') {
+                                $whereJsonContains[] = [$key, $value];
+                                break;
+                            }
+
                             if ($logicalOperator === 'OR') {
                                 $orConditions[] = [$key, $operator, $value];
                             } else {
@@ -212,6 +217,12 @@ abstract class BaseRepository
                 if (!empty($whereInConditions)) {
                     foreach ($whereInConditions as $condition) {
                         $model = $model->whereIn(...$condition);
+                    }
+                }
+
+                if (!empty($whereJsonContains)) {
+                    foreach ($whereJsonContains as $condition) {
+                        $model = $model->whereJsonContains(...$condition);
                     }
                 }
             }

@@ -487,7 +487,41 @@
                                 </div>
                             @endif
                         @endif
-                        @if(($isAdmin || $isStocker) && (in_array($order->status, [IN_PROCESSING, DELIVERY])))
+                        @if($isWareHouseStaff && $order->check_stock_ok !== CHECK_STOCK_OK)
+                            <form class="d-none" id="check-stock-ok-order" method="POST"
+                                  action="{{ route('warehouse-staff.order.checkStockOk', ['id' => $order->id]) }}">
+                                @csrf
+                                @method('PUT')
+                            </form>
+                            <button id="checkStockOkOrderModalBtn" data-bs-target="#checkStockOkOrderModal"
+                                    data-bs-toggle="modal"
+                                    class="text-center btn btn-danger me-2">Xác nhận đủ hàng
+                            </button>
+                            <div class="modal fade" id="checkStockOkOrderModal" tabindex="-1"
+                                 aria-labelledby="checkStockOkOrderModalLabel"
+                                 aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="checkStockOkOrderModalLabel">Xác nhận hàng hóa</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Xác nhận đơn hàng này đã đủ hàng để giao?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy
+                                                bỏ
+                                            </button>
+                                            <button id="checkStockOkOrder" type="button" class="btn btn-success">Đồng ý
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        @if(($isAdmin || $isStocker || $isAccountant) && (in_array($order->status, [IN_PROCESSING, DELIVERY])))
                             @if($order->status == IN_PROCESSING && $order->payment_status == UNPAID)
                                 <form class="d-none" id="update-status-order-reject" method="POST"
                                       action="{{ route($isStocker ? 'stocker.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id, 'status' => REJECTED]) }}">
@@ -500,7 +534,7 @@
                                 </button>
                             @endif
                             <form class="d-none" id="update-status-order" method="POST"
-                                  action="{{ route($isStocker ? 'stocker.order.updateStatusOrder' : 'order.updateStatusOrder', ['id' => $order->id]) }}">
+                                  action="{{ route($isStocker ? 'stocker.order.updateStatusOrder' : ($isAccountant ? 'accountant.order.updateStatusOrder' : 'order.updateStatusOrder'), ['id' => $order->id]) }}">
                                 @csrf
                                 @method('PUT')
                             </form>
