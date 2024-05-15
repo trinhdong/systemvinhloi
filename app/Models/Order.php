@@ -45,6 +45,7 @@ class Order extends Model
         'delivery_appointment_date',
         'payment_status',
         'payment_check_type',
+        'check_stock_ok',
         'created_by',
         'updated_by',
         'deleted_at',

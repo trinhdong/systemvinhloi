@@ -88,7 +88,7 @@
                 </a>
             </li>
         @endif
-        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === ACCOUNTANT)
+        @if (Auth::user()->role === ADMIN || Auth::user()->role === SUPER_ADMIN || Auth::user()->role === ACCOUNTANT || Auth::user()->role === SALE)
             <li class="<?= (request()->is('payment*')) ? 'mm-active' : '' ?>">
                 <a href="{{route('payment.indexPayment')}}">
                     <div class="parent-icon"><i class="bi bi-credit-card"></i>

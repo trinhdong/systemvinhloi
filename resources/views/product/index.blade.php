@@ -122,7 +122,7 @@
                         </table>
                         @if($productList && $productList->count() > 0)
                             <div class=" justify-content-center">
-                                {!! $productList->links('pagination::bootstrap-5') !!}
+                                {!! $productList->links('pagination::bootstrap-4') !!}
                             </div>
                         @endif
                     </div>

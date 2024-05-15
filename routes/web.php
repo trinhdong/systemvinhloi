@@ -127,6 +127,7 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,WAREHOUSE_STAFF'])->grou
     Route::prefix('/warehouse-staff/order')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('warehouse-staff.order.index');
         Route::get('/detail/{id}', [OrderController::class, 'detail'])->name('warehouse-staff.order.detail');
+        Route::put('/check-stock-ok/{id}', [OrderController::class, 'checkStockOk'])->name('warehouse-staff.order.checkStockOk');
     });
 });
 Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(function () {
@@ -142,10 +143,16 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,STOCKER'])->group(functi
     Route::get('/print-invoice/{id}',  [OrderController::class, 'printInvoice'])->name('stocker.order.printInvoice');
     Route::get('/print-delivery-bill/{id}/{isDelivery}',  [OrderController::class, 'printInvoice'])->name('stocker.order.printDeliveryBill');
 });
-Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT'])->group(function () {
+
+Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT,SALE'])->group(function () {
     Route::prefix('/payment')->group(function () {
         Route::get('/', [OrderController::class, 'indexPayment'])->name('payment.indexPayment');
         Route::get('/detail-payment/{id}', [OrderController::class, 'detailPayment'])->name('payment.detailPayment');
+    });
+});
+
+Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT'])->group(function () {
+    Route::prefix('/payment')->group(function () {
         Route::put('/update-status-payment/{id}/{status?}', [OrderController::class, 'updateStatusPayment'])->name(
             'payment.updateStatusPayment'
         );
@@ -153,5 +160,8 @@ Route::middleware(['auth', 'checkRole:SUPER_ADMIN,ADMIN,ACCOUNTANT'])->group(fun
             'payment.updatePayment'
         );
         Route::get('/getBankAccountById/{id}',  [OrderController::class, 'getBankAccountById'])->name('payment.getBankAccountById');
+        Route::put('/update-status-order/{id}/{status?}', [OrderController::class, 'updateStatusOrder'])->name(
+            'accountant.order.updateStatusOrder'
+        );
     });
 });

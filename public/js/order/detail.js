@@ -1,4 +1,10 @@
 $(document).ready(function () {
+
+    $(document).on('click', '#checkStockOkOrder', function () {
+        $('#check-stock-ok-order').submit()
+        $(this).prop('disabled',true);
+        $(this).closest('#checkStockOkOrderModal').modal('hide');
+    })
     $(document).on('click', '#rejectOrder', function () {
         if ($(this).closest('#rejectOrderModal').find('#rejectNote').val() == '') {
             $(this).closest('#rejectOrderModal').find('#rejectNote').addClass('is-invalid')

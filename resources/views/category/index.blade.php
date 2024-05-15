@@ -87,7 +87,7 @@
                         </table>
                         @if($categoryList && $categoryList->count() > 0)
                             <div class=" justify-content-center">
-                                {!! $categoryList->links('pagination::bootstrap-5') !!}
+                                {!! $categoryList->links('pagination::bootstrap-4') !!}
                             </div>
                         @endif
                     </div>

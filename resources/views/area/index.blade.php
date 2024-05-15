@@ -89,7 +89,7 @@
                             </table>
                             @if($areaList && $areaList->count() > 0)
                                 <div class=" justify-content-center">
-                                    {!! $areaList->links('pagination::bootstrap-5') !!}
+                                    {!! $areaList->links('pagination::bootstrap-4') !!}
                                 </div>
                             @endif
                     </div>
